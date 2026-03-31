@@ -4,22 +4,22 @@ Creator monetization marketplace — connecting influencers with brands for paid
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS v4 + shadcn/ui |
-| Forms | React Hook Form + Zod |
-| Data Fetching | TanStack Query |
-| Database | PostgreSQL (Supabase) |
-| ORM | Drizzle |
-| Auth | Supabase Auth |
-| Storage | Supabase Storage |
-| Realtime | Supabase Realtime |
-| Payments | Stripe Connect |
-| Email | Resend |
-| Error Tracking | Sentry |
-| Deployment | Vercel |
+| Layer          | Technology                  |
+| -------------- | --------------------------- |
+| Framework      | Next.js 16 (App Router)     |
+| Language       | TypeScript                  |
+| Styling        | Tailwind CSS v4 + shadcn/ui |
+| Forms          | React Hook Form + Zod       |
+| Data Fetching  | TanStack Query              |
+| Database       | PostgreSQL (Supabase)       |
+| ORM            | Drizzle                     |
+| Auth           | Supabase Auth               |
+| Storage        | Supabase Storage            |
+| Realtime       | Supabase Realtime           |
+| Payments       | Stripe Connect              |
+| Email          | Resend                      |
+| Error Tracking | Sentry                      |
+| Deployment     | Vercel                      |
 
 ## Getting Started
 
@@ -98,13 +98,36 @@ src/
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start dev server |
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
+| Command               | Description                 |
+| --------------------- | --------------------------- |
+| `npm run dev`         | Start dev server            |
+| `npm run build`       | Production build            |
+| `npm run start`       | Start production server     |
+| `npm run lint`        | Run ESLint                  |
 | `npm run db:generate` | Generate Drizzle migrations |
-| `npm run db:migrate` | Run Drizzle migrations |
-| `npm run db:push` | Push schema directly (dev) |
-| `npm run db:studio` | Open Drizzle Studio GUI |
+| `npm run db:migrate`  | Run Drizzle migrations      |
+| `npm run db:push`     | Push schema directly (dev)  |
+| `npm run db:studio`   | Open Drizzle Studio GUI     |
+
+## Localization
+
+All locales show "up to date" because they already have all 37 keys. The script works correctly — `--dry-run` now runs without an API key, and it detects that no translations are needed.
+
+### How to use it
+
+| Command                          | What it does                                             |
+| -------------------------------- | -------------------------------------------------------- |
+| `npm run translate`              | Translates only new/missing keys across all locales      |
+| `npm run translate:force`        | Re-translates all keys from scratch                      |
+| `npm run translate -- es fr`     | Translates only specific locales                         |
+| `npm run translate -- --dry-run` | Preview what would be translated without calling the API |
+
+### Setup
+
+Add `ANTHROPIC_API_KEY=sk-ant-...` to your `.env.local`.
+
+### Workflow
+
+1. Edit `en.json` with new keys.
+2. Run `npm run translate`.  
+   The script diffs against existing locale files — it only translates missing keys and removes stale ones, minimizing API calls.

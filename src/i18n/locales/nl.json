@@ -1,0 +1,48 @@
+{
+  "nav.home": "Home",
+  "nav.dashboard": "Dashboard",
+  "nav.messages": "Berichten",
+  "nav.signIn": "Inloggen",
+  "nav.getStarted": "Aan de slag",
+  "nav.toggleMenu": "Menu wisselen",
+
+  "hero.badge": "De creatieve marktplaats",
+  "hero.title": "Verdien met je",
+  "hero.titleHighlight": "invloed",
+  "hero.description": "ivann verbindt creators met merken voor betaalde samenwerkingen. Maak je profiel, toon je statistieken en begin met verdienen.",
+
+  "footer.rights": "© {year} ivann. Alle rechten voorbehouden.",
+  "footer.terms": "Voorwaarden",
+  "footer.privacy": "Privacy",
+  "footer.language": "Taal",
+
+  "auth.signIn.title": "Inloggen bij ivann",
+  "auth.signIn.subtitle": "Voer je gegevens in om verder te gaan.",
+  "auth.register.title": "Maak je account aan",
+  "auth.register.subtitle": "Begin vandaag met ivann.",
+  "auth.forgotPassword.title": "Wachtwoord resetten",
+  "auth.forgotPassword.subtitle": "We sturen je een resetlink.",
+
+  "dashboard.title": "Dashboard",
+  "dashboard.subtitle": "Je overzicht en statistieken verschijnen hier.",
+
+  "messages.title": "Berichten",
+  "messages.subtitle": "Realtime berichten komen hier.",
+
+  "packages.title": "Je Pakketten",
+  "packages.subtitle": "Pakketbeheer komt hier.",
+
+  "settings.title": "Instellingen",
+  "settings.subtitle": "Accountinstellingen komen hier.",
+
+  "profile.connectedPlatforms": "Verbonden Platformen",
+  "profile.followers": "volgers",
+  "profile.editProfile": "Profiel bewerken",
+  "profile.sendOffer": "Aanbod versturen",
+  "profile.noPlatforms": "Nog geen platformen verbonden.",
+  "profile.engagement": "bet.",
+
+  "userMenu.editProfile": "Profiel bewerken",
+  "userMenu.settings": "Instellingen",
+  "userMenu.logOut": "Uitloggen"
+}

@@ -1,0 +1,48 @@
+{
+  "nav.home": "Accueil",
+  "nav.dashboard": "Tableau de bord",
+  "nav.messages": "Messages",
+  "nav.signIn": "Se connecter",
+  "nav.getStarted": "Commencer",
+  "nav.toggleMenu": "Basculer le menu",
+
+  "hero.badge": "Le marché des créateurs",
+  "hero.title": "Monétisez votre",
+  "hero.titleHighlight": "influence",
+  "hero.description": "ivann connecte les créateurs aux marques pour des collaborations rémunérées. Créez votre profil, présentez vos statistiques et commencez à gagner.",
+
+  "footer.rights": "© {year} ivann. Tous droits réservés.",
+  "footer.terms": "Conditions",
+  "footer.privacy": "Confidentialité",
+  "footer.language": "Langue",
+
+  "auth.signIn.title": "Connectez-vous à ivann",
+  "auth.signIn.subtitle": "Entrez vos identifiants pour continuer.",
+  "auth.register.title": "Créez votre compte",
+  "auth.register.subtitle": "Commencez avec ivann aujourd'hui.",
+  "auth.forgotPassword.title": "Réinitialisez votre mot de passe",
+  "auth.forgotPassword.subtitle": "Nous vous enverrons un lien de réinitialisation.",
+
+  "dashboard.title": "Tableau de bord",
+  "dashboard.subtitle": "Votre aperçu et vos statistiques apparaîtront ici.",
+
+  "messages.title": "Messages",
+  "messages.subtitle": "La messagerie en temps réel sera ici.",
+
+  "packages.title": "Vos Forfaits",
+  "packages.subtitle": "La gestion des forfaits sera ici.",
+
+  "settings.title": "Paramètres",
+  "settings.subtitle": "Les paramètres du compte seront ici.",
+
+  "profile.connectedPlatforms": "Plateformes Connectées",
+  "profile.followers": "abonnés",
+  "profile.editProfile": "Modifier le Profil",
+  "profile.sendOffer": "Envoyer une Offre",
+  "profile.noPlatforms": "Aucune plateforme connectée pour le moment.",
+  "profile.engagement": "eng.",
+
+  "userMenu.editProfile": "Modifier le Profil",
+  "userMenu.settings": "Paramètres",
+  "userMenu.logOut": "Se déconnecter"
+}

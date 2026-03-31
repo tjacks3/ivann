@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = { title: "Forgot Password" };
+import { useTranslation } from "@/i18n";
 
 export default function ForgotPasswordPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="text-center">
-      <h1 className="text-2xl font-bold">Reset your password</h1>
+      <h1 className="text-2xl font-bold">{t("auth.forgotPassword.title")}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Password reset form will go here.
+        {t("auth.forgotPassword.subtitle")}
       </p>
     </div>
   );

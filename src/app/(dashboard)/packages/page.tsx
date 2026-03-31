@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = { title: "Packages" };
+import { useTranslation } from "@/i18n";
 
 export default function PackagesPage() {
+  const { t } = useTranslation();
+
   return (
     <div>
-      <h1 className="text-2xl font-bold">Your Packages</h1>
+      <h1 className="text-2xl font-bold">{t("packages.title")}</h1>
       <p className="mt-2 text-muted-foreground">
-        Package management will go here.
+        {t("packages.subtitle")}
       </p>
     </div>
   );

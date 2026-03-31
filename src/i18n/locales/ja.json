@@ -1,0 +1,48 @@
+{
+  "nav.home": "ホーム",
+  "nav.dashboard": "ダッシュボード",
+  "nav.messages": "メッセージ",
+  "nav.signIn": "ログイン",
+  "nav.getStarted": "始める",
+  "nav.toggleMenu": "メニュー切替",
+
+  "hero.badge": "クリエイターマーケットプレイス",
+  "hero.title": "あなたの",
+  "hero.titleHighlight": "影響力を収益化",
+  "hero.description": "ivannはクリエイターとブランドを有料コラボレーションで結びつけます。プロフィールを作成し、統計を公開して、収益を始めましょう。",
+
+  "footer.rights": "© {year} ivann. All rights reserved.",
+  "footer.terms": "利用規約",
+  "footer.privacy": "プライバシー",
+  "footer.language": "言語",
+
+  "auth.signIn.title": "ivannにログイン",
+  "auth.signIn.subtitle": "続けるには認証情報を入力してください。",
+  "auth.register.title": "アカウントを作成",
+  "auth.register.subtitle": "今日からivannを始めましょう。",
+  "auth.forgotPassword.title": "パスワードをリセット",
+  "auth.forgotPassword.subtitle": "リセットリンクをお送りします。",
+
+  "dashboard.title": "ダッシュボード",
+  "dashboard.subtitle": "概要と統計がここに表示されます。",
+
+  "messages.title": "メッセージ",
+  "messages.subtitle": "リアルタイムメッセージングがここに表示されます。",
+
+  "packages.title": "パッケージ",
+  "packages.subtitle": "パッケージ管理がここに表示されます。",
+
+  "settings.title": "設定",
+  "settings.subtitle": "アカウント設定がここに表示されます。",
+
+  "profile.connectedPlatforms": "接続済みプラットフォーム",
+  "profile.followers": "フォロワー",
+  "profile.editProfile": "プロフィール編集",
+  "profile.sendOffer": "オファーを送る",
+  "profile.noPlatforms": "まだプラットフォームが接続されていません。",
+  "profile.engagement": "エンゲージ",
+
+  "userMenu.editProfile": "プロフィール編集",
+  "userMenu.settings": "設定",
+  "userMenu.logOut": "ログアウト"
+}

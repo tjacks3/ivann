@@ -1,4 +1,7 @@
+"use client";
+
 import { PlatformCard } from "./platform-card";
+import { useTranslation } from "@/i18n";
 
 export interface PlatformData {
   platform: string;
@@ -12,10 +15,12 @@ interface PlatformGridProps {
 }
 
 export function PlatformGrid({ platforms }: PlatformGridProps) {
+  const { t } = useTranslation();
+
   if (platforms.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-        No platforms connected yet.
+        {t("profile.noPlatforms")}
       </div>
     );
   }

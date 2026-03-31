@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = { title: "Messages" };
+import { useTranslation } from "@/i18n";
 
 export default function MessagesPage() {
+  const { t } = useTranslation();
+
   return (
     <div>
-      <h1 className="text-2xl font-bold">Messages</h1>
+      <h1 className="text-2xl font-bold">{t("messages.title")}</h1>
       <p className="mt-2 text-muted-foreground">
-        Real-time messaging will go here.
+        {t("messages.subtitle")}
       </p>
     </div>
   );

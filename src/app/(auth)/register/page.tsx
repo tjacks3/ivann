@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = { title: "Create Account" };
+import { useTranslation } from "@/i18n";
 
 export default function RegisterPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="text-center">
-      <h1 className="text-2xl font-bold">Create your account</h1>
+      <h1 className="text-2xl font-bold">{t("auth.register.title")}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Registration form will go here.
+        {t("auth.register.subtitle")}
       </p>
     </div>
   );

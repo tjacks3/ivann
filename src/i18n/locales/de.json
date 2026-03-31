@@ -1,0 +1,48 @@
+{
+  "nav.home": "Startseite",
+  "nav.dashboard": "Dashboard",
+  "nav.messages": "Nachrichten",
+  "nav.signIn": "Anmelden",
+  "nav.getStarted": "Loslegen",
+  "nav.toggleMenu": "Menü umschalten",
+
+  "hero.badge": "Der Kreativ-Marktplatz",
+  "hero.title": "Monetarisiere deinen",
+  "hero.titleHighlight": "Einfluss",
+  "hero.description": "ivann verbindet Kreative mit Marken für bezahlte Kooperationen. Erstelle dein Profil, zeige deine Statistiken und beginne zu verdienen.",
+
+  "footer.rights": "© {year} ivann. Alle Rechte vorbehalten.",
+  "footer.terms": "Nutzungsbedingungen",
+  "footer.privacy": "Datenschutz",
+  "footer.language": "Sprache",
+
+  "auth.signIn.title": "Bei ivann anmelden",
+  "auth.signIn.subtitle": "Gib deine Zugangsdaten ein, um fortzufahren.",
+  "auth.register.title": "Konto erstellen",
+  "auth.register.subtitle": "Starte noch heute mit ivann.",
+  "auth.forgotPassword.title": "Passwort zurücksetzen",
+  "auth.forgotPassword.subtitle": "Wir senden dir einen Link zum Zurücksetzen.",
+
+  "dashboard.title": "Dashboard",
+  "dashboard.subtitle": "Deine Übersicht und Statistiken erscheinen hier.",
+
+  "messages.title": "Nachrichten",
+  "messages.subtitle": "Echtzeit-Nachrichten werden hier angezeigt.",
+
+  "packages.title": "Deine Pakete",
+  "packages.subtitle": "Die Paketverwaltung wird hier angezeigt.",
+
+  "settings.title": "Einstellungen",
+  "settings.subtitle": "Die Kontoeinstellungen werden hier angezeigt.",
+
+  "profile.connectedPlatforms": "Verbundene Plattformen",
+  "profile.followers": "Follower",
+  "profile.editProfile": "Profil bearbeiten",
+  "profile.sendOffer": "Angebot senden",
+  "profile.noPlatforms": "Noch keine Plattformen verbunden.",
+  "profile.engagement": "Eng.",
+
+  "userMenu.editProfile": "Profil bearbeiten",
+  "userMenu.settings": "Einstellungen",
+  "userMenu.logOut": "Abmelden"
+}

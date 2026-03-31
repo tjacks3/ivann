@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = { title: "Dashboard" };
+import { useTranslation } from "@/i18n";
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
+
   return (
     <div>
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <h1 className="text-2xl font-bold">{t("dashboard.title")}</h1>
       <p className="mt-2 text-muted-foreground">
-        Your overview and stats will appear here.
+        {t("dashboard.subtitle")}
       </p>
     </div>
   );

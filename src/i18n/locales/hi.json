@@ -1,0 +1,48 @@
+{
+  "nav.home": "होम",
+  "nav.dashboard": "डैशबोर्ड",
+  "nav.messages": "संदेश",
+  "nav.signIn": "साइन इन",
+  "nav.getStarted": "शुरू करें",
+  "nav.toggleMenu": "मेनू टॉगल",
+
+  "hero.badge": "क्रिएटर मार्केटप्लेस",
+  "hero.title": "अपने",
+  "hero.titleHighlight": "प्रभाव को मुद्रीकृत करें",
+  "hero.description": "ivann क्रिएटर्स को भुगतान सहयोग के लिए ब्रांड्स से जोड़ता है। अपनी प्रोफ़ाइल बनाएं, अपने आंकड़े दिखाएं और कमाई शुरू करें।",
+
+  "footer.rights": "© {year} ivann. सर्वाधिकार सुरक्षित।",
+  "footer.terms": "शर्तें",
+  "footer.privacy": "गोपनीयता",
+  "footer.language": "भाषा",
+
+  "auth.signIn.title": "ivann में साइन इन करें",
+  "auth.signIn.subtitle": "जारी रखने के लिए अपने क्रेडेंशियल दर्ज करें।",
+  "auth.register.title": "अपना खाता बनाएं",
+  "auth.register.subtitle": "आज ही ivann के साथ शुरुआत करें।",
+  "auth.forgotPassword.title": "अपना पासवर्ड रीसेट करें",
+  "auth.forgotPassword.subtitle": "हम आपको एक रीसेट लिंक भेजेंगे।",
+
+  "dashboard.title": "डैशबोर्ड",
+  "dashboard.subtitle": "आपका अवलोकन और आंकड़े यहां दिखाई देंगे।",
+
+  "messages.title": "संदेश",
+  "messages.subtitle": "रियल-टाइम मैसेजिंग यहां होगी।",
+
+  "packages.title": "आपके पैकेज",
+  "packages.subtitle": "पैकेज प्रबंधन यहां होगा।",
+
+  "settings.title": "सेटिंग्स",
+  "settings.subtitle": "खाता सेटिंग्स यहां होंगी।",
+
+  "profile.connectedPlatforms": "कनेक्टेड प्लेटफ़ॉर्म",
+  "profile.followers": "फ़ॉलोअर्स",
+  "profile.editProfile": "प्रोफ़ाइल संपादित करें",
+  "profile.sendOffer": "ऑफ़र भेजें",
+  "profile.noPlatforms": "अभी तक कोई प्लेटफ़ॉर्म कनेक्ट नहीं है।",
+  "profile.engagement": "सहभागिता",
+
+  "userMenu.editProfile": "प्रोफ़ाइल संपादित करें",
+  "userMenu.settings": "सेटिंग्स",
+  "userMenu.logOut": "लॉग आउट"
+}

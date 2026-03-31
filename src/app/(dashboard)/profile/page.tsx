@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+"use client";
+
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { PlatformGrid, type PlatformData } from "@/components/profile/platform-grid";
-
-export const metadata: Metadata = { title: "Profile" };
+import { useTranslation } from "@/i18n";
 
 // TODO: Replace with real data from Supabase
 const mockProfile = {
@@ -22,12 +22,14 @@ const mockPlatforms: PlatformData[] = [
 ];
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-8">
       <ProfileHeader {...mockProfile} />
 
       <div>
-        <h2 className="mb-4 text-lg font-semibold">Connected Platforms</h2>
+        <h2 className="mb-4 text-lg font-semibold">{t("profile.connectedPlatforms")}</h2>
         <PlatformGrid platforms={mockPlatforms} />
       </div>
     </div>

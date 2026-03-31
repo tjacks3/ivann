@@ -1,7 +1,10 @@
+"use client";
+
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
+import { useTranslation } from "@/i18n";
 
 interface ProfileHeaderProps {
   name: string;
@@ -28,6 +31,7 @@ export function ProfileHeader({
   followers,
   isOwnProfile = false,
 }: ProfileHeaderProps) {
+  const { t } = useTranslation();
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -45,7 +49,7 @@ export function ProfileHeader({
         </Avatar>
 
         {/* Info */}
-        <div className="flex flex-1 flex-col items-center gap-3 text-center sm:items-start sm:text-left">
+        <div className="flex flex-1 flex-col items-center gap-3 text-center sm:items-start sm:text-left rtl:sm:text-right">
           <div>
             <h1 className="text-2xl font-bold">{name}</h1>
             <p className="text-sm text-muted-foreground">@{username}</p>
@@ -77,10 +81,10 @@ export function ProfileHeader({
               <span className="font-semibold text-foreground">
                 {formatCount(followers)}
               </span>{" "}
-              followers
+              {t("profile.followers")}
             </div>
             <Button size="lg">
-              {isOwnProfile ? "Edit Profile" : "Send Offer"}
+              {isOwnProfile ? t("profile.editProfile") : t("profile.sendOffer")}
             </Button>
           </div>
         </div>

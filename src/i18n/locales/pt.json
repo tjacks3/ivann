@@ -1,0 +1,48 @@
+{
+  "nav.home": "Início",
+  "nav.dashboard": "Painel",
+  "nav.messages": "Mensagens",
+  "nav.signIn": "Entrar",
+  "nav.getStarted": "Começar",
+  "nav.toggleMenu": "Alternar menu",
+
+  "hero.badge": "O mercado de criadores",
+  "hero.title": "Monetize sua",
+  "hero.titleHighlight": "influência",
+  "hero.description": "ivann conecta criadores com marcas para colaborações pagas. Crie seu perfil, mostre suas estatísticas e comece a ganhar.",
+
+  "footer.rights": "© {year} ivann. Todos os direitos reservados.",
+  "footer.terms": "Termos",
+  "footer.privacy": "Privacidade",
+  "footer.language": "Idioma",
+
+  "auth.signIn.title": "Entre no ivann",
+  "auth.signIn.subtitle": "Insira suas credenciais para continuar.",
+  "auth.register.title": "Crie sua conta",
+  "auth.register.subtitle": "Comece com o ivann hoje.",
+  "auth.forgotPassword.title": "Redefina sua senha",
+  "auth.forgotPassword.subtitle": "Enviaremos um link de redefinição.",
+
+  "dashboard.title": "Painel",
+  "dashboard.subtitle": "Sua visão geral e estatísticas aparecerão aqui.",
+
+  "messages.title": "Mensagens",
+  "messages.subtitle": "As mensagens em tempo real estarão aqui.",
+
+  "packages.title": "Seus Pacotes",
+  "packages.subtitle": "O gerenciamento de pacotes estará aqui.",
+
+  "settings.title": "Configurações",
+  "settings.subtitle": "As configurações da conta estarão aqui.",
+
+  "profile.connectedPlatforms": "Plataformas Conectadas",
+  "profile.followers": "seguidores",
+  "profile.editProfile": "Editar Perfil",
+  "profile.sendOffer": "Enviar Oferta",
+  "profile.noPlatforms": "Nenhuma plataforma conectada ainda.",
+  "profile.engagement": "eng.",
+
+  "userMenu.editProfile": "Editar Perfil",
+  "userMenu.settings": "Configurações",
+  "userMenu.logOut": "Sair"
+}

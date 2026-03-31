@@ -4,14 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { UserMenu } from "@/components/layout/user-menu";
+import { useTranslation } from "@/i18n";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/messages", label: "Messages" },
-];
 
 // TODO: Replace with real auth state from Supabase
 const mockUser = null as null | {
@@ -22,7 +17,14 @@ const mockUser = null as null | {
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useTranslation();
   const user = mockUser;
+
+  const navLinks = [
+    { href: "/", label: t("nav.home") },
+    { href: "/dashboard", label: t("nav.dashboard") },
+    { href: "/messages", label: t("nav.messages") },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -63,10 +65,10 @@ export function Header() {
                 href="/login"
                 className={buttonVariants({ variant: "ghost", size: "sm" })}
               >
-                Sign In
+                {t("nav.signIn")}
               </Link>
               <Link href="/register" className={buttonVariants({ size: "sm" })}>
-                Get Started
+                {t("nav.getStarted")}
               </Link>
             </div>
           )}
@@ -76,7 +78,7 @@ export function Header() {
         <button
           className="md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
+          aria-label={t("nav.toggleMenu")}
         >
           {mobileOpen ? (
             <X className="h-6 w-6" />
@@ -120,7 +122,7 @@ export function Header() {
                     className: "w-full",
                   })}
                 >
-                  Sign In
+                  {t("nav.signIn")}
                 </Link>
                 <Link
                   href="/register"
@@ -129,7 +131,7 @@ export function Header() {
                     className: "w-full",
                   })}
                 >
-                  Get Started
+                  {t("nav.getStarted")}
                 </Link>
               </div>
             )}

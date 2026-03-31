@@ -1,0 +1,48 @@
+{
+  "nav.home": "首页",
+  "nav.dashboard": "仪表盘",
+  "nav.messages": "消息",
+  "nav.signIn": "登录",
+  "nav.getStarted": "开始使用",
+  "nav.toggleMenu": "切换菜单",
+
+  "hero.badge": "创作者市场",
+  "hero.title": "将你的",
+  "hero.titleHighlight": "影响力变现",
+  "hero.description": "ivann将创作者与品牌连接，实现付费合作。创建你的个人资料，展示你的数据，开始赚钱。",
+
+  "footer.rights": "© {year} ivann. 保留所有权利。",
+  "footer.terms": "条款",
+  "footer.privacy": "隐私",
+  "footer.language": "语言",
+
+  "auth.signIn.title": "登录 ivann",
+  "auth.signIn.subtitle": "输入你的凭据以继续。",
+  "auth.register.title": "创建账户",
+  "auth.register.subtitle": "今天开始使用 ivann。",
+  "auth.forgotPassword.title": "重置密码",
+  "auth.forgotPassword.subtitle": "我们将向你发送重置链接。",
+
+  "dashboard.title": "仪表盘",
+  "dashboard.subtitle": "你的概览和统计数据将显示在这里。",
+
+  "messages.title": "消息",
+  "messages.subtitle": "实时消息将显示在这里。",
+
+  "packages.title": "你的套餐",
+  "packages.subtitle": "套餐管理将显示在这里。",
+
+  "settings.title": "设置",
+  "settings.subtitle": "账户设置将显示在这里。",
+
+  "profile.connectedPlatforms": "已连接平台",
+  "profile.followers": "粉丝",
+  "profile.editProfile": "编辑资料",
+  "profile.sendOffer": "发送报价",
+  "profile.noPlatforms": "尚未连接任何平台。",
+  "profile.engagement": "互动率",
+
+  "userMenu.editProfile": "编辑资料",
+  "userMenu.settings": "设置",
+  "userMenu.logOut": "退出登录"
+}

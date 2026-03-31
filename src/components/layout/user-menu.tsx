@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { useTranslation } from "@/i18n";
 
 interface UserMenuProps {
   name: string;
@@ -19,6 +20,7 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ name, email, avatarUrl }: UserMenuProps) {
+  const { t } = useTranslation();
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -44,16 +46,16 @@ export function UserMenu({ name, email, avatarUrl }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem render={<Link href="/profile" />}>
           <User className="size-4" />
-          Edit Profile
+          {t("userMenu.editProfile")}
         </DropdownMenuItem>
         <DropdownMenuItem render={<Link href="/settings" />}>
           <Settings className="size-4" />
-          Settings
+          {t("userMenu.settings")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive">
           <LogOut className="size-4" />
-          Log out
+          {t("userMenu.logOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

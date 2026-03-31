@@ -1,0 +1,48 @@
+{
+  "nav.home": "الرئيسية",
+  "nav.dashboard": "لوحة التحكم",
+  "nav.messages": "الرسائل",
+  "nav.signIn": "تسجيل الدخول",
+  "nav.getStarted": "ابدأ الآن",
+  "nav.toggleMenu": "تبديل القائمة",
+
+  "hero.badge": "سوق صناع المحتوى",
+  "hero.title": "حقق الربح من",
+  "hero.titleHighlight": "تأثيرك",
+  "hero.description": "ivann يربط صناع المحتوى بالعلامات التجارية للتعاون المدفوع. أنشئ ملفك الشخصي، واعرض إحصائياتك، وابدأ في الكسب.",
+
+  "footer.rights": "© {year} ivann. جميع الحقوق محفوظة.",
+  "footer.terms": "الشروط",
+  "footer.privacy": "الخصوصية",
+  "footer.language": "اللغة",
+
+  "auth.signIn.title": "تسجيل الدخول إلى ivann",
+  "auth.signIn.subtitle": "أدخل بيانات الاعتماد الخاصة بك للمتابعة.",
+  "auth.register.title": "إنشاء حسابك",
+  "auth.register.subtitle": "ابدأ مع ivann اليوم.",
+  "auth.forgotPassword.title": "إعادة تعيين كلمة المرور",
+  "auth.forgotPassword.subtitle": "سنرسل لك رابط إعادة التعيين.",
+
+  "dashboard.title": "لوحة التحكم",
+  "dashboard.subtitle": "ستظهر نظرتك العامة وإحصائياتك هنا.",
+
+  "messages.title": "الرسائل",
+  "messages.subtitle": "ستظهر الرسائل الفورية هنا.",
+
+  "packages.title": "باقاتك",
+  "packages.subtitle": "ستظهر إدارة الباقات هنا.",
+
+  "settings.title": "الإعدادات",
+  "settings.subtitle": "ستظهر إعدادات الحساب هنا.",
+
+  "profile.connectedPlatforms": "المنصات المتصلة",
+  "profile.followers": "متابع",
+  "profile.editProfile": "تعديل الملف الشخصي",
+  "profile.sendOffer": "إرسال عرض",
+  "profile.noPlatforms": "لم يتم ربط أي منصات بعد.",
+  "profile.engagement": "تفاعل",
+
+  "userMenu.editProfile": "تعديل الملف الشخصي",
+  "userMenu.settings": "الإعدادات",
+  "userMenu.logOut": "تسجيل الخروج"
+}

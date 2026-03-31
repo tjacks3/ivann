@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = { title: "Sign In" };
+import { useTranslation } from "@/i18n";
 
 export default function LoginPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="text-center">
-      <h1 className="text-2xl font-bold">Sign in to ivann</h1>
+      <h1 className="text-2xl font-bold">{t("auth.signIn.title")}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Auth form will go here.
+        {t("auth.signIn.subtitle")}
       </p>
     </div>
   );

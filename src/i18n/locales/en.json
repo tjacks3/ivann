@@ -1,0 +1,48 @@
+{
+  "nav.home": "Home",
+  "nav.dashboard": "Dashboard",
+  "nav.messages": "Messages",
+  "nav.signIn": "Sign In",
+  "nav.getStarted": "Get Started",
+  "nav.toggleMenu": "Toggle menu",
+
+  "hero.badge": "The creator marketplace",
+  "hero.title": "Monetize your",
+  "hero.titleHighlight": "influence",
+  "hero.description": "ivann connects creators with brands for paid collaborations. Build your profile, showcase your stats, and start earning.",
+
+  "footer.rights": "© {year} ivann. All rights reserved.",
+  "footer.terms": "Terms",
+  "footer.privacy": "Privacy",
+  "footer.language": "Language",
+
+  "auth.signIn.title": "Sign in to ivann",
+  "auth.signIn.subtitle": "Enter your credentials to continue.",
+  "auth.register.title": "Create your account",
+  "auth.register.subtitle": "Get started with ivann today.",
+  "auth.forgotPassword.title": "Reset your password",
+  "auth.forgotPassword.subtitle": "We'll send you a reset link.",
+
+  "dashboard.title": "Dashboard",
+  "dashboard.subtitle": "Your overview and stats will appear here.",
+
+  "messages.title": "Messages",
+  "messages.subtitle": "Real-time messaging will go here.",
+
+  "packages.title": "Your Packages",
+  "packages.subtitle": "Package management will go here.",
+
+  "settings.title": "Settings",
+  "settings.subtitle": "Account settings will go here.",
+
+  "profile.connectedPlatforms": "Connected Platforms",
+  "profile.followers": "followers",
+  "profile.editProfile": "Edit Profile",
+  "profile.sendOffer": "Send Offer",
+  "profile.noPlatforms": "No platforms connected yet.",
+  "profile.engagement": "eng.",
+
+  "userMenu.editProfile": "Edit Profile",
+  "userMenu.settings": "Settings",
+  "userMenu.logOut": "Log out"
+}

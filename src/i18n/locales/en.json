@@ -44,5 +44,41 @@
 
   "userMenu.editProfile": "Edit Profile",
   "userMenu.settings": "Settings",
-  "userMenu.logOut": "Log out"
+  "userMenu.logOut": "Log out",
+
+  "nav.discover": "Discover",
+  "nav.myProfile": "My Profile",
+  "nav.brandDashboard": "Dashboard",
+  "nav.packages": "Packages",
+  "nav.settings": "Settings",
+
+  "auth.signUp.title": "Create your account",
+  "auth.signUp.subtitle": "Get started with ivann today.",
+  "auth.brandPanel.tagline": "Connect with creators",
+  "auth.brandPanel.description": "ivann helps brands find and collaborate with the right creators for impactful campaigns.",
+
+  "onboarding.title": "Welcome to ivann",
+  "onboarding.subtitle": "Let's get your account set up.",
+  "onboarding.selectRole": "I am a...",
+  "onboarding.creator": "Creator",
+  "onboarding.creatorDescription": "I create content and want to work with brands.",
+  "onboarding.brand": "Brand",
+  "onboarding.brandDescription": "I represent a brand and want to find creators.",
+  "onboarding.continue": "Continue",
+
+  "discover.title": "Discover Creators",
+  "discover.subtitle": "Browse and find creators for your next collaboration.",
+  "discover.emptyTitle": "Coming soon",
+  "discover.emptyDescription": "Creator discovery is being built. Check back soon.",
+
+  "brandDashboard.title": "Brand Dashboard",
+  "brandDashboard.subtitle": "Manage your collaborations and discover creators.",
+  "brandDashboard.emptyTitle": "No active collaborations",
+  "brandDashboard.emptyDescription": "Start by discovering creators and sending offers.",
+
+  "empty.noMessages": "No messages yet",
+  "empty.noMessagesDescription": "Start a conversation with a creator or brand.",
+  "empty.browseCreators": "Browse Creators",
+
+  "loading.text": "Loading..."
 }

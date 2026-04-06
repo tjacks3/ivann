@@ -12,14 +12,16 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "@/i18n";
+import type { UserRole } from "@/types";
 
 interface UserMenuProps {
   name: string;
   email: string;
   avatarUrl?: string;
+  role?: UserRole;
 }
 
-export function UserMenu({ name, email, avatarUrl }: UserMenuProps) {
+export function UserMenu({ name, email, avatarUrl, role = "creator" }: UserMenuProps) {
   const { t } = useTranslation();
   const initials = name
     .split(" ")
@@ -44,7 +46,7 @@ export function UserMenu({ name, email, avatarUrl }: UserMenuProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem render={<Link href="/profile" />}>
+        <DropdownMenuItem render={<Link href={role === "brand" ? "/brand/dashboard" : "/creator/profile"} />}>
           <User className="size-4" />
           {t("userMenu.editProfile")}
         </DropdownMenuItem>

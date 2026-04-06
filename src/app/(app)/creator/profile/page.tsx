@@ -2,6 +2,8 @@
 
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { PlatformGrid, type PlatformData } from "@/components/profile/platform-grid";
+import { PageContainer } from "@/components/shared/page-container";
+import { SectionHeader } from "@/components/shared/section-header";
 import { useTranslation } from "@/i18n";
 
 // TODO: Replace with real data from Supabase
@@ -21,17 +23,20 @@ const mockPlatforms: PlatformData[] = [
   { platform: "TikTok", handle: "alex.rivera", followers: 3_000, engagement: 8.4 },
 ];
 
-export default function ProfilePage() {
+export default function CreatorProfilePage() {
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-8">
-      <ProfileHeader {...mockProfile} />
-
-      <div>
-        <h2 className="mb-4 text-lg font-semibold">{t("profile.connectedPlatforms")}</h2>
-        <PlatformGrid platforms={mockPlatforms} />
+    <PageContainer>
+      <div className="space-y-8">
+        <ProfileHeader {...mockProfile} />
+        <div>
+          <SectionHeader title={t("profile.connectedPlatforms")} as="h2" />
+          <div className="mt-4">
+            <PlatformGrid platforms={mockPlatforms} />
+          </div>
+        </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

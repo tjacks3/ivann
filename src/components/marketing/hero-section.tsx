@@ -24,7 +24,7 @@ export function HeroSection() {
       </p>
 
       <div className="mt-10 flex items-center gap-4">
-        <Link href="/register" className={buttonVariants({ size: "lg" })}>
+        <Link href="/signup" className={buttonVariants({ size: "lg" })}>
           {t("nav.getStarted")}
         </Link>
         <Link

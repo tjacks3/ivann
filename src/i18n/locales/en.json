@@ -80,5 +80,13 @@
   "empty.noMessagesDescription": "Start a conversation with a creator or brand.",
   "empty.browseCreators": "Browse Creators",
 
-  "loading.text": "Loading..."
+  "loading.text": "Loading...",
+
+  "footer.about": "About",
+  "about.title": "About ivann",
+  "about.acronym": "Influencer Value Alignment & Negotiation Network",
+  "about.paragraph1": "ivann exists to ensure creator value is clearly aligned, fairly negotiated, and seamlessly turned into real partnerships.",
+  "about.paragraph2": "ivann is a modern platform where creators and brands come together to do real business — clearly, efficiently, and on their own terms. At its core, ivann removes the friction from partnerships. Instead of scattered messages, unclear pricing, and slow negotiations, ivann provides a structured environment where creators can present their value and brands can make direct, informed offers.",
+  "about.paragraph3": "The result is simple: better alignment, faster decisions, and partnerships that actually close.",
+  "about.tagline": "ivann isn't just a marketplace — it's the operating layer for creator commerce."
 }

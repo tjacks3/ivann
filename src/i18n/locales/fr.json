@@ -44,5 +44,49 @@
 
   "userMenu.editProfile": "Modifier le Profil",
   "userMenu.settings": "Paramètres",
-  "userMenu.logOut": "Se déconnecter"
+  "userMenu.logOut": "Se déconnecter",
+
+  "nav.discover": "Découvrir",
+  "nav.myProfile": "Mon Profil",
+  "nav.brandDashboard": "Tableau de bord",
+  "nav.packages": "Forfaits",
+  "nav.settings": "Paramètres",
+
+  "auth.signUp.title": "Créez votre compte",
+  "auth.signUp.subtitle": "Commencez avec ivann aujourd'hui.",
+  "auth.brandPanel.tagline": "Connectez-vous aux créateurs",
+  "auth.brandPanel.description": "ivann aide les marques à trouver et collaborer avec les bons créateurs pour des campagnes percutantes.",
+
+  "onboarding.title": "Bienvenue sur ivann",
+  "onboarding.subtitle": "Configurons votre compte.",
+  "onboarding.selectRole": "Je suis un...",
+  "onboarding.creator": "Créateur",
+  "onboarding.creatorDescription": "Je crée du contenu et je veux travailler avec des marques.",
+  "onboarding.brand": "Marque",
+  "onboarding.brandDescription": "Je représente une marque et je veux trouver des créateurs.",
+  "onboarding.continue": "Continuer",
+
+  "discover.title": "Découvrir les Créateurs",
+  "discover.subtitle": "Parcourez et trouvez des créateurs pour votre prochaine collaboration.",
+  "discover.emptyTitle": "Bientôt disponible",
+  "discover.emptyDescription": "La découverte de créateurs est en cours de construction. Revenez bientôt.",
+
+  "brandDashboard.title": "Tableau de Bord Marque",
+  "brandDashboard.subtitle": "Gérez vos collaborations et découvrez des créateurs.",
+  "brandDashboard.emptyTitle": "Aucune collaboration active",
+  "brandDashboard.emptyDescription": "Commencez par découvrir des créateurs et envoyer des offres.",
+
+  "empty.noMessages": "Pas encore de messages",
+  "empty.noMessagesDescription": "Démarrez une conversation avec un créateur ou une marque.",
+  "empty.browseCreators": "Parcourir les Créateurs",
+
+  "loading.text": "Chargement...",
+
+  "footer.about": "À propos",
+  "about.title": "À propos d'ivann",
+  "about.acronym": "Réseau d'Alignement de Valeur et de Négociation pour Influenceurs",
+  "about.paragraph1": "ivann existe pour s'assurer que la valeur des créateurs est clairement alignée, équitablement négociée et transformée en partenariats réels.",
+  "about.paragraph2": "ivann est une plateforme moderne où créateurs et marques se réunissent pour faire de vrais affaires — clairement, efficacement et à leurs propres conditions. Au cœur d'ivann, la friction des partenariats est éliminée. Au lieu de messages éparpillés, de prix flous et de négociations lentes, ivann offre un environnement structuré où les créateurs peuvent présenter leur valeur et les marques peuvent faire des offres directes et éclairées.",
+  "about.paragraph3": "Le résultat est simple : un meilleur alignement, des décisions plus rapides et des partenariats qui aboutissent vraiment.",
+  "about.tagline": "ivann n'est pas qu'un marché — c'est la couche opérationnelle du commerce des créateurs."
 }

@@ -44,5 +44,49 @@
 
   "userMenu.editProfile": "تعديل الملف الشخصي",
   "userMenu.settings": "الإعدادات",
-  "userMenu.logOut": "تسجيل الخروج"
+  "userMenu.logOut": "تسجيل الخروج",
+
+  "nav.discover": "اكتشف",
+  "nav.myProfile": "ملفي الشخصي",
+  "nav.brandDashboard": "لوحة التحكم",
+  "nav.packages": "الباقات",
+  "nav.settings": "الإعدادات",
+
+  "auth.signUp.title": "إنشاء حسابك",
+  "auth.signUp.subtitle": "ابدأ مع ivann اليوم.",
+  "auth.brandPanel.tagline": "تواصل مع صناع المحتوى",
+  "auth.brandPanel.description": "ivann يساعد العلامات التجارية في العثور على صناع المحتوى المناسبين والتعاون معهم لحملات مؤثرة.",
+
+  "onboarding.title": "مرحباً بك في ivann",
+  "onboarding.subtitle": "دعنا نُعد حسابك.",
+  "onboarding.selectRole": "أنا...",
+  "onboarding.creator": "صانع محتوى",
+  "onboarding.creatorDescription": "أصنع محتوى وأريد العمل مع العلامات التجارية.",
+  "onboarding.brand": "علامة تجارية",
+  "onboarding.brandDescription": "أمثل علامة تجارية وأريد إيجاد صناع محتوى.",
+  "onboarding.continue": "متابعة",
+
+  "discover.title": "اكتشف صناع المحتوى",
+  "discover.subtitle": "تصفح وابحث عن صناع محتوى لتعاونك القادم.",
+  "discover.emptyTitle": "قريباً",
+  "discover.emptyDescription": "ميزة اكتشاف صناع المحتوى قيد الإنشاء. عد قريباً.",
+
+  "brandDashboard.title": "لوحة تحكم العلامة التجارية",
+  "brandDashboard.subtitle": "أدر تعاوناتك واكتشف صناع محتوى.",
+  "brandDashboard.emptyTitle": "لا توجد تعاونات نشطة",
+  "brandDashboard.emptyDescription": "ابدأ باكتشاف صناع المحتوى وإرسال العروض.",
+
+  "empty.noMessages": "لا توجد رسائل بعد",
+  "empty.noMessagesDescription": "ابدأ محادثة مع صانع محتوى أو علامة تجارية.",
+  "empty.browseCreators": "تصفح صناع المحتوى",
+
+  "loading.text": "جارٍ التحميل...",
+
+  "footer.about": "حول",
+  "about.title": "حول ivann",
+  "about.acronym": "شبكة مواءمة قيمة المؤثرين والتفاوض",
+  "about.paragraph1": "ivann موجود لضمان أن قيمة صانع المحتوى متوائمة بوضوح، ومتفاوض عليها بعدالة، ومحولة بسلاسة إلى شراكات حقيقية.",
+  "about.paragraph2": "ivann منصة حديثة حيث يجتمع صناع المحتوى والعلامات التجارية لإجراء أعمال حقيقية — بوضوح وكفاءة وبشروطهم الخاصة. في جوهره، يزيل ivann الاحتكاك من الشراكات. بدلاً من الرسائل المتناثرة والأسعار غير الواضحة والمفاوضات البطيئة، يوفر ivann بيئة منظمة حيث يمكن لصناع المحتوى تقديم قيمتهم ويمكن للعلامات التجارية تقديم عروض مباشرة ومدروسة.",
+  "about.paragraph3": "النتيجة بسيطة: مواءمة أفضل، قرارات أسرع، وشراكات تتحقق فعلاً.",
+  "about.tagline": "ivann ليس مجرد سوق — إنه الطبقة التشغيلية لتجارة صناع المحتوى."
 }

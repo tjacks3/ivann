@@ -44,5 +44,49 @@
 
   "userMenu.editProfile": "Modifica Profilo",
   "userMenu.settings": "Impostazioni",
-  "userMenu.logOut": "Esci"
+  "userMenu.logOut": "Esci",
+
+  "nav.discover": "Scopri",
+  "nav.myProfile": "Il Mio Profilo",
+  "nav.brandDashboard": "Dashboard",
+  "nav.packages": "Pacchetti",
+  "nav.settings": "Impostazioni",
+
+  "auth.signUp.title": "Crea il tuo account",
+  "auth.signUp.subtitle": "Inizia con ivann oggi.",
+  "auth.brandPanel.tagline": "Connettiti con i creator",
+  "auth.brandPanel.description": "ivann aiuta i brand a trovare e collaborare con i creator giusti per campagne d'impatto.",
+
+  "onboarding.title": "Benvenuto su ivann",
+  "onboarding.subtitle": "Configuriamo il tuo account.",
+  "onboarding.selectRole": "Io sono un...",
+  "onboarding.creator": "Creator",
+  "onboarding.creatorDescription": "Creo contenuti e voglio lavorare con i brand.",
+  "onboarding.brand": "Brand",
+  "onboarding.brandDescription": "Rappresento un brand e voglio trovare creator.",
+  "onboarding.continue": "Continua",
+
+  "discover.title": "Scopri i Creator",
+  "discover.subtitle": "Sfoglia e trova creator per la tua prossima collaborazione.",
+  "discover.emptyTitle": "In arrivo",
+  "discover.emptyDescription": "La scoperta dei creator è in costruzione. Torna presto.",
+
+  "brandDashboard.title": "Dashboard Brand",
+  "brandDashboard.subtitle": "Gestisci le tue collaborazioni e scopri creator.",
+  "brandDashboard.emptyTitle": "Nessuna collaborazione attiva",
+  "brandDashboard.emptyDescription": "Inizia scoprendo creator e inviando offerte.",
+
+  "empty.noMessages": "Nessun messaggio ancora",
+  "empty.noMessagesDescription": "Inizia una conversazione con un creator o un brand.",
+  "empty.browseCreators": "Sfoglia Creator",
+
+  "loading.text": "Caricamento...",
+
+  "footer.about": "Chi siamo",
+  "about.title": "Chi è ivann",
+  "about.acronym": "Influencer Value Alignment & Negotiation Network",
+  "about.paragraph1": "ivann esiste per garantire che il valore dei creator sia chiaramente allineato, negoziato equamente e trasformato in partnership reali.",
+  "about.paragraph2": "ivann è una piattaforma moderna dove creator e brand si incontrano per fare affari veri — in modo chiaro, efficiente e alle proprie condizioni. Al suo nucleo, ivann elimina l'attrito dalle partnership. Invece di messaggi sparsi, prezzi poco chiari e negoziazioni lente, ivann offre un ambiente strutturato dove i creator possono presentare il loro valore e i brand possono fare offerte dirette e informate.",
+  "about.paragraph3": "Il risultato è semplice: migliore allineamento, decisioni più rapide e partnership che si concretizzano davvero.",
+  "about.tagline": "ivann non è solo un marketplace — è il livello operativo del commercio dei creator."
 }

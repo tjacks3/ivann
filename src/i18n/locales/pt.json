@@ -44,5 +44,49 @@
 
   "userMenu.editProfile": "Editar Perfil",
   "userMenu.settings": "Configurações",
-  "userMenu.logOut": "Sair"
+  "userMenu.logOut": "Sair",
+
+  "nav.discover": "Descobrir",
+  "nav.myProfile": "Meu Perfil",
+  "nav.brandDashboard": "Painel",
+  "nav.packages": "Pacotes",
+  "nav.settings": "Configurações",
+
+  "auth.signUp.title": "Crie sua conta",
+  "auth.signUp.subtitle": "Comece com o ivann hoje.",
+  "auth.brandPanel.tagline": "Conecte-se com criadores",
+  "auth.brandPanel.description": "ivann ajuda marcas a encontrar e colaborar com os criadores certos para campanhas impactantes.",
+
+  "onboarding.title": "Bem-vindo ao ivann",
+  "onboarding.subtitle": "Vamos configurar sua conta.",
+  "onboarding.selectRole": "Eu sou um...",
+  "onboarding.creator": "Criador",
+  "onboarding.creatorDescription": "Eu crio conteúdo e quero trabalhar com marcas.",
+  "onboarding.brand": "Marca",
+  "onboarding.brandDescription": "Eu represento uma marca e quero encontrar criadores.",
+  "onboarding.continue": "Continuar",
+
+  "discover.title": "Descobrir Criadores",
+  "discover.subtitle": "Navegue e encontre criadores para sua próxima colaboração.",
+  "discover.emptyTitle": "Em breve",
+  "discover.emptyDescription": "A descoberta de criadores está sendo construída. Volte em breve.",
+
+  "brandDashboard.title": "Painel da Marca",
+  "brandDashboard.subtitle": "Gerencie suas colaborações e descubra criadores.",
+  "brandDashboard.emptyTitle": "Sem colaborações ativas",
+  "brandDashboard.emptyDescription": "Comece descobrindo criadores e enviando ofertas.",
+
+  "empty.noMessages": "Nenhuma mensagem ainda",
+  "empty.noMessagesDescription": "Inicie uma conversa com um criador ou marca.",
+  "empty.browseCreators": "Explorar Criadores",
+
+  "loading.text": "Carregando...",
+
+  "footer.about": "Sobre",
+  "about.title": "Sobre o ivann",
+  "about.acronym": "Rede de Alinhamento de Valor e Negociação de Influenciadores",
+  "about.paragraph1": "ivann existe para garantir que o valor do criador esteja claramente alinhado, negociado de forma justa e transformado em parcerias reais.",
+  "about.paragraph2": "ivann é uma plataforma moderna onde criadores e marcas se unem para fazer negócios reais — de forma clara, eficiente e em seus próprios termos. Em sua essência, ivann remove a fricção das parcerias. Em vez de mensagens dispersas, preços pouco claros e negociações lentas, ivann oferece um ambiente estruturado onde criadores podem apresentar seu valor e marcas podem fazer ofertas diretas e informadas.",
+  "about.paragraph3": "O resultado é simples: melhor alinhamento, decisões mais rápidas e parcerias que realmente se concretizam.",
+  "about.tagline": "ivann não é apenas um mercado — é a camada operacional do comércio de criadores."
 }

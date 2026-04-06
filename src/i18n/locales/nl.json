@@ -44,5 +44,49 @@
 
   "userMenu.editProfile": "Profiel bewerken",
   "userMenu.settings": "Instellingen",
-  "userMenu.logOut": "Uitloggen"
+  "userMenu.logOut": "Uitloggen",
+
+  "nav.discover": "Ontdek",
+  "nav.myProfile": "Mijn Profiel",
+  "nav.brandDashboard": "Dashboard",
+  "nav.packages": "Pakketten",
+  "nav.settings": "Instellingen",
+
+  "auth.signUp.title": "Maak je account aan",
+  "auth.signUp.subtitle": "Begin vandaag met ivann.",
+  "auth.brandPanel.tagline": "Verbind met creators",
+  "auth.brandPanel.description": "ivann helpt merken de juiste creators te vinden en samen te werken voor impactvolle campagnes.",
+
+  "onboarding.title": "Welkom bij ivann",
+  "onboarding.subtitle": "Laten we je account instellen.",
+  "onboarding.selectRole": "Ik ben een...",
+  "onboarding.creator": "Creator",
+  "onboarding.creatorDescription": "Ik maak content en wil samenwerken met merken.",
+  "onboarding.brand": "Merk",
+  "onboarding.brandDescription": "Ik vertegenwoordig een merk en wil creators vinden.",
+  "onboarding.continue": "Doorgaan",
+
+  "discover.title": "Ontdek Creators",
+  "discover.subtitle": "Blader en vind creators voor je volgende samenwerking.",
+  "discover.emptyTitle": "Binnenkort beschikbaar",
+  "discover.emptyDescription": "Creator-ontdekking wordt gebouwd. Kom snel terug.",
+
+  "brandDashboard.title": "Merk Dashboard",
+  "brandDashboard.subtitle": "Beheer je samenwerkingen en ontdek creators.",
+  "brandDashboard.emptyTitle": "Geen actieve samenwerkingen",
+  "brandDashboard.emptyDescription": "Begin met het ontdekken van creators en het versturen van aanbiedingen.",
+
+  "empty.noMessages": "Nog geen berichten",
+  "empty.noMessagesDescription": "Start een gesprek met een creator of merk.",
+  "empty.browseCreators": "Creators bekijken",
+
+  "loading.text": "Laden...",
+
+  "footer.about": "Over ons",
+  "about.title": "Over ivann",
+  "about.acronym": "Influencer Value Alignment & Negotiation Network",
+  "about.paragraph1": "ivann bestaat om ervoor te zorgen dat de waarde van creators duidelijk is afgestemd, eerlijk wordt onderhandeld en naadloos wordt omgezet in echte partnerschappen.",
+  "about.paragraph2": "ivann is een modern platform waar creators en merken samenkomen om echte zaken te doen — duidelijk, efficiënt en op hun eigen voorwaarden. In de kern verwijdert ivann de wrijving uit partnerschappen. In plaats van verspreide berichten, onduidelijke prijzen en trage onderhandelingen, biedt ivann een gestructureerde omgeving waar creators hun waarde kunnen presenteren en merken directe, weloverwogen aanbiedingen kunnen doen.",
+  "about.paragraph3": "Het resultaat is simpel: betere afstemming, snellere beslissingen en partnerschappen die daadwerkelijk slagen.",
+  "about.tagline": "ivann is niet zomaar een marktplaats — het is de operationele laag voor creator-commerce."
 }

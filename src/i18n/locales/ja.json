@@ -44,5 +44,49 @@
 
   "userMenu.editProfile": "プロフィール編集",
   "userMenu.settings": "設定",
-  "userMenu.logOut": "ログアウト"
+  "userMenu.logOut": "ログアウト",
+
+  "nav.discover": "発見",
+  "nav.myProfile": "マイプロフィール",
+  "nav.brandDashboard": "ダッシュボード",
+  "nav.packages": "パッケージ",
+  "nav.settings": "設定",
+
+  "auth.signUp.title": "アカウントを作成",
+  "auth.signUp.subtitle": "今日からivannを始めましょう。",
+  "auth.brandPanel.tagline": "クリエイターとつながる",
+  "auth.brandPanel.description": "ivannはブランドが適切なクリエイターを見つけ、インパクトのあるキャンペーンで協力するのを支援します。",
+
+  "onboarding.title": "ivannへようこそ",
+  "onboarding.subtitle": "アカウントを設定しましょう。",
+  "onboarding.selectRole": "私は...",
+  "onboarding.creator": "クリエイター",
+  "onboarding.creatorDescription": "コンテンツを作成し、ブランドと仕事をしたいです。",
+  "onboarding.brand": "ブランド",
+  "onboarding.brandDescription": "ブランドを代表し、クリエイターを見つけたいです。",
+  "onboarding.continue": "続ける",
+
+  "discover.title": "クリエイターを発見",
+  "discover.subtitle": "次のコラボレーションのためにクリエイターを探しましょう。",
+  "discover.emptyTitle": "近日公開",
+  "discover.emptyDescription": "クリエイター発見機能を構築中です。もうしばらくお待ちください。",
+
+  "brandDashboard.title": "ブランドダッシュボード",
+  "brandDashboard.subtitle": "コラボレーションを管理し、クリエイターを発見しましょう。",
+  "brandDashboard.emptyTitle": "アクティブなコラボレーションはありません",
+  "brandDashboard.emptyDescription": "クリエイターを発見してオファーを送ることから始めましょう。",
+
+  "empty.noMessages": "まだメッセージはありません",
+  "empty.noMessagesDescription": "クリエイターやブランドとの会話を始めましょう。",
+  "empty.browseCreators": "クリエイターを探す",
+
+  "loading.text": "読み込み中...",
+
+  "footer.about": "ivannについて",
+  "about.title": "ivannについて",
+  "about.acronym": "インフルエンサー・バリュー・アライメント＆ネゴシエーション・ネットワーク",
+  "about.paragraph1": "ivannは、クリエイターの価値が明確に整合され、公正に交渉され、シームレスに実際のパートナーシップに変わることを保証するために存在します。",
+  "about.paragraph2": "ivannは、クリエイターとブランドが本当のビジネスを行うために集まるモダンなプラットフォームです — 明確に、効率的に、そして自分たちの条件で。その核心で、ivannはパートナーシップの摩擦を取り除きます。散在するメッセージ、不明確な価格設定、遅い交渉の代わりに、ivannはクリエイターが自分の価値を提示し、ブランドが直接的で情報に基づいたオファーを行える構造化された環境を提供します。",
+  "about.paragraph3": "結果はシンプルです：より良い整合性、より速い意思決定、そして実際に成立するパートナーシップ。",
+  "about.tagline": "ivannは単なるマーケットプレイスではありません — クリエイターコマースのオペレーティングレイヤーです。"
 }

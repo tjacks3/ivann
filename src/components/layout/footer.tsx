@@ -18,6 +18,9 @@ export function Footer() {
           <Link href="/privacy" className="hover:text-primary">
             {t("footer.privacy")}
           </Link>
+          <Link href="/about" className="hover:text-primary">
+            {t("footer.about")}
+          </Link>
           <LanguageSelector />
         </div>
       </div>

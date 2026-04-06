@@ -44,5 +44,49 @@
 
   "userMenu.editProfile": "Profil bearbeiten",
   "userMenu.settings": "Einstellungen",
-  "userMenu.logOut": "Abmelden"
+  "userMenu.logOut": "Abmelden",
+
+  "nav.discover": "Entdecken",
+  "nav.myProfile": "Mein Profil",
+  "nav.brandDashboard": "Dashboard",
+  "nav.packages": "Pakete",
+  "nav.settings": "Einstellungen",
+
+  "auth.signUp.title": "Konto erstellen",
+  "auth.signUp.subtitle": "Starte noch heute mit ivann.",
+  "auth.brandPanel.tagline": "Verbinde dich mit Kreativen",
+  "auth.brandPanel.description": "ivann hilft Marken, die richtigen Kreativen für wirkungsvolle Kampagnen zu finden und mit ihnen zusammenzuarbeiten.",
+
+  "onboarding.title": "Willkommen bei ivann",
+  "onboarding.subtitle": "Lass uns dein Konto einrichten.",
+  "onboarding.selectRole": "Ich bin ein...",
+  "onboarding.creator": "Creator",
+  "onboarding.creatorDescription": "Ich erstelle Inhalte und möchte mit Marken zusammenarbeiten.",
+  "onboarding.brand": "Marke",
+  "onboarding.brandDescription": "Ich vertrete eine Marke und möchte Creator finden.",
+  "onboarding.continue": "Weiter",
+
+  "discover.title": "Creator entdecken",
+  "discover.subtitle": "Finde Creator für deine nächste Zusammenarbeit.",
+  "discover.emptyTitle": "Demnächst verfügbar",
+  "discover.emptyDescription": "Die Creator-Entdeckung wird gerade aufgebaut. Schau bald wieder vorbei.",
+
+  "brandDashboard.title": "Marken-Dashboard",
+  "brandDashboard.subtitle": "Verwalte deine Kooperationen und entdecke Creator.",
+  "brandDashboard.emptyTitle": "Keine aktiven Kooperationen",
+  "brandDashboard.emptyDescription": "Beginne damit, Creator zu entdecken und Angebote zu senden.",
+
+  "empty.noMessages": "Noch keine Nachrichten",
+  "empty.noMessagesDescription": "Starte eine Unterhaltung mit einem Creator oder einer Marke.",
+  "empty.browseCreators": "Creator durchsuchen",
+
+  "loading.text": "Laden...",
+
+  "footer.about": "Über uns",
+  "about.title": "Über ivann",
+  "about.acronym": "Influencer Value Alignment & Negotiation Network",
+  "about.paragraph1": "ivann existiert, um sicherzustellen, dass der Wert von Kreativen klar abgestimmt, fair verhandelt und nahtlos in echte Partnerschaften umgewandelt wird.",
+  "about.paragraph2": "ivann ist eine moderne Plattform, auf der Creator und Marken zusammenkommen, um echte Geschäfte zu machen — klar, effizient und zu ihren eigenen Bedingungen. Im Kern beseitigt ivann die Reibung bei Partnerschaften. Statt verstreuter Nachrichten, unklarer Preise und langsamer Verhandlungen bietet ivann eine strukturierte Umgebung, in der Creator ihren Wert präsentieren und Marken direkte, fundierte Angebote machen können.",
+  "about.paragraph3": "Das Ergebnis ist einfach: bessere Abstimmung, schnellere Entscheidungen und Partnerschaften, die tatsächlich zustande kommen.",
+  "about.tagline": "ivann ist nicht nur ein Marktplatz — es ist die operative Schicht für Creator-Commerce."
 }

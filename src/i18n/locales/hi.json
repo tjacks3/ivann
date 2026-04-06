@@ -44,5 +44,49 @@
 
   "userMenu.editProfile": "प्रोफ़ाइल संपादित करें",
   "userMenu.settings": "सेटिंग्स",
-  "userMenu.logOut": "लॉग आउट"
+  "userMenu.logOut": "लॉग आउट",
+
+  "nav.discover": "खोजें",
+  "nav.myProfile": "मेरी प्रोफ़ाइल",
+  "nav.brandDashboard": "डैशबोर्ड",
+  "nav.packages": "पैकेज",
+  "nav.settings": "सेटिंग्स",
+
+  "auth.signUp.title": "अपना खाता बनाएं",
+  "auth.signUp.subtitle": "आज ही ivann के साथ शुरुआत करें।",
+  "auth.brandPanel.tagline": "क्रिएटर्स से जुड़ें",
+  "auth.brandPanel.description": "ivann ब्रांड्स को प्रभावशाली अभियानों के लिए सही क्रिएटर्स खोजने और सहयोग करने में मदद करता है।",
+
+  "onboarding.title": "ivann में आपका स्वागत है",
+  "onboarding.subtitle": "चलिए आपका खाता सेट करते हैं।",
+  "onboarding.selectRole": "मैं हूं...",
+  "onboarding.creator": "क्रिएटर",
+  "onboarding.creatorDescription": "मैं कंटेंट बनाता/बनाती हूं और ब्रांड्स के साथ काम करना चाहता/चाहती हूं।",
+  "onboarding.brand": "ब्रांड",
+  "onboarding.brandDescription": "मैं एक ब्रांड का प्रतिनिधित्व करता/करती हूं और क्रिएटर्स खोजना चाहता/चाहती हूं।",
+  "onboarding.continue": "जारी रखें",
+
+  "discover.title": "क्रिएटर्स खोजें",
+  "discover.subtitle": "अपने अगले सहयोग के लिए क्रिएटर्स ब्राउज़ करें और खोजें।",
+  "discover.emptyTitle": "जल्द आ रहा है",
+  "discover.emptyDescription": "क्रिएटर खोज सुविधा बनाई जा रही है। जल्दी वापस आएं।",
+
+  "brandDashboard.title": "ब्रांड डैशबोर्ड",
+  "brandDashboard.subtitle": "अपने सहयोग प्रबंधित करें और क्रिएटर्स खोजें।",
+  "brandDashboard.emptyTitle": "कोई सक्रिय सहयोग नहीं",
+  "brandDashboard.emptyDescription": "क्रिएटर्स खोजकर और ऑफ़र भेजकर शुरू करें।",
+
+  "empty.noMessages": "अभी तक कोई संदेश नहीं",
+  "empty.noMessagesDescription": "किसी क्रिएटर या ब्रांड के साथ बातचीत शुरू करें।",
+  "empty.browseCreators": "क्रिएटर्स ब्राउज़ करें",
+
+  "loading.text": "लोड हो रहा है...",
+
+  "footer.about": "परिचय",
+  "about.title": "ivann के बारे में",
+  "about.acronym": "इन्फ्लुएंसर वैल्यू अलाइनमेंट एंड नेगोशिएशन नेटवर्क",
+  "about.paragraph1": "ivann यह सुनिश्चित करने के लिए मौजूद है कि क्रिएटर का मूल्य स्पष्ट रूप से संरेखित हो, निष्पक्ष रूप से बातचीत की जाए, और वास्तविक साझेदारियों में सहजता से बदल जाए।",
+  "about.paragraph2": "ivann एक आधुनिक प्लेटफ़ॉर्म है जहां क्रिएटर्स और ब्रांड्स असली व्यापार करने के लिए एक साथ आते हैं — स्पष्ट रूप से, कुशलता से, और अपनी शर्तों पर। अपने मूल में, ivann साझेदारियों से घर्षण को दूर करता है। बिखरे संदेशों, अस्पष्ट मूल्य निर्धारण और धीमी बातचीत के बजाय, ivann एक संरचित वातावरण प्रदान करता है जहां क्रिएटर्स अपना मूल्य प्रस्तुत कर सकते हैं और ब्रांड्स सीधे, सूचित प्रस्ताव दे सकते हैं।",
+  "about.paragraph3": "परिणाम सरल है: बेहतर संरेखण, तेज़ निर्णय, और साझेदारियां जो वास्तव में पूरी होती हैं।",
+  "about.tagline": "ivann सिर्फ एक बाज़ार नहीं है — यह क्रिएटर कॉमर्स की ऑपरेटिंग लेयर है।"
 }

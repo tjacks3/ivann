@@ -40,7 +40,7 @@ export function ProfileHeader({
     .slice(0, 2);
 
   return (
-    <section className="rounded-xl bg-secondary p-6 sm:p-8">
+    <section className="rounded-xl p-6 sm:p-8">
       <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
         {/* Avatar */}
         <Avatar className="size-20 sm:size-24 text-lg">

@@ -24,7 +24,7 @@ interface HeaderProps {
 
 export function Header({ variant = "marketing" }: HeaderProps) {
   const { t } = useTranslation();
-  const { user } = useUser();
+  const { user, isAuthenticated } = useUser();
   const pathname = usePathname();
 
   const marketingLinks = [
@@ -74,14 +74,19 @@ export function Header({ variant = "marketing" }: HeaderProps) {
 
         {/* Right side */}
         <div className="flex items-center gap-3">
-          {user ? (
-            <UserMenu
-              name={user.name}
-              email={user.email}
-              avatarUrl={user.avatarUrl}
-              role={user.role}
-            />
-          ) : (
+          {isAuthenticated && user ? (
+            <div className="flex items-center gap-2">
+              <span className="hidden text-sm font-medium md:inline">
+                {user.name}
+              </span>
+              <UserMenu
+                name={user.name}
+                email={user.email}
+                avatarUrl={user.avatarUrl}
+                role={user.role}
+              />
+            </div>
+          ) : !isAuthenticated ? (
             <div className="hidden items-center gap-2 md:flex">
               <Link
                 href="/login"
@@ -96,7 +101,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
                 {t("nav.getStarted")}
               </Link>
             </div>
-          )}
+          ) : null}
 
           {/* Mobile menu — only on marketing pages (app pages use bottom nav) */}
           {variant === "marketing" && (
@@ -127,7 +132,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
                         </span>
                       </SheetClose>
                     ))}
-                    {!user && (
+                    {!isAuthenticated && (
                       <div className="mt-4 flex flex-col gap-2 border-t pt-4">
                         <SheetClose render={<Link href="/login" className={buttonVariants({ variant: "outline", className: "w-full" })} />}>
                           {t("nav.signIn")}

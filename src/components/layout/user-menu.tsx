@@ -1,16 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { User, Settings, LogOut } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { useSupabase } from "@/hooks/use-supabase";
 import { useTranslation } from "@/i18n";
 import type { UserRole } from "@/types";
 
@@ -23,12 +26,21 @@ interface UserMenuProps {
 
 export function UserMenu({ name, email, avatarUrl, role = "creator" }: UserMenuProps) {
   const { t } = useTranslation();
+  const supabase = useSupabase();
+  const router = useRouter();
+
   const initials = name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+    router.refresh();
+  };
 
   return (
     <DropdownMenu>
@@ -39,12 +51,14 @@ export function UserMenu({ name, email, avatarUrl, role = "creator" }: UserMenuP
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={8} className="w-56">
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col gap-0.5">
-            <p className="text-sm font-medium">{name}</p>
-            <p className="text-xs text-muted-foreground">{email}</p>
-          </div>
-        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col gap-0.5">
+              <p className="text-sm font-medium">{name}</p>
+              <p className="text-xs text-muted-foreground">{email}</p>
+            </div>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem render={<Link href={role === "brand" ? "/brand/dashboard" : "/creator/profile"} />}>
           <User className="size-4" />
@@ -55,7 +69,7 @@ export function UserMenu({ name, email, avatarUrl, role = "creator" }: UserMenuP
           {t("userMenu.settings")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive">
+        <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
           <LogOut className="size-4" />
           {t("userMenu.logOut")}
         </DropdownMenuItem>

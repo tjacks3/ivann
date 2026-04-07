@@ -27,7 +27,7 @@ export default function CreatorProfilePage() {
   const { t } = useTranslation();
 
   return (
-    <PageContainer>
+    <PageContainer size="narrow">
       <div className="space-y-8">
         <ProfileHeader {...mockProfile} />
         <div>

@@ -9,7 +9,7 @@ interface CreatorReviewStepProps {
     fullName?: string;
     username?: string;
     bio?: string;
-    category?: string;
+    categories?: string[];
     location?: string;
   };
   onEditStep: (step: number) => void;
@@ -49,10 +49,19 @@ export function CreatorReviewStep({ data, onEditStep }: CreatorReviewStepProps) 
                 <dd className="mt-1 font-medium">@{data.username}</dd>
               </div>
             )}
-            {data.category && (
+            {data.categories && data.categories.length > 0 && (
               <div>
-                <dt className="text-xs text-muted-foreground">{t("onboarding.creatorProfile.category")}</dt>
-                <dd className="mt-1 font-medium">{t(`onboarding.category.${data.category}`)}</dd>
+                <dt className="text-xs text-muted-foreground">{t("onboarding.creatorProfile.categories")}</dt>
+                <dd className="mt-1 flex flex-wrap gap-1.5">
+                  {data.categories.map((cat) => (
+                    <span
+                      key={cat}
+                      className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
+                    >
+                      {t(`onboarding.category.${cat}`)}
+                    </span>
+                  ))}
+                </dd>
               </div>
             )}
             {data.location && (

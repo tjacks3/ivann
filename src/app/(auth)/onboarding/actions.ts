@@ -40,7 +40,7 @@ export async function saveDraft(data: {
   fullName?: string;
   username?: string;
   bio?: string;
-  category?: string;
+  categories?: string[];
   location?: string;
   brandName?: string;
   contactName?: string;
@@ -83,7 +83,7 @@ export async function completeOnboarding(data: {
   fullName?: string;
   username?: string;
   bio?: string;
-  category?: string;
+  categories?: string[];
   location?: string;
   brandName?: string;
   contactName?: string;

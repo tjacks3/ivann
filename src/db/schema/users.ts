@@ -1,6 +1,20 @@
-import { pgTable, uuid, text, timestamp, varchar, pgEnum, boolean, integer } from "drizzle-orm/pg-core";
-
-export const userRoleEnum = pgEnum("user_role", ["creator", "brand", "admin"]);
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  varchar,
+  boolean,
+  integer,
+} from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { userRoleEnum } from "./enums";
+import { socialAccounts } from "./social-accounts";
+import { packages } from "./packages";
+import { collaborationRequests } from "./collaboration-requests";
+import { messageThreadMembers } from "./message-thread-members";
+import { messages } from "./messages";
+import { notifications } from "./notifications";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -13,7 +27,7 @@ export const users = pgTable("users", {
 
   // Creator fields
   username: varchar("username", { length: 50 }).unique(),
-  category: varchar("category", { length: 100 }),
+  categories: text("categories").array().notNull().default([]),
   location: varchar("location", { length: 100 }),
 
   // Brand fields
@@ -22,13 +36,37 @@ export const users = pgTable("users", {
   companyWebsite: varchar("company_website", { length: 500 }),
   industry: varchar("industry", { length: 100 }),
 
+  // Stripe
+  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }).unique(),
+  stripeAccountId: varchar("stripe_account_id", { length: 255 }).unique(),
+
   // Onboarding tracking
-  onboardingCompleted: boolean("onboarding_completed").notNull().default(false),
+  onboardingCompleted: boolean("onboarding_completed")
+    .notNull()
+    .default(false),
   onboardingStep: integer("onboarding_step").notNull().default(0),
 
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
+
+export const usersRelations = relations(users, ({ many }) => ({
+  socialAccounts: many(socialAccounts),
+  packages: many(packages),
+  sentCollabRequests: many(collaborationRequests, {
+    relationName: "brand",
+  }),
+  receivedCollabRequests: many(collaborationRequests, {
+    relationName: "creator",
+  }),
+  threadMemberships: many(messageThreadMembers),
+  sentMessages: many(messages),
+  notifications: many(notifications),
+}));
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;

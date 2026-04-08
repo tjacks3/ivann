@@ -30,7 +30,7 @@ interface FormData {
   fullName?: string;
   username?: string;
   bio?: string;
-  category?: string;
+  categories?: string[];
   location?: string;
   brandName?: string;
   contactName?: string;
@@ -70,7 +70,7 @@ export default function OnboardingPage() {
       fullName: "",
       username: "",
       bio: "",
-      category: "",
+      categories: [],
       location: "",
     },
   });
@@ -96,7 +96,7 @@ export default function OnboardingPage() {
           fullName: draft.fullName ?? undefined,
           username: draft.username ?? undefined,
           bio: draft.bio ?? undefined,
-          category: draft.category ?? undefined,
+          categories: draft.categories ?? undefined,
           location: draft.location ?? undefined,
           brandName: draft.brandName ?? undefined,
           contactName: draft.contactName ?? undefined,
@@ -112,7 +112,7 @@ export default function OnboardingPage() {
             fullName: draft.fullName ?? "",
             username: draft.username ?? "",
             bio: draft.bio ?? "",
-            category: draft.category ?? "",
+            categories: draft.categories ?? [],
             location: draft.location ?? "",
           });
         } else if (draft.role === "brand") {

@@ -12,7 +12,7 @@ export const creatorProfileSchema = z.object({
     .max(50)
     .regex(/^[a-zA-Z0-9_]+$/, "Letters, numbers, and underscores only"),
   bio: z.string().max(500).optional().or(z.literal("")),
-  category: z.string().min(1, "Required"),
+  categories: z.array(z.string()).min(1, "Select at least one category"),
   location: z.string().max(100).optional().or(z.literal("")),
 });
 

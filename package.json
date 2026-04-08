@@ -11,6 +11,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx src/db/seed.ts",
+    "db:add-test": "tsx scripts/add-test-records.ts",
     "translate": "tsx scripts/translate.ts",
     "translate:force": "tsx scripts/translate.ts --force"
   },

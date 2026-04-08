@@ -131,3 +131,9 @@ Add `ANTHROPIC_API_KEY=sk-ant-...` to your `.env.local`.
 1. Edit `en.json` with new keys.
 2. Run `npm run translate`.  
    The script diffs against existing locale files — it only translates missing keys and removes stale ones, minimizing API calls.
+
+### Add test users
+
+npm run db:add-test — adds one test creator + one test brand
+npm run db:add-test -- creator — adds a creator only
+npm run db:add-test -- brand — adds a brand only

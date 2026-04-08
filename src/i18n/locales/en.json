@@ -133,8 +133,8 @@
   "onboarding.creatorProfile.username": "Username",
   "onboarding.creatorProfile.bio": "Bio",
   "onboarding.creatorProfile.bioPlaceholder": "Tell brands about yourself...",
-  "onboarding.creatorProfile.category": "Category",
-  "onboarding.creatorProfile.categoryPlaceholder": "Select your niche",
+  "onboarding.creatorProfile.categories": "Categories",
+  "onboarding.creatorProfile.categoriesHint": "Select all that apply",
   "onboarding.creatorProfile.location": "Location",
   "onboarding.creatorProfile.locationPlaceholder": "City, Country",
 

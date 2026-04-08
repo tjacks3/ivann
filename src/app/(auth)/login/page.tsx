@@ -10,7 +10,7 @@ import { useSupabase } from "@/hooks/use-supabase";
 import { useTranslation } from "@/i18n";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { SocialButtons } from "@/components/auth/social-buttons";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { Loader2, Mail } from "lucide-react";
@@ -99,10 +99,10 @@ export default function LoginPage() {
               <p className="text-xs text-destructive">{t("auth.error.invalidEmail")}</p>
             )}
           </div>
-          <Button type="submit" className="w-full" disabled={magicForm.formState.isSubmitting}>
-            {magicForm.formState.isSubmitting && <Loader2 className="animate-spin" />}
+          <button type="submit" className={buttonVariants({ className: "w-full" })} disabled={magicForm.formState.isSubmitting}>
+            {magicForm.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
             {t("auth.signIn.sendMagicLink")}
-          </Button>
+          </button>
           <button
             type="button"
             onClick={() => setMagicLinkMode(false)}
@@ -142,10 +142,10 @@ export default function LoginPage() {
               <p className="text-xs text-destructive">{t("auth.error.weakPassword")}</p>
             )}
           </div>
-          <Button type="submit" className="w-full" disabled={loginForm.formState.isSubmitting}>
-            {loginForm.formState.isSubmitting && <Loader2 className="animate-spin" />}
+          <button type="submit" className={buttonVariants({ className: "w-full" })} disabled={loginForm.formState.isSubmitting}>
+            {loginForm.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
             {t("auth.signIn.submit")}
-          </Button>
+          </button>
           <button
             type="button"
             onClick={() => setMagicLinkMode(true)}

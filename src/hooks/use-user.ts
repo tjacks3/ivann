@@ -10,6 +10,7 @@ export interface AppUser {
   email: string;
   avatarUrl?: string;
   role: UserRole;
+  onboardingCompleted: boolean;
 }
 
 interface UseUserResult {
@@ -32,18 +33,18 @@ export function useUser(): UseUserResult {
 
       const { data: profile } = await supabase
         .from("users")
-        .select("full_name, email, avatar_url, role")
+        .select("full_name, email, avatar_url, role, onboarding_completed")
         .eq("auth_id", authUser.id)
         .single();
 
       if (!profile) {
-        // Authenticated but no profile yet (needs onboarding)
         return {
           appUser: {
             name: authUser.user_metadata?.full_name || authUser.email?.split("@")[0] || "",
             email: authUser.email || "",
             avatarUrl: authUser.user_metadata?.avatar_url ?? undefined,
             role: "creator",
+            onboardingCompleted: false,
           },
           hasSession: true,
         };
@@ -55,6 +56,7 @@ export function useUser(): UseUserResult {
           email: profile.email,
           avatarUrl: profile.avatar_url ?? undefined,
           role: profile.role as UserRole,
+          onboardingCompleted: profile.onboarding_completed ?? false,
         },
         hasSession: true,
       };

@@ -10,7 +10,7 @@ import { useSupabase } from "@/hooks/use-supabase";
 import { useTranslation } from "@/i18n";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { SocialButtons } from "@/components/auth/social-buttons";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { Loader2, Mail } from "lucide-react";
@@ -29,6 +29,11 @@ export default function SignUpPage() {
 
   const onSubmit = async (values: SignupValues) => {
     setError(null);
+
+    // Supabase with email confirmation enabled returns a fake user for
+    // existing emails (for privacy). Detect this by checking if the
+    // returned user has an empty `identities` array — that means the
+    // email is already taken.
     const { data, error: authError } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
@@ -39,10 +44,18 @@ export default function SignUpPage() {
 
     if (authError) {
       if (authError.message.includes("already registered")) {
-        setError(t("auth.error.emailTaken"));
+        setError(t("auth.error.emailTakenAction"));
+      } else if (authError.message.includes("rate limit")) {
+        setError(t("auth.error.rateLimited"));
       } else {
         setError(t("auth.error.generic"));
       }
+      return;
+    }
+
+    // Supabase returns a user with empty identities when email already exists
+    if (data.user && data.user.identities?.length === 0) {
+      setError(t("auth.error.emailTakenAction"));
       return;
     }
 
@@ -57,6 +70,22 @@ export default function SignUpPage() {
     router.refresh();
   };
 
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
+
+  const handleResend = async () => {
+    const email = form.getValues("email");
+    if (!email) return;
+    setResending(true);
+    const { error: resendError } = await supabase.auth.resend({ type: "signup", email });
+    setResending(false);
+    if (resendError?.message.includes("rate limit")) {
+      setError(t("auth.error.rateLimited"));
+    } else {
+      setResent(true);
+    }
+  };
+
   if (checkEmail) {
     return (
       <div className="space-y-4 text-center">
@@ -65,6 +94,23 @@ export default function SignUpPage() {
         </div>
         <h1 className="text-2xl font-bold">{t("auth.signUp.title")}</h1>
         <p className="text-sm text-muted-foreground">{t("auth.signUp.checkEmail")}</p>
+        {error && (
+          <div className="rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {error}
+          </div>
+        )}
+        {resent ? (
+          <p className="text-sm font-medium text-primary">{t("auth.signUp.resentSuccess")}</p>
+        ) : (
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resending}
+            className="text-sm font-medium text-primary hover:underline disabled:opacity-50"
+          >
+            {resending ? t("auth.signUp.resending") : t("auth.signUp.resend")}
+          </button>
+        )}
       </div>
     );
   }
@@ -78,7 +124,17 @@ export default function SignUpPage() {
 
       {error && (
         <div className="rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {error}
+          <p>{error}</p>
+          {error === t("auth.error.emailTakenAction") && (
+            <div className="mt-2 flex gap-3 text-xs">
+              <Link href="/login" className="font-medium underline">
+                {t("nav.signIn")}
+              </Link>
+              <Link href="/forgot-password" className="font-medium underline">
+                {t("auth.signIn.forgotPassword")}
+              </Link>
+            </div>
+          )}
         </div>
       )}
 
@@ -121,10 +177,10 @@ export default function SignUpPage() {
             </p>
           )}
         </div>
-        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting && <Loader2 className="animate-spin" />}
+        <button type="submit" className={buttonVariants({ className: "w-full" })} disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
           {t("auth.signUp.submit")}
-        </Button>
+        </button>
       </form>
 
       <AuthDivider />

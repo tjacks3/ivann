@@ -9,7 +9,7 @@ import { useSupabase } from "@/hooks/use-supabase";
 import { useTranslation } from "@/i18n";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { Loader2, Mail } from "lucide-react";
 
 export default function ForgotPasswordPage() {
@@ -77,10 +77,10 @@ export default function ForgotPasswordPage() {
             <p className="text-xs text-destructive">{t("auth.error.invalidEmail")}</p>
           )}
         </div>
-        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting && <Loader2 className="animate-spin" />}
+        <button type="submit" className={buttonVariants({ className: "w-full" })} disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
           {t("auth.forgotPassword.submit")}
-        </Button>
+        </button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">

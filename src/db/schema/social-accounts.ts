@@ -10,8 +10,9 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { socialPlatformEnum } from "./enums";
+import { socialPlatformEnum, socialAccountStatusEnum } from "./enums";
 import { users } from "./users";
+import { socialTokens } from "./social-tokens";
 
 export const socialAccounts = pgTable(
   "social_accounts",
@@ -25,6 +26,7 @@ export const socialAccounts = pgTable(
     handle: varchar("handle", { length: 255 }).notNull(),
     displayName: varchar("display_name", { length: 255 }),
     profileUrl: text("profile_url"),
+    status: socialAccountStatusEnum("status").notNull().default("connected"),
     followerCount: integer("follower_count").notNull().default(0),
     isVerified: boolean("is_verified").notNull().default(false),
     connectedAt: timestamp("connected_at", { withTimezone: true }),
@@ -51,6 +53,7 @@ export const socialAccountsRelations = relations(
       fields: [socialAccounts.userId],
       references: [users.id],
     }),
+    token: one(socialTokens),
   }),
 );
 

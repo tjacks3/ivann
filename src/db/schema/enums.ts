@@ -10,6 +10,16 @@ export const socialPlatformEnum = pgEnum("social_platform", [
   "tiktok",
   "twitter",
   "linkedin",
+  "twitch",
+  "website",
+]);
+
+// Social account status
+export const socialAccountStatusEnum = pgEnum("social_account_status", [
+  "connected",
+  "error",
+  "expired",
+  "manual",
 ]);
 
 // Package statuses and types

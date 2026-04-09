@@ -33,6 +33,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
   ];
 
   const creatorLinks = [
+    { href: "/creator/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
     { href: "/creator/profile", label: t("nav.myProfile"), icon: User },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
   ];

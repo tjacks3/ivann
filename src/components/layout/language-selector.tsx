@@ -8,7 +8,7 @@ export function LanguageSelector() {
 
   return (
     <div className="flex items-center gap-1.5">
-      <Globe className="size-3.5 text-muted-foreground" />
+      <Globe className="size-3.5" />
       <label htmlFor="language-select" className="sr-only">
         {t("footer.language")}
       </label>
@@ -16,7 +16,7 @@ export function LanguageSelector() {
         id="language-select"
         value={locale}
         onChange={(e) => setLocale(e.target.value as typeof locale)}
-        className="cursor-pointer appearance-none border-none bg-transparent text-sm text-muted-foreground outline-none hover:text-primary"
+        className="cursor-pointer appearance-none border-none bg-transparent text-sm outline-none opacity-80 hover:opacity-100"
       >
         {SUPPORTED_LOCALES.map(({ code, label }) => (
           <option key={code} value={code}>

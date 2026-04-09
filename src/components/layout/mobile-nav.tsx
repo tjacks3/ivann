@@ -13,6 +13,7 @@ export function MobileNav() {
   const pathname = usePathname();
 
   const creatorTabs = [
+    { href: "/creator/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
     { href: "/creator/profile", label: t("nav.myProfile"), icon: User },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
     { href: "/settings", label: t("nav.settings"), icon: Settings },

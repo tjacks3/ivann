@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, MessageSquare, Package, Settings, User, LayoutDashboard } from "lucide-react";
+import { Compass, MessageSquare, User, LayoutDashboard, Settings } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -12,17 +12,20 @@ export function MobileNav() {
   const { user } = useUser();
   const pathname = usePathname();
 
-  const tabs = [
-    { href: "/discover", label: t("nav.discover"), icon: Compass },
+  const creatorTabs = [
+    { href: "/creator/profile", label: t("nav.myProfile"), icon: User },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
-    {
-      href: user?.role === "brand" ? "/brand/dashboard" : "/creator/profile",
-      label: user?.role === "brand" ? t("nav.brandDashboard") : t("nav.myProfile"),
-      icon: user?.role === "brand" ? LayoutDashboard : User,
-    },
-    { href: "/packages", label: t("nav.packages"), icon: Package },
     { href: "/settings", label: t("nav.settings"), icon: Settings },
   ];
+
+  const brandTabs = [
+    { href: "/brand/dashboard", label: t("nav.brandDashboard"), icon: LayoutDashboard },
+    { href: "/discover", label: t("nav.discover"), icon: Compass },
+    { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
+    { href: "/settings", label: t("nav.settings"), icon: Settings },
+  ];
+
+  const tabs = user?.role === "brand" ? brandTabs : creatorTabs;
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">

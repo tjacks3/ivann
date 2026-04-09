@@ -38,6 +38,13 @@ export const collabStatusEnum = pgEnum("collab_status", [
   "cancelled",
 ]);
 
+// Profile status
+export const profileStatusEnum = pgEnum("profile_status", [
+  "draft",
+  "published",
+  "archived",
+]);
+
 // Notification types
 export const notificationTypeEnum = pgEnum("notification_type", [
   "collab_request",

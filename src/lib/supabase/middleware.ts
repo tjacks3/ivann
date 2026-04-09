@@ -46,10 +46,25 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth routes
+  // Redirect authenticated users away from auth routes to their dashboard
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+
+    // Look up profile role for correct redirect
+    const { data: profile } = await supabase
+      .from("users")
+      .select("role, onboarding_completed")
+      .eq("auth_id", user.sub)
+      .single();
+
+    if (!profile || !profile.onboarding_completed) {
+      url.pathname = "/onboarding";
+    } else if (profile.role === "brand") {
+      url.pathname = "/brand/dashboard";
+    } else {
+      url.pathname = "/creator/dashboard";
+    }
+
     return NextResponse.redirect(url);
   }
 

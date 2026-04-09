@@ -4,36 +4,73 @@ import { ProfileHeader } from "@/components/profile/profile-header";
 import { PlatformGrid, type PlatformData } from "@/components/profile/platform-grid";
 import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
+import { LoadingState } from "@/components/shared/loading-state";
+import { useCreatorProfile } from "@/hooks/use-creator-profile";
 import { useTranslation } from "@/i18n";
+import { Users } from "lucide-react";
+import type { ProfileStatus } from "@/types";
 
-// TODO: Replace with real data from Supabase
-const mockProfile = {
-  name: "Alex Rivera",
-  username: "alexrivera",
-  bio: "Lifestyle & tech content creator. Helping brands tell their story through authentic content across platforms.",
-  categories: ["Lifestyle", "Tech", "Photography"],
-  followers: 142_500,
-  isOwnProfile: true,
-};
-
-const mockPlatforms: PlatformData[] = [
-  { platform: "Instagram", handle: "alexrivera", followers: 85_200, engagement: 3.8 },
-  { platform: "YouTube", handle: "AlexRivera", followers: 42_000, engagement: 5.2 },
-  { platform: "Twitter", handle: "alexrivera_", followers: 12_300, engagement: 2.1 },
-  { platform: "TikTok", handle: "alex.rivera", followers: 3_000, engagement: 8.4 },
-];
+function formatCount(count: number): string {
+  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
+  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}K`;
+  return count.toString();
+}
 
 export default function CreatorProfilePage() {
   const { t } = useTranslation();
+  const { profile, isLoading } = useCreatorProfile();
+
+  if (isLoading) {
+    return <LoadingState variant="page" />;
+  }
+
+  if (!profile) {
+    return null;
+  }
+
+  // Map social accounts to platform grid format
+  const platforms: PlatformData[] = (profile.socialAccounts ?? []).map((sa) => ({
+    platform: sa.platform.charAt(0).toUpperCase() + sa.platform.slice(1),
+    handle: sa.handle,
+    followers: sa.followerCount,
+    engagement: undefined,
+  }));
+
+  const totalFollowers = platforms.reduce((sum, p) => sum + p.followers, 0);
 
   return (
     <PageContainer size="narrow">
-      <div className="space-y-8">
-        <ProfileHeader {...mockProfile} />
+      <div className="space-y-12">
+        <ProfileHeader
+          name={profile.fullName || ""}
+          avatarUrl={profile.avatarUrl ?? undefined}
+          bio={profile.bio ?? undefined}
+          categories={profile.categories}
+          website={profile.website}
+          publicEmail={profile.publicEmail}
+          profileStatus={profile.profileStatus as ProfileStatus}
+          isOwnProfile
+        />
         <div>
-          <SectionHeader title={t("profile.connectedPlatforms")} as="h2" />
+          <SectionHeader
+            title={t("profile.connectedPlatforms")}
+            as="h2"
+            action={
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <span>@{profile.username}</span>
+                <span className="h-4 w-px bg-border" />
+                <div className="flex items-center gap-1.5">
+                  <Users className="size-4" />
+                  <span className="font-semibold text-foreground">
+                    {formatCount(totalFollowers)}
+                  </span>{" "}
+                  {t("profile.followers")}
+                </div>
+              </div>
+            }
+          />
           <div className="mt-4">
-            <PlatformGrid platforms={mockPlatforms} />
+            <PlatformGrid platforms={platforms} />
           </div>
         </div>
       </div>

@@ -2,33 +2,30 @@
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Users } from "lucide-react";
+import { ProfileStatusBadge } from "./profile-status-badge";
+import { Globe, Mail } from "lucide-react";
 import { useTranslation } from "@/i18n";
+import type { ProfileStatus } from "@/types";
 
 interface ProfileHeaderProps {
   name: string;
-  username: string;
   avatarUrl?: string;
   bio?: string;
   categories: string[];
-  followers: number;
+  website?: string | null;
+  publicEmail?: string | null;
+  profileStatus?: ProfileStatus;
   isOwnProfile?: boolean;
-}
-
-function formatCount(count: number): string {
-  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
-  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}K`;
-  return count.toString();
 }
 
 export function ProfileHeader({
   name,
-  username,
   avatarUrl,
   bio,
   categories,
-  followers,
+  website,
+  publicEmail,
+  profileStatus,
   isOwnProfile = false,
 }: ProfileHeaderProps) {
   const { t } = useTranslation();
@@ -40,55 +37,66 @@ export function ProfileHeader({
     .slice(0, 2);
 
   return (
-    <section className="rounded-xl p-6 sm:p-8">
-      <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-        {/* Avatar */}
-        <Avatar className="size-20 sm:size-24 text-lg">
+    <section className="space-y-4">
+      {/* Avatar */}
+      <div>
+        <Avatar className="size-28 text-xl sm:size-32">
           {avatarUrl && <AvatarImage src={avatarUrl} alt={name} />}
-          <AvatarFallback className="text-lg">{initials}</AvatarFallback>
+          <AvatarFallback className="text-xl">{initials}</AvatarFallback>
         </Avatar>
-
-        {/* Info */}
-        <div className="flex flex-1 flex-col items-center gap-3 text-center sm:items-start sm:text-left rtl:sm:text-right">
-          <div>
-            <h1 className="text-2xl font-bold">{name}</h1>
-            <p className="text-sm text-muted-foreground">@{username}</p>
-          </div>
-
-          {bio && (
-            <p className="max-w-lg text-sm text-muted-foreground">{bio}</p>
-          )}
-
-          {/* Categories */}
-          {categories.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Badge
-                  key={category}
-                  variant="outline"
-                  className="rounded-full border-primary/20 bg-primary/10 text-primary"
-                >
-                  {category}
-                </Badge>
-              ))}
-            </div>
-          )}
-
-          {/* Stats + CTA */}
-          <div className="flex items-center gap-4 pt-2">
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Users className="size-4" />
-              <span className="font-semibold text-foreground">
-                {formatCount(followers)}
-              </span>{" "}
-              {t("profile.followers")}
-            </div>
-            <Button size="lg">
-              {isOwnProfile ? t("profile.editProfile") : t("profile.sendOffer")}
-            </Button>
-          </div>
-        </div>
       </div>
+
+      {/* Name + status */}
+      <div className="flex flex-wrap items-center gap-2">
+        <h1 className="text-5xl font-bold">{name}</h1>
+        {profileStatus && isOwnProfile && (
+          <ProfileStatusBadge status={profileStatus} />
+        )}
+      </div>
+
+      {/* Bio */}
+      {bio && <p className="-mt-2 max-w-2xl text-sm text-muted-foreground">{bio}</p>}
+
+      {/* Categories */}
+      {categories.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category) => (
+            <Badge
+              key={category}
+              variant="outline"
+              className="rounded-full border-primary/20 bg-primary/10 text-primary"
+            >
+              {t(`onboarding.category.${category}`)}
+            </Badge>
+          ))}
+        </div>
+      )}
+
+      {/* Links */}
+      {(website || publicEmail) && (
+        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+          {website && (
+            <a
+              href={website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-foreground"
+            >
+              <Globe className="size-3.5" />
+              {website.replace(/^https?:\/\//, "")}
+            </a>
+          )}
+          {publicEmail && (
+            <a
+              href={`mailto:${publicEmail}`}
+              className="flex items-center gap-1.5 hover:text-foreground"
+            >
+              <Mail className="size-3.5" />
+              {publicEmail}
+            </a>
+          )}
+        </div>
+      )}
     </section>
   );
 }

@@ -8,7 +8,7 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { userRoleEnum } from "./enums";
+import { userRoleEnum, profileStatusEnum } from "./enums";
 import { socialAccounts } from "./social-accounts";
 import { packages } from "./packages";
 import { collaborationRequests } from "./collaboration-requests";
@@ -29,6 +29,9 @@ export const users = pgTable("users", {
   username: varchar("username", { length: 50 }).unique(),
   categories: text("categories").array().notNull().default([]),
   location: varchar("location", { length: 100 }),
+  website: varchar("website", { length: 500 }),
+  publicEmail: varchar("public_email", { length: 255 }),
+  profileStatus: profileStatusEnum("profile_status").notNull().default("draft"),
 
   // Brand fields
   brandName: varchar("brand_name", { length: 255 }),

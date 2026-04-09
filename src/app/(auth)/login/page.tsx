@@ -38,12 +38,26 @@ export default function LoginPage() {
 
   const onLogin = async (values: LoginValues) => {
     setError(null);
-    const { error: authError } = await supabase.auth.signInWithPassword(values);
+    const { error: authError, data } = await supabase.auth.signInWithPassword(values);
     if (authError) {
       setError(t("auth.error.invalidCredentials"));
       return;
     }
-    router.push("/");
+
+    // Look up profile role to redirect to the right dashboard
+    const { data: profile } = await supabase
+      .from("users")
+      .select("role, onboarding_completed")
+      .eq("auth_id", data.user.id)
+      .single();
+
+    if (!profile || !profile.onboarding_completed) {
+      router.push("/onboarding");
+    } else if (profile.role === "brand") {
+      router.push("/brand/dashboard");
+    } else {
+      router.push("/creator/dashboard");
+    }
     router.refresh();
   };
 

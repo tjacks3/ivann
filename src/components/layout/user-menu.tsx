@@ -60,7 +60,7 @@ export function UserMenu({ name, email, avatarUrl, role = "creator" }: UserMenuP
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem render={<Link href={role === "brand" ? "/brand/dashboard" : "/creator/profile"} />}>
+        <DropdownMenuItem render={<Link href={role === "brand" ? "/brand/profile/edit" : "/creator/profile/edit"} />}>
           <User className="size-4" />
           {t("userMenu.editProfile")}
         </DropdownMenuItem>

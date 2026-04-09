@@ -14,7 +14,7 @@ import {
 import { UserMenu } from "@/components/layout/user-menu";
 import { useUser } from "@/hooks/use-user";
 import { useTranslation } from "@/i18n";
-import { Menu, Compass, MessageSquare, X } from "lucide-react";
+import { Menu, Compass, MessageSquare, User, LayoutDashboard, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { HeaderVariant } from "@/types";
 
@@ -32,12 +32,19 @@ export function Header({ variant = "marketing" }: HeaderProps) {
     { href: "/discover", label: t("nav.discover"), icon: Compass },
   ];
 
-  const appLinks = [
+  const creatorLinks = [
+    { href: "/creator/profile", label: t("nav.myProfile"), icon: User },
+    { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
+  ];
+
+  const brandLinks = [
+    { href: "/brand/dashboard", label: t("nav.brandDashboard"), icon: LayoutDashboard },
     { href: "/discover", label: t("nav.discover"), icon: Compass },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
   ];
 
-  const links = variant === "app" ? appLinks : marketingLinks;
+  const appLinks = user?.role === "brand" ? brandLinks : creatorLinks;
+  const links = isAuthenticated ? appLinks : marketingLinks;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

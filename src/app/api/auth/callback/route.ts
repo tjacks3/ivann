@@ -33,7 +33,7 @@ export async function GET(request: Request) {
         }
 
         const destination =
-          profile.role === "brand" ? "/brand/dashboard" : "/creator/profile";
+          profile.role === "brand" ? "/brand/dashboard" : "/creator/dashboard";
         return NextResponse.redirect(`${origin}${destination}`);
       }
 

@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
+import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { sql } from "drizzle-orm";
@@ -19,7 +20,25 @@ const connectionString = process.env.DATABASE_URL!;
 const client = postgres(connectionString, { prepare: false });
 const db = drizzle(client);
 
-// Deterministic UUIDs for seed data
+// Supabase admin client for creating auth users
+const supabase = createSupabaseAdmin(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+);
+
+const SEED_PASSWORD = "TestPass123!";
+
+// Seed user definitions
+const SEED_USERS = [
+  { email: "maya@example.com", key: "creator1" },
+  { email: "alex@example.com", key: "creator2" },
+  { email: "jordan@example.com", key: "creator3" },
+  { email: "brand@luxewear.example.com", key: "brand1" },
+  { email: "brand@techflow.example.com", key: "brand2" },
+  { email: "admin@ivann.example.com", key: "admin" },
+] as const;
+
+// Deterministic profile IDs (for FK references within the seed)
 const CREATOR_1_ID = "a0000000-0000-0000-0000-000000000001";
 const CREATOR_2_ID = "a0000000-0000-0000-0000-000000000002";
 const CREATOR_3_ID = "a0000000-0000-0000-0000-000000000003";
@@ -41,12 +60,41 @@ const COLLAB_3_ID = "e0000000-0000-0000-0000-000000000003";
 const THREAD_1_ID = "f0000000-0000-0000-0000-000000000001";
 const THREAD_2_ID = "f0000000-0000-0000-0000-000000000002";
 
+/**
+ * Create or get a Supabase Auth user. Returns the auth user ID.
+ */
+async function ensureAuthUser(email: string): Promise<string> {
+  // Check if user already exists
+  const { data: existing } = await supabase.auth.admin.listUsers();
+  const found = existing?.users?.find((u) => u.email === email);
+  if (found) {
+    return found.id;
+  }
+
+  const { data, error } = await supabase.auth.admin.createUser({
+    email,
+    password: SEED_PASSWORD,
+    email_confirm: true,
+  });
+
+  if (error) throw new Error(`Failed to create auth user ${email}: ${error.message}`);
+  return data.user.id;
+}
+
 async function seed() {
-  console.log("🌱 Seeding database...");
+  console.log("🌱 Seeding database...\n");
+
+  // --- Create Supabase Auth users ---
+  console.log("  Creating auth users...");
+  const authIds: Record<string, string> = {};
+  for (const { email, key } of SEED_USERS) {
+    authIds[key] = await ensureAuthUser(email);
+    console.log(`    ${email} → ${authIds[key]}`);
+  }
 
   await db.transaction(async (tx) => {
     // Clear tables in reverse dependency order
-    console.log("  Clearing existing seed data...");
+    console.log("\n  Clearing existing seed data...");
     await tx.delete(notifications);
     await tx.delete(messages);
     await tx.delete(messageThreadMembers);
@@ -61,13 +109,17 @@ async function seed() {
           .join(","),
       )})`,
     );
+    // Also delete by auth_id in case IDs shifted
+    for (const authId of Object.values(authIds)) {
+      await tx.execute(sql`DELETE FROM users WHERE auth_id = ${authId}`);
+    }
 
     // --- Users ---
     console.log("  Seeding users...");
     await tx.insert(users).values([
       {
         id: CREATOR_1_ID,
-        authId: "00000000-aaaa-0000-0000-000000000001",
+        authId: authIds.creator1,
         email: "maya@example.com",
         fullName: "Maya Chen",
         role: "creator",
@@ -75,12 +127,14 @@ async function seed() {
         username: "mayachen",
         categories: ["lifestyle", "fashion"],
         location: "Los Angeles, CA",
+        website: "https://mayachen.com",
+        profileStatus: "published",
         onboardingCompleted: true,
         onboardingStep: 4,
       },
       {
         id: CREATOR_2_ID,
-        authId: "00000000-aaaa-0000-0000-000000000002",
+        authId: authIds.creator2,
         email: "alex@example.com",
         fullName: "Alex Rivera",
         role: "creator",
@@ -88,12 +142,15 @@ async function seed() {
         username: "alextech",
         categories: ["tech", "entertainment"],
         location: "Austin, TX",
+        website: "https://alextech.dev",
+        publicEmail: "collab@alextech.dev",
+        profileStatus: "published",
         onboardingCompleted: true,
         onboardingStep: 4,
       },
       {
         id: CREATOR_3_ID,
-        authId: "00000000-aaaa-0000-0000-000000000003",
+        authId: authIds.creator3,
         email: "jordan@example.com",
         fullName: "Jordan Lee",
         role: "creator",
@@ -101,12 +158,13 @@ async function seed() {
         username: "jordanfitness",
         categories: ["fitness", "lifestyle", "food"],
         location: "Miami, FL",
+        profileStatus: "draft",
         onboardingCompleted: true,
         onboardingStep: 4,
       },
       {
         id: BRAND_1_ID,
-        authId: "00000000-aaaa-0000-0000-000000000004",
+        authId: authIds.brand1,
         email: "brand@luxewear.example.com",
         fullName: "Sarah Kim",
         role: "brand",
@@ -120,7 +178,7 @@ async function seed() {
       },
       {
         id: BRAND_2_ID,
-        authId: "00000000-aaaa-0000-0000-000000000005",
+        authId: authIds.brand2,
         email: "brand@techflow.example.com",
         fullName: "Marcus Johnson",
         role: "brand",
@@ -134,7 +192,7 @@ async function seed() {
       },
       {
         id: ADMIN_ID,
-        authId: "00000000-aaaa-0000-0000-000000000006",
+        authId: authIds.admin,
         email: "admin@ivann.example.com",
         fullName: "Ivann Admin",
         role: "admin",
@@ -218,13 +276,11 @@ async function seed() {
         id: PACKAGE_1_ID,
         userId: CREATOR_1_ID,
         title: "Instagram Story Package",
-        description:
-          "3 Instagram stories featuring your product with swipe-up link.",
+        description: "3 Instagram stories featuring your product with swipe-up link.",
         type: "story",
         status: "active",
         priceInCents: 15000,
-        deliverables:
-          "3 Instagram stories, 24-hour posting, swipe-up link included",
+        deliverables: "3 Instagram stories, 24-hour posting, swipe-up link included",
         deliveryDays: 5,
         revisions: 1,
         isHighlighted: true,
@@ -234,8 +290,7 @@ async function seed() {
         id: PACKAGE_2_ID,
         userId: CREATOR_1_ID,
         title: "UGC Video Content",
-        description:
-          "High-quality UGC video for your brand. Perfect for ads and social.",
+        description: "High-quality UGC video for your brand. Perfect for ads and social.",
         type: "ugc",
         status: "active",
         priceInCents: 35000,
@@ -248,13 +303,11 @@ async function seed() {
         id: PACKAGE_3_ID,
         userId: CREATOR_2_ID,
         title: "Tech Product Review",
-        description:
-          "In-depth YouTube review of your tech product with honest assessment.",
+        description: "In-depth YouTube review of your tech product with honest assessment.",
         type: "video",
         status: "active",
         priceInCents: 50000,
-        deliverables:
-          "1 YouTube video (8-15 min), community post, pinned comment",
+        deliverables: "1 YouTube video (8-15 min), community post, pinned comment",
         deliveryDays: 14,
         revisions: 1,
         isHighlighted: true,
@@ -277,8 +330,7 @@ async function seed() {
         id: PACKAGE_5_ID,
         userId: CREATOR_3_ID,
         title: "Fitness Brand Reel",
-        description:
-          "Dynamic Instagram Reel showcasing your fitness product in action.",
+        description: "Dynamic Instagram Reel showcasing your fitness product in action.",
         type: "reel",
         status: "active",
         priceInCents: 25000,
@@ -292,13 +344,11 @@ async function seed() {
         id: PACKAGE_6_ID,
         userId: CREATOR_3_ID,
         title: "Full Fitness Bundle",
-        description:
-          "Complete content package: Reel + Stories + Feed Post for maximum reach.",
+        description: "Complete content package: Reel + Stories + Feed Post for maximum reach.",
         type: "bundle",
         status: "draft",
         priceInCents: 75000,
-        deliverables:
-          "1 Reel, 3 Stories, 1 Feed Post, usage rights for 30 days",
+        deliverables: "1 Reel, 3 Stories, 1 Feed Post, usage rights for 30 days",
         deliveryDays: 10,
         revisions: 2,
         sortOrder: 1,
@@ -354,8 +404,6 @@ async function seed() {
 
     // --- Message Threads ---
     console.log("  Seeding message threads...");
-    const threadTime = new Date("2026-04-03T14:30:00Z");
-
     await tx.insert(messageThreads).values([
       {
         id: THREAD_1_ID,
@@ -373,25 +421,10 @@ async function seed() {
 
     // --- Thread Members ---
     await tx.insert(messageThreadMembers).values([
-      {
-        threadId: THREAD_1_ID,
-        userId: BRAND_2_ID,
-        lastReadAt: new Date("2026-04-05T10:15:00Z"),
-      },
-      {
-        threadId: THREAD_1_ID,
-        userId: CREATOR_2_ID,
-        lastReadAt: new Date("2026-04-05T09:00:00Z"),
-      },
-      {
-        threadId: THREAD_2_ID,
-        userId: BRAND_1_ID,
-        lastReadAt: new Date("2026-04-04T16:45:00Z"),
-      },
-      {
-        threadId: THREAD_2_ID,
-        userId: CREATOR_1_ID,
-      },
+      { threadId: THREAD_1_ID, userId: BRAND_2_ID, lastReadAt: new Date("2026-04-05T10:15:00Z") },
+      { threadId: THREAD_1_ID, userId: CREATOR_2_ID, lastReadAt: new Date("2026-04-05T09:00:00Z") },
+      { threadId: THREAD_2_ID, userId: BRAND_1_ID, lastReadAt: new Date("2026-04-04T16:45:00Z") },
+      { threadId: THREAD_2_ID, userId: CREATOR_1_ID },
     ]);
 
     // --- Messages ---
@@ -513,7 +546,11 @@ async function seed() {
     ]);
   });
 
-  console.log("✅ Seed complete!");
+  console.log("\n✅ Seed complete!");
+  console.log("\n📋 Test credentials (password for all: TestPass123!):");
+  console.log("   Creators: maya@example.com, alex@example.com, jordan@example.com");
+  console.log("   Brands:   brand@luxewear.example.com, brand@techflow.example.com");
+  console.log("   Admin:    admin@ivann.example.com");
   process.exit(0);
 }
 

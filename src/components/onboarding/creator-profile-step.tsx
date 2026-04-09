@@ -5,14 +5,8 @@ import type { CreatorProfileValues } from "@/lib/validations/onboarding";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { CategorySelect } from "@/components/shared/category-select";
 import { useTranslation } from "@/i18n";
-import { cn } from "@/lib/utils";
-
-const CATEGORIES = [
-  "fashion", "tech", "lifestyle", "fitness",
-  "food", "travel", "education", "entertainment",
-  "business", "other",
-] as const;
 
 interface CreatorProfileStepProps {
   form: UseFormReturn<CreatorProfileValues>;
@@ -22,13 +16,6 @@ export function CreatorProfileStep({ form }: CreatorProfileStepProps) {
   const { t } = useTranslation();
   const { register, formState: { errors }, setValue, watch } = form;
   const selected = watch("categories") ?? [];
-
-  const toggleCategory = (cat: string) => {
-    const next = selected.includes(cat)
-      ? selected.filter((c) => c !== cat)
-      : [...selected, cat];
-    setValue("categories", next, { shouldValidate: true });
-  };
 
   return (
     <div className="space-y-6">
@@ -67,27 +54,11 @@ export function CreatorProfileStep({ form }: CreatorProfileStepProps) {
         <div className="space-y-2">
           <Label>{t("onboarding.creatorProfile.categories")}</Label>
           <p className="text-xs text-muted-foreground">{t("onboarding.creatorProfile.categoriesHint")}</p>
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((cat) => {
-              const isSelected = selected.includes(cat);
-              return (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => toggleCategory(cat)}
-                  className={cn(
-                    "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
-                    isSelected
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-input bg-background text-muted-foreground hover:border-primary/50 hover:text-foreground",
-                  )}
-                >
-                  {t(`onboarding.category.${cat}`)}
-                </button>
-              );
-            })}
-          </div>
-          {errors.categories && <p className="text-xs text-destructive">{errors.categories.message}</p>}
+          <CategorySelect
+            selected={selected}
+            onChange={(cats) => setValue("categories", cats, { shouldValidate: true })}
+            error={errors.categories?.message}
+          />
         </div>
 
         <div className="space-y-2">

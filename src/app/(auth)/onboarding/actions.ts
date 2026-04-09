@@ -1,20 +1,11 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/auth/get-auth-user";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import type { UserRole } from "@/types";
-
-async function getAuthUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-  return user;
-}
 
 /**
  * Find existing row by authId OR email, so we always update
@@ -120,5 +111,5 @@ export async function completeOnboarding(data: {
     throw err;
   }
 
-  redirect(data.role === "brand" ? "/brand/dashboard" : "/creator/profile");
+  redirect(data.role === "brand" ? "/brand/dashboard" : "/creator/dashboard");
 }

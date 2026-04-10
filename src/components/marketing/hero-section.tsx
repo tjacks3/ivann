@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { Badge } from "@/components/ui/badge";
 import { useUser } from "@/hooks/use-user";
 import { useTranslation } from "@/i18n";
 
@@ -12,9 +11,9 @@ export function HeroSection() {
 
   return (
     <div className="flex flex-col items-center justify-center px-4 py-24 text-center sm:py-32">
-      <Badge variant="secondary" className="mb-6 rounded-full px-4 py-1.5 text-xs font-medium">
+      <span className="mb-6 rounded-full border border-primary bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
         {t("hero.badge")}
-      </Badge>
+      </span>
 
       <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
         {t("hero.title")}{" "}

@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "@/i18n";
 import { PLATFORM_ORDER, getPlatformMeta } from "@/lib/social/platforms";
 
@@ -35,9 +33,9 @@ export function CreatorSocialStep() {
                   </div>
                   <span className="text-sm font-medium">{meta.name}</span>
                 </div>
-                <Badge variant="secondary" className="text-[10px]">
+                <span className="rounded-full border border-gray-500 bg-gray-500/10 px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400">
                   {t("onboarding.creatorSocial.comingSoon")}
-                </Badge>
+                </span>
               </CardContent>
             </Card>
           );

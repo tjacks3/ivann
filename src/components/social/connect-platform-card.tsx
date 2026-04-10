@@ -2,7 +2,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { getPlatformMeta, OAUTH_PLATFORMS } from "@/lib/social/platforms";
 import { useTranslation } from "@/i18n";
 
@@ -30,9 +29,9 @@ export function ConnectPlatformCard({ platform, onManualAdd }: ConnectPlatformCa
         <div className="flex-1">
           <p className="font-medium">{meta.name}</p>
           {isOAuth && (
-            <Badge variant="secondary" className="mt-0.5 text-[10px]">
+            <span className="mt-0.5 rounded-full border border-gray-500 bg-gray-500/10 px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400">
               {t("social.oauthComingSoon")}
-            </Badge>
+            </span>
           )}
         </div>
 

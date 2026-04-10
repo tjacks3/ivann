@@ -1,7 +1,6 @@
 "use client";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { ProfileStatusBadge } from "./profile-status-badge";
 import { Globe, Mail } from "lucide-react";
 import { useTranslation } from "@/i18n";
@@ -61,13 +60,12 @@ export function ProfileHeader({
       {categories.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {categories.map((category) => (
-            <Badge
+            <span
               key={category}
-              variant="outline"
-              className="rounded-full border-primary/20 bg-primary/10 text-primary"
+              className="rounded-full border border-primary bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary"
             >
               {t(`onboarding.category.${category}`)}
-            </Badge>
+            </span>
           ))}
         </div>
       )}

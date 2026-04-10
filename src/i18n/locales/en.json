@@ -172,8 +172,29 @@
 
   "discover.title": "Discover Creators",
   "discover.subtitle": "Browse and find creators for your next collaboration.",
-  "discover.emptyTitle": "Coming soon",
-  "discover.emptyDescription": "Creator discovery is being built. Check back soon.",
+  "discover.searchPlaceholder": "Search by name, username, or bio...",
+  "discover.filters": "Filters",
+  "discover.clearFilters": "Clear filters",
+  "discover.results": "{count} creators found",
+  "discover.loadMore": "Load more",
+
+  "discover.sort.followers": "Most followers",
+  "discover.sort.newest": "Newest",
+  "discover.sort.az": "A–Z",
+
+  "discover.filter.keyword": "Search",
+  "discover.filter.category": "Category",
+  "discover.filter.platform": "Platform",
+  "discover.filter.allPlatforms": "All platforms",
+  "discover.filter.followerRange": "Follower range",
+  "discover.filter.location": "Location",
+  "discover.filter.locationPlaceholder": "City or country...",
+  "discover.filter.verified": "Verified accounts only",
+
+  "discover.noResults.title": "No creators match your filters",
+  "discover.noResults.description": "Try adjusting your search or clearing some filters.",
+  "discover.empty.title": "No creators yet",
+  "discover.empty.description": "Check back soon as creators publish their profiles.",
 
   "brandDashboard.title": "Brand Dashboard",
   "brandDashboard.subtitle": "Manage your collaborations and discover creators.",

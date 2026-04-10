@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
 import { getPlatformMeta } from "@/lib/social/platforms";
 import { unlinkAccount } from "@/app/(app)/settings/socials/actions";
@@ -11,10 +10,10 @@ import { useTranslation } from "@/i18n";
 import type { SocialAccount } from "@/db/schema/social-accounts";
 
 const statusStyles: Record<string, string> = {
-  connected: "border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400",
-  manual: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400",
-  error: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400",
-  expired: "border-yellow-500/30 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
+  connected: "border-green-500 bg-green-500/10 text-green-700 dark:text-green-400",
+  manual: "border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+  error: "border-red-500 bg-red-500/10 text-red-700 dark:text-red-400",
+  expired: "border-yellow-500 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
 };
 
 interface LinkedAccountCardProps {
@@ -48,12 +47,11 @@ export function LinkedAccountCard({ account, onUnlinked }: LinkedAccountCardProp
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="font-medium">{meta.name}</p>
-            <Badge
-              variant="outline"
-              className={`rounded-full text-[10px] ${statusStyles[account.status] ?? ""}`}
+            <span
+              className={`rounded-full border px-3 py-1.5 text-sm font-medium ${statusStyles[account.status] ?? ""}`}
             >
               {t(`social.status.${account.status}`)}
-            </Badge>
+            </span>
           </div>
           <p className="truncate text-sm text-muted-foreground">
             {meta.handlePrefix}{account.handle}

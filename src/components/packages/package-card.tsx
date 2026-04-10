@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { PackageTypeBadge } from "./package-type-badge";
 import { Pencil, Trash2, Loader2, Clock, RotateCcw } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
@@ -12,9 +11,9 @@ import { useTranslation } from "@/i18n";
 import type { Package } from "@/db/schema/packages";
 
 const statusStyles: Record<string, string> = {
-  draft: "border-yellow-500/30 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
-  active: "border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400",
-  archived: "border-gray-500/30 bg-gray-500/10 text-gray-600 dark:text-gray-400",
+  draft: "border-yellow-500 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
+  active: "border-green-500 bg-green-500/10 text-green-700 dark:text-green-400",
+  archived: "border-gray-500 bg-gray-500/10 text-gray-600 dark:text-gray-400",
 };
 
 interface PackageCardProps {
@@ -53,12 +52,11 @@ export function PackageCard({ pkg, onEdit, onDeleted }: PackageCardProps) {
 
         <div className="flex flex-wrap items-center gap-2">
           <PackageTypeBadge type={pkg.type} />
-          <Badge
-            variant="outline"
-            className={`rounded-full text-xs ${statusStyles[pkg.status] ?? ""}`}
+          <span
+            className={`rounded-full border px-3 py-1.5 text-sm font-medium ${statusStyles[pkg.status] ?? ""}`}
           >
             {t(`packages.status.${pkg.status}`)}
-          </Badge>
+          </span>
           {pkg.deliveryDays && (
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock className="size-3" />

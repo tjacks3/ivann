@@ -9,7 +9,7 @@ export function Footer() {
 
   return (
     <footer className="mt-auto bg-primary">
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-8 text-center text-sm text-primary-foreground sm:flex-row sm:justify-between sm:text-left">
+      <div className="flex w-full flex-col items-center gap-4 px-4 py-8 text-center text-sm text-primary-foreground sm:flex-row sm:justify-between sm:text-left sm:px-6 lg:px-8">
         <p>{t("footer.rights", { year: new Date().getFullYear() })}</p>
         <div className="flex items-center gap-4">
           <Link href="/terms" className="text-primary-foreground/80 hover:text-primary-foreground">

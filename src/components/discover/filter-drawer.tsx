@@ -41,7 +41,7 @@ export function FilterDrawer({
           </span>
         )}
       </SheetTrigger>
-      <SheetContent side="left" className="w-80 p-0">
+      <SheetContent side="left" className="w-80 p-0" showCloseButton={false}>
         <div className="flex h-14 items-center justify-between border-b px-4">
           <SheetTitle className="text-base font-bold">
             {t("discover.filters")}

@@ -8,36 +8,42 @@ import { LoadingState } from "@/components/shared/loading-state";
 import { PackageCard } from "@/components/packages/package-card";
 import { PackageForm } from "@/components/packages/package-form";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet";
 import { usePackages } from "@/hooks/use-packages";
 import { useTranslation } from "@/i18n";
-import { Package, Plus } from "lucide-react";
+import { Package, Plus, X } from "lucide-react";
 import type { Package as PackageType } from "@/db/schema/packages";
 
 export default function PackagesPage() {
   const { t } = useTranslation();
   const { packages, isLoading, refetch } = usePackages();
-  const [showForm, setShowForm] = useState(false);
-  const [editingPkg, setEditingPkg] = useState<PackageType | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [editingPkg, setEditingPkg] = useState<PackageType | undefined>();
 
   const handleCreate = () => {
-    setEditingPkg(null);
-    setShowForm(true);
+    setEditingPkg(undefined);
+    setSheetOpen(true);
   };
 
   const handleEdit = (pkg: PackageType) => {
     setEditingPkg(pkg);
-    setShowForm(true);
+    setSheetOpen(true);
   };
 
   const handleSaved = () => {
-    setShowForm(false);
-    setEditingPkg(null);
+    setSheetOpen(false);
+    setEditingPkg(undefined);
     refetch();
   };
 
   const handleClose = () => {
-    setShowForm(false);
-    setEditingPkg(null);
+    setSheetOpen(false);
+    setEditingPkg(undefined);
   };
 
   if (isLoading) {
@@ -50,27 +56,34 @@ export default function PackagesPage() {
         title={t("packages.title")}
         description={t("packages.subtitle")}
         action={
-          !showForm && (
-            <Button size="sm" onClick={handleCreate}>
-              <Plus className="size-3.5" />
-              {t("packages.create")}
-            </Button>
-          )
+          <Button size="sm" onClick={handleCreate}>
+            <Plus className="size-3.5" />
+            {t("packages.create")}
+          </Button>
         }
       />
 
-      {showForm && (
-        <div className="mt-6 max-w-xl">
+      {/* Sheet modal for create/edit */}
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent side="right" className="flex w-full flex-col overflow-hidden p-0 sm:max-w-2xl" showCloseButton={false}>
+          <div className="flex h-14 shrink-0 items-center justify-between border-b px-4">
+            <SheetTitle className="text-base font-bold">
+              {editingPkg ? t("packages.edit") : t("packages.create")}
+            </SheetTitle>
+            <SheetClose>
+              <X className="size-5" />
+            </SheetClose>
+          </div>
           <PackageForm
-            pkg={editingPkg ?? undefined}
+            pkg={editingPkg}
             onClose={handleClose}
             onSaved={handleSaved}
           />
-        </div>
-      )}
+        </SheetContent>
+      </Sheet>
 
       <div className="mt-8">
-        {packages.length === 0 && !showForm ? (
+        {packages.length === 0 ? (
           <EmptyState
             icon={<Package className="size-6" />}
             title={t("packages.empty.title")}

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PageContainer } from "@/components/shared/page-container";
@@ -83,14 +83,14 @@ export default function CreatorDashboardPage() {
                 )}
 
                 <div className="mt-4 flex flex-wrap justify-center gap-3 sm:justify-start">
-                  <Button size="sm" render={<Link href="/creator/profile/edit" />}>
+                  <Link href="/creator/profile/edit" className={buttonVariants({ size: "sm" })}>
                     <Pencil className="size-3.5" />
                     {t("creatorDashboard.editProfile")}
-                  </Button>
-                  <Button size="sm" variant="outline" render={<Link href="/creator/profile" />}>
+                  </Link>
+                  <Link href="/creator/profile" className={buttonVariants({ variant: "outline", size: "sm" })}>
                     <Eye className="size-3.5" />
                     {t("creatorDashboard.viewProfile")}
-                  </Button>
+                  </Link>
                 </div>
               </div>
             </div>

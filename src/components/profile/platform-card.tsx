@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { getPlatformMeta } from "@/lib/social/platforms";
 import { cn } from "@/lib/utils";
 
@@ -29,56 +30,64 @@ export function PlatformCard({
   const meta = getPlatformMeta(platform.toLowerCase());
   const Icon = meta.icon;
   const isLarge = share !== undefined && share >= 0.35;
+  const fullHandle = `${meta.handlePrefix}${handle}`;
 
   return (
-    <Card
-      className={cn(
-        "overflow-hidden border-0 ring-0 transition-all hover:shadow-md hover:scale-[1.01]",
-      )}
-      style={{ backgroundColor: `${meta.color}08` }}
-    >
-      <CardContent
+    <TooltipProvider>
+      <Card
         className={cn(
-          "flex flex-col justify-between",
-          isLarge ? "gap-6 p-6" : "gap-4 p-4",
+          "overflow-hidden border-0 ring-0 transition-all hover:shadow-md hover:scale-[1.01]",
         )}
+        style={{ backgroundColor: `${meta.color}08` }}
       >
-        {/* Top: icon + platform name */}
-        <div className="flex items-center gap-3">
-          <div
-            className={cn(
-              "flex shrink-0 items-center justify-center rounded-xl",
-              isLarge ? "size-12" : "size-9",
-            )}
-            style={{ backgroundColor: `${meta.color}18` }}
-          >
-            <Icon
-              className={isLarge ? "size-6" : "size-4"}
-              style={{ color: meta.color }}
-            />
+        <CardContent
+          className={cn(
+            "flex flex-col justify-between",
+            isLarge ? "gap-6 p-6" : "gap-4 p-4",
+          )}
+        >
+          {/* Top: icon + platform name */}
+          <div className="flex items-center gap-3">
+            <div
+              className={cn(
+                "flex shrink-0 items-center justify-center rounded-xl",
+                isLarge ? "size-12" : "size-9",
+              )}
+              style={{ backgroundColor: `${meta.color}18` }}
+            >
+              <Icon
+                className={isLarge ? "size-6" : "size-4"}
+                style={{ color: meta.color }}
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className={cn("font-semibold truncate", isLarge ? "text-base" : "text-sm")}>
+                {meta.name}
+              </p>
+              <Tooltip>
+                <TooltipTrigger className="block max-w-full text-left">
+                  <p className="truncate text-xs text-muted-foreground">
+                    {fullHandle}
+                  </p>
+                </TooltipTrigger>
+                <TooltipContent>{fullHandle}</TooltipContent>
+              </Tooltip>
+            </div>
           </div>
+
+          {/* Bottom: stats */}
           <div>
-            <p className={cn("font-semibold", isLarge ? "text-base" : "text-sm")}>
-              {meta.name}
+            <p className={cn("font-bold", isLarge ? "text-3xl" : "text-xl")}>
+              {formatCount(followers)}
             </p>
             <p className="text-xs text-muted-foreground">
-              {meta.handlePrefix}{handle}
+              {engagement !== undefined
+                ? `${engagement.toFixed(1)}% engagement`
+                : "followers"}
             </p>
           </div>
-        </div>
-
-        {/* Bottom: stats */}
-        <div>
-          <p className={cn("font-bold", isLarge ? "text-3xl" : "text-xl")}>
-            {formatCount(followers)}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {engagement !== undefined
-              ? `${engagement.toFixed(1)}% engagement`
-              : "followers"}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </TooltipProvider>
   );
 }

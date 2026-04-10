@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const AUTH_ROUTES = ["/login", "/signup", "/forgot-password"];
-const PROTECTED_PREFIXES = ["/creator/profile", "/creator/dashboard", "/brand", "/messages", "/packages", "/settings", "/onboarding"];
+const PROTECTED_PREFIXES = ["/creator/profile", "/creator/dashboard", "/brand", "/collaborations", "/messages", "/packages", "/settings", "/onboarding"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });

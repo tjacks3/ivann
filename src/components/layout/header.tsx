@@ -14,7 +14,7 @@ import {
 import { UserMenu } from "@/components/layout/user-menu";
 import { useUser } from "@/hooks/use-user";
 import { useTranslation } from "@/i18n";
-import { Menu, Compass, MessageSquare, User, LayoutDashboard, X } from "lucide-react";
+import { Menu, Compass, MessageSquare, User, LayoutDashboard, Handshake, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { HeaderVariant } from "@/types";
 
@@ -35,12 +35,14 @@ export function Header({ variant = "marketing" }: HeaderProps) {
   const creatorLinks = [
     { href: "/creator/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
     { href: "/creator/profile", label: t("nav.myProfile"), icon: User },
+    { href: "/collaborations", label: t("nav.collaborations"), icon: Handshake },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
   ];
 
   const brandLinks = [
     { href: "/brand/dashboard", label: t("nav.brandDashboard"), icon: LayoutDashboard },
     { href: "/discover", label: t("nav.discover"), icon: Compass },
+    { href: "/collaborations", label: t("nav.collaborations"), icon: Handshake },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
   ];
 
@@ -118,7 +120,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
                 <SheetTrigger aria-label={t("nav.toggleMenu")}>
                   <Menu className="size-5" />
                 </SheetTrigger>
-                <SheetContent side="right" className="w-72 p-0">
+                <SheetContent side="right" className="w-72 p-0" showCloseButton={false}>
                   <div className="flex h-14 items-center justify-between border-b px-4">
                     <SheetTitle className="text-base font-bold text-primary">ivann</SheetTitle>
                     <SheetClose>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
@@ -100,9 +100,9 @@ export default function BrandDashboardPage() {
           title={t("brandDashboard.emptyTitle")}
           description={t("brandDashboard.emptyDescription")}
           action={
-            <Button render={<Link href="/discover" />}>
+            <Link href="/discover" className={buttonVariants()}>
               {t("nav.discover")}
-            </Button>
+            </Link>
           }
         />
       </div>

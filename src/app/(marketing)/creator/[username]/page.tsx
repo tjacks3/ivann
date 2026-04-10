@@ -1,19 +1,28 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { PlatformGrid, type PlatformData } from "@/components/profile/platform-grid";
 import { PackagePublicCard } from "@/components/packages/package-public-card";
 import { RelatedCreators } from "@/components/discover/related-creators";
+import { RequestForm } from "@/components/collaborations/request-form";
 import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingState } from "@/components/shared/loading-state";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet";
+import { useUser } from "@/hooks/use-user";
 import { useTranslation } from "@/i18n";
-import { ArrowLeft, Users, UserX } from "lucide-react";
+import { ArrowLeft, Users, UserX, Handshake, X } from "lucide-react";
 import { getPublicCreatorProfile } from "./actions";
 
 function formatCount(count: number): string {
@@ -29,6 +38,9 @@ export default function PublicCreatorProfilePage({
 }) {
   const { username } = use(params);
   const { t } = useTranslation();
+  const { user, isAuthenticated } = useUser();
+  const [selectedPackageId, setSelectedPackageId] = useState<string | undefined>();
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["public-creator", username],
@@ -48,10 +60,10 @@ export default function PublicCreatorProfilePage({
           title={t("publicProfile.notFound.title")}
           description={t("publicProfile.notFound.description")}
           action={
-            <Button variant="outline" render={<Link href="/discover" />}>
+            <Link href="/discover" className={buttonVariants({ variant: "outline" })}>
               <ArrowLeft className="size-3.5" />
               {t("publicProfile.backToDiscover")}
-            </Button>
+            </Link>
           }
         />
       </PageContainer>
@@ -68,15 +80,48 @@ export default function PublicCreatorProfilePage({
   const totalFollowers = platforms.reduce((sum, p) => sum + p.followers, 0);
   const isVerified = (profile.socialAccounts ?? []).some((sa) => sa.isVerified);
   const activePackages = (profile.packages ?? []).filter((pkg) => pkg.status === "active");
+  const isBrand = isAuthenticated && user?.role === "brand";
+
+  const handleSelectPackage = (packageId: string) => {
+    setSelectedPackageId(packageId);
+    setSheetOpen(true);
+  };
 
   return (
     <PageContainer size="narrow">
-      {/* Back nav */}
-      <div className="mb-6">
-        <Button variant="ghost" size="sm" render={<Link href="/discover" />}>
+      {/* Back nav + Send Offer */}
+      <div className="mb-6 flex items-center justify-between">
+        <Link href="/discover" className={buttonVariants({ variant: "ghost", size: "sm" })}>
           <ArrowLeft className="size-3.5" />
           {t("publicProfile.backToDiscover")}
-        </Button>
+        </Link>
+        {isBrand && (
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+            <SheetTrigger
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/85"
+            >
+              <Handshake className="size-3.5" />
+              {t("profile.sendOffer")}
+            </SheetTrigger>
+            <SheetContent side="right" className="flex w-full flex-col overflow-hidden p-0 sm:max-w-2xl" showCloseButton={false}>
+              <div className="flex h-14 shrink-0 items-center justify-between border-b px-4">
+                <SheetTitle className="text-base font-bold">
+                  {t("collab.form.title", { name: profile.fullName || "" })}
+                </SheetTitle>
+                <SheetClose>
+                  <X className="size-5" />
+                </SheetClose>
+              </div>
+              <RequestForm
+                creatorId={profile.id}
+                creatorName={profile.fullName || ""}
+                packages={activePackages}
+                preSelectedPackageId={selectedPackageId}
+                onClose={() => setSheetOpen(false)}
+              />
+            </SheetContent>
+          </Sheet>
+        )}
       </div>
 
       <div className="space-y-12">
@@ -130,7 +175,11 @@ export default function PublicCreatorProfilePage({
             />
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {activePackages.map((pkg) => (
-                <PackagePublicCard key={pkg.id} pkg={pkg} />
+                <PackagePublicCard
+                  key={pkg.id}
+                  pkg={pkg}
+                  onSelect={isBrand ? () => handleSelectPackage(pkg.id) : undefined}
+                />
               ))}
             </div>
           </div>

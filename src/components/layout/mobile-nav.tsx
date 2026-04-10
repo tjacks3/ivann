@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, MessageSquare, User, LayoutDashboard, Settings } from "lucide-react";
+import { Compass, MessageSquare, User, LayoutDashboard, Handshake, Settings } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ export function MobileNav() {
   const creatorTabs = [
     { href: "/creator/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
     { href: "/creator/profile", label: t("nav.myProfile"), icon: User },
+    { href: "/collaborations", label: t("nav.collaborations"), icon: Handshake },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
     { href: "/settings", label: t("nav.settings"), icon: Settings },
   ];
@@ -22,6 +23,7 @@ export function MobileNav() {
   const brandTabs = [
     { href: "/brand/dashboard", label: t("nav.brandDashboard"), icon: LayoutDashboard },
     { href: "/discover", label: t("nav.discover"), icon: Compass },
+    { href: "/collaborations", label: t("nav.collaborations"), icon: Handshake },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
     { href: "/settings", label: t("nav.settings"), icon: Settings },
   ];

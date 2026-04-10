@@ -2,17 +2,18 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { PackageTypeBadge } from "./package-type-badge";
-import { Clock, RotateCcw } from "lucide-react";
+import { Clock, RotateCcw, Handshake } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
 import type { Package } from "@/db/schema/packages";
 
 interface PackagePublicCardProps {
   pkg: Package;
+  onSelect?: () => void;
 }
 
-export function PackagePublicCard({ pkg }: PackagePublicCardProps) {
-  const { locale } = useTranslation();
+export function PackagePublicCard({ pkg, onSelect }: PackagePublicCardProps) {
+  const { t, locale } = useTranslation();
 
   return (
     <Card className="transition-all hover:shadow-md hover:scale-[1.01]">
@@ -30,19 +31,31 @@ export function PackagePublicCard({ pkg }: PackagePublicCardProps) {
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-2">
-          <PackageTypeBadge type={pkg.type} />
-          {pkg.deliveryDays && (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Clock className="size-3" />
-              {pkg.deliveryDays} days
-            </span>
-          )}
-          {pkg.revisions > 0 && (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <RotateCcw className="size-3" />
-              {pkg.revisions} {pkg.revisions === 1 ? "revision" : "revisions"}
-            </span>
+        <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            <PackageTypeBadge type={pkg.type} />
+            {pkg.deliveryDays && (
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="size-3" />
+                {pkg.deliveryDays}d
+              </span>
+            )}
+            {pkg.revisions > 0 && (
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <RotateCcw className="size-3" />
+                {pkg.revisions}
+              </span>
+            )}
+          </div>
+          {onSelect && (
+            <button
+              type="button"
+              onClick={onSelect}
+              className="inline-flex items-center gap-1 rounded-full border border-input bg-background px-3 py-1 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              <Handshake className="size-3" />
+              {t("collab.select")}
+            </button>
           )}
         </div>
       </CardContent>

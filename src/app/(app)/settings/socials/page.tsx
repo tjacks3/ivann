@@ -8,7 +8,7 @@ import { LoadingState } from "@/components/shared/loading-state";
 import { LinkedAccountCard } from "@/components/social/linked-account-card";
 import { ConnectPlatformCard } from "@/components/social/connect-platform-card";
 import { ManualLinkForm } from "@/components/social/manual-link-form";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { useSocialAccounts } from "@/hooks/use-social-accounts";
 import { useTranslation } from "@/i18n";
 import { PLATFORM_ORDER } from "@/lib/social/platforms";
@@ -39,10 +39,10 @@ export default function SocialsSettingsPage() {
         title={t("social.title")}
         description={t("social.subtitle")}
         action={
-          <Button variant="outline" size="sm" render={<Link href="/settings" />}>
+          <Link href="/settings" className={buttonVariants({ variant: "outline", size: "sm" })}>
             <ArrowLeft className="size-3.5" />
             {t("social.backToSettings")}
-          </Button>
+          </Link>
         }
       />
 

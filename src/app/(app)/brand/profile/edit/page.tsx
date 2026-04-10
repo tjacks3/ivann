@@ -5,7 +5,7 @@ import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { LoadingState } from "@/components/shared/loading-state";
 import { BrandEditForm } from "@/components/brand/brand-edit-form";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { useBrandProfile } from "@/hooks/use-brand-profile";
 import { useTranslation } from "@/i18n";
 import { ArrowLeft } from "lucide-react";
@@ -28,10 +28,10 @@ export default function BrandEditProfilePage() {
         title={t("brandProfile.edit.title")}
         description={t("brandProfile.edit.subtitle")}
         action={
-          <Button variant="outline" size="sm" render={<Link href="/brand/dashboard" />}>
+          <Link href="/brand/dashboard" className={buttonVariants({ variant: "outline", size: "sm" })}>
             <ArrowLeft className="size-3.5" />
             {t("brandProfile.edit.backToDashboard")}
-          </Button>
+          </Link>
         }
       />
       <div className="mt-6">

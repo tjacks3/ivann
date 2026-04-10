@@ -1,12 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { EmptyState } from "@/components/shared/empty-state";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { MessageSquare } from "lucide-react";
 import { useTranslation } from "@/i18n";
-import Link from "next/link";
 
 export default function MessagesPage() {
   const { t } = useTranslation();
@@ -23,9 +23,9 @@ export default function MessagesPage() {
           title={t("empty.noMessages")}
           description={t("empty.noMessagesDescription")}
           action={
-            <Button render={<Link href="/discover" />}>
+            <Link href="/discover" className={buttonVariants()}>
               {t("empty.browseCreators")}
-            </Button>
+            </Link>
           }
         />
       </div>

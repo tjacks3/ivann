@@ -139,3 +139,25 @@ npm run db:add-test -- creator — adds a creator only
 npm run db:add-test -- brand — adds a brand only
 
 ### Add Creators for testing the Discover view
+
+### Flow for Collaborations and Offers
+
+Flow
+Brand sends offer:
+
+1. Browse Discover → click creator card → view public profile
+2. Click "Send Offer" (top right) or "Select" on a package card
+3. Form appears inline with package pre-selected (if applicable), budget auto-filled
+4. Submit → success state with confirmation
+
+Creator receives:
+
+1. Navigate to Collaborations (nav link)
+2. See incoming requests with status badges
+3. Expand message, view budget/deadline/package
+4. Accept or Decline (with optional reason)
+
+Brand tracks:
+
+1. Navigate to Collaborations
+2. See sent requests with current status

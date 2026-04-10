@@ -15,6 +15,7 @@ export async function getCreatorProfile() {
     where: eq(users.authId, authUser.id),
     with: {
       socialAccounts: true,
+      packages: true,
     },
   });
 

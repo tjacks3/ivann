@@ -1,0 +1,228 @@
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
+import { Loader2, X } from "lucide-react";
+import { useTranslation } from "@/i18n";
+import { packageFormSchema } from "@/lib/validations/package";
+import type { PackageFormValues } from "@/lib/validations/package";
+import { createPackage, updatePackage } from "@/app/(app)/packages/actions";
+import { getCurrencyForLocale, fromCents, toCents } from "@/lib/currency";
+import type { Package } from "@/db/schema/packages";
+
+const PACKAGE_TYPES = [
+  "ugc",
+  "sponsored_post",
+  "story",
+  "reel",
+  "video",
+  "bundle",
+  "custom",
+] as const;
+
+interface PackageFormProps {
+  pkg?: Package;
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+export function PackageForm({ pkg, onClose, onSaved }: PackageFormProps) {
+  const { t, locale } = useTranslation();
+  const [saving, setSaving] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const isEditing = !!pkg;
+
+  const currency = pkg?.currency ?? getCurrencyForLocale(locale);
+
+  const form = useForm<PackageFormValues>({
+    resolver: zodResolver(packageFormSchema),
+    defaultValues: {
+      title: pkg?.title ?? "",
+      description: pkg?.description ?? "",
+      type: (pkg?.type as PackageFormValues["type"]) ?? "custom",
+      priceInCents: pkg?.priceInCents ?? 0,
+      currency,
+      deliveryDays: pkg?.deliveryDays ?? undefined,
+      revisions: pkg?.revisions ?? 1,
+      status: (pkg?.status as PackageFormValues["status"]) ?? "draft",
+    },
+  });
+
+  const { register, formState: { errors }, setValue, watch, handleSubmit } = form;
+
+  // Display price in major currency units for the input
+  const priceDisplay = watch("priceInCents")
+    ? fromCents(watch("priceInCents"), currency).toString()
+    : "";
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    if (isNaN(val)) {
+      setValue("priceInCents", 0, { shouldValidate: true });
+    } else {
+      setValue("priceInCents", toCents(val, currency), { shouldValidate: true });
+    }
+  };
+
+  const onSubmit = async (data: PackageFormValues) => {
+    setSaving(true);
+    setServerError(null);
+
+    const result = isEditing
+      ? await updatePackage(pkg!.id, data)
+      : await createPackage(data);
+
+    if (result.success) {
+      onSaved();
+    } else {
+      setServerError(t("packages.form.error"));
+    }
+
+    setSaving(false);
+  };
+
+  return (
+    <Card>
+      <CardContent className="pt-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold">
+            {isEditing ? t("packages.edit") : t("packages.create")}
+          </h3>
+          <Button size="sm" variant="ghost" onClick={onClose}>
+            <X className="size-4" />
+          </Button>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="title">{t("packages.form.title")}</Label>
+            <Input id="title" {...register("title")} />
+            {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="description">{t("packages.form.description")}</Label>
+            <Textarea
+              id="description"
+              rows={3}
+              placeholder={t("packages.form.descriptionPlaceholder")}
+              {...register("description")}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>{t("packages.form.type")}</Label>
+              <Select
+                value={watch("type")}
+                onValueChange={(val) =>
+                  setValue("type", val as PackageFormValues["type"], { shouldValidate: true })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PACKAGE_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {t(`packages.type.${type}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>{t("packages.form.status")}</Label>
+              <Select
+                value={watch("status")}
+                onValueChange={(val) =>
+                  setValue("status", val as PackageFormValues["status"], { shouldValidate: true })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">{t("packages.status.draft")}</SelectItem>
+                  <SelectItem value="active">{t("packages.status.active")}</SelectItem>
+                  <SelectItem value="archived">{t("packages.status.archived")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="price">{t("packages.form.price")}</Label>
+            <div className="flex">
+              <span className="flex items-center rounded-l-lg border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground uppercase">
+                {currency}
+              </span>
+              <Input
+                id="price"
+                type="number"
+                step="0.01"
+                min="1"
+                className="rounded-l-none"
+                value={priceDisplay}
+                onChange={handlePriceChange}
+              />
+            </div>
+            {errors.priceInCents && <p className="text-xs text-destructive">{errors.priceInCents.message}</p>}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="deliveryDays">{t("packages.form.deliveryDays")}</Label>
+              <Input
+                id="deliveryDays"
+                type="number"
+                min="1"
+                max="365"
+                {...register("deliveryDays", { valueAsNumber: true })}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="revisions">{t("packages.form.revisions")}</Label>
+              <Input
+                id="revisions"
+                type="number"
+                min="0"
+                max="10"
+                {...register("revisions", { valueAsNumber: true })}
+              />
+            </div>
+          </div>
+
+          {serverError && (
+            <p className="text-xs text-destructive">{serverError}</p>
+          )}
+
+          <div className="flex gap-2 pt-1">
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+              {t("packages.form.cancel")}
+            </Button>
+            <Button type="submit" disabled={saving} className="flex-1">
+              {saving && <Loader2 className="size-3 animate-spin" />}
+              {saving ? t("packages.form.saving") : t("packages.form.save")}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}

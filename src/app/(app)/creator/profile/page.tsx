@@ -2,6 +2,7 @@
 
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { PlatformGrid, type PlatformData } from "@/components/profile/platform-grid";
+import { PackagePublicCard } from "@/components/packages/package-public-card";
 import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { LoadingState } from "@/components/shared/loading-state";
@@ -38,6 +39,11 @@ export default function CreatorProfilePage() {
 
   const totalFollowers = platforms.reduce((sum, p) => sum + p.followers, 0);
 
+  // Only show active packages on public profile
+  const activePackages = (profile.packages ?? []).filter(
+    (pkg) => pkg.status === "active",
+  );
+
   return (
     <PageContainer size="narrow">
       <div className="space-y-12">
@@ -51,6 +57,7 @@ export default function CreatorProfilePage() {
           profileStatus={profile.profileStatus as ProfileStatus}
           isOwnProfile
         />
+
         <div>
           <SectionHeader
             title={t("profile.connectedPlatforms")}
@@ -73,6 +80,25 @@ export default function CreatorProfilePage() {
             <PlatformGrid platforms={platforms} />
           </div>
         </div>
+
+        {activePackages.length > 0 && (
+          <div>
+            <SectionHeader
+              title={t("packages.profileTitle")}
+              as="h2"
+              action={
+                <span className="text-sm text-muted-foreground">
+                  {activePackages.length} {activePackages.length === 1 ? "package" : "packages"}
+                </span>
+              }
+            />
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {activePackages.map((pkg) => (
+                <PackagePublicCard key={pkg.id} pkg={pkg} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </PageContainer>
   );

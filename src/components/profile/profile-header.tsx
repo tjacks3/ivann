@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ProfileStatusBadge } from "./profile-status-badge";
-import { Globe, Mail } from "lucide-react";
+import { Globe, Mail, BadgeCheck } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import type { ProfileStatus } from "@/types";
 
@@ -14,6 +14,7 @@ interface ProfileHeaderProps {
   website?: string | null;
   publicEmail?: string | null;
   profileStatus?: ProfileStatus;
+  isVerified?: boolean;
   isOwnProfile?: boolean;
 }
 
@@ -25,6 +26,7 @@ export function ProfileHeader({
   website,
   publicEmail,
   profileStatus,
+  isVerified = false,
   isOwnProfile = false,
 }: ProfileHeaderProps) {
   const { t } = useTranslation();
@@ -45,9 +47,12 @@ export function ProfileHeader({
         </Avatar>
       </div>
 
-      {/* Name + status */}
+      {/* Name + verified + status */}
       <div className="flex flex-wrap items-center gap-2">
         <h1 className="text-5xl font-bold">{name}</h1>
+        {isVerified && (
+          <BadgeCheck className="size-6 text-primary" />
+        )}
         {profileStatus && isOwnProfile && (
           <ProfileStatusBadge status={profileStatus} />
         )}

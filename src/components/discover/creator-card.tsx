@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Users, BadgeCheck } from "lucide-react";
@@ -30,6 +31,7 @@ export function CreatorCard({ creator }: CreatorCardProps) {
   const extraCount = (creator.categories?.length ?? 0) - 3;
 
   return (
+    <Link href={`/creator/${creator.username}`} className="block">
     <Card className="transition-all hover:shadow-md hover:scale-[1.01]">
       <CardContent className="space-y-3 pt-4">
         {/* Header: avatar + name */}
@@ -116,5 +118,6 @@ export function CreatorCard({ creator }: CreatorCardProps) {
         </div>
       </CardContent>
     </Card>
+    </Link>
   );
 }

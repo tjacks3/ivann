@@ -96,6 +96,13 @@
 
   "profile.connectedPlatforms": "Connected Platforms",
   "profile.followers": "followers",
+
+  "publicProfile.backToDiscover": "Back to Discover",
+  "publicProfile.notFound.title": "Creator not found",
+  "publicProfile.notFound.description": "This profile doesn't exist or isn't published yet.",
+  "publicProfile.relatedCreators": "Related Creators",
+  "publicProfile.relatedComingSoon": "Coming soon",
+  "publicProfile.relatedDescription": "Discover similar creators based on category and niche.",
   "profile.editProfile": "Edit Profile",
   "profile.sendOffer": "Send Offer",
   "profile.noPlatforms": "No platforms connected yet.",

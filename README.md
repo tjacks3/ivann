@@ -137,3 +137,5 @@ Add `ANTHROPIC_API_KEY=sk-ant-...` to your `.env.local`.
 npm run db:add-test — adds one test creator + one test brand
 npm run db:add-test -- creator — adds a creator only
 npm run db:add-test -- brand — adds a brand only
+
+### Add Creators for testing the Discover view

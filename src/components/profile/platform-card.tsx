@@ -33,7 +33,7 @@ export function PlatformCard({
   return (
     <Card
       className={cn(
-        "overflow-hidden border transition-all hover:shadow-md hover:scale-[1.01]",
+        "overflow-hidden border-0 ring-0 transition-all hover:shadow-md hover:scale-[1.01]",
       )}
       style={{ backgroundColor: `${meta.color}08` }}
     >

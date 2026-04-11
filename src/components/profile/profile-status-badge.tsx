@@ -19,7 +19,7 @@ export function ProfileStatusBadge({ status, className }: ProfileStatusBadgeProp
   return (
     <span
       className={cn(
-        "rounded-full border px-3 py-1.5 text-sm font-medium",
+        "rounded-full border px-2 py-0.5 text-xs font-medium",
         statusStyles[status],
         className,
       )}

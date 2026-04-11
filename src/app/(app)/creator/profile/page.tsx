@@ -9,6 +9,7 @@ import { LoadingState } from "@/components/shared/loading-state";
 import { useCreatorProfile } from "@/hooks/use-creator-profile";
 import { useTranslation } from "@/i18n";
 import { Users } from "lucide-react";
+import { getFlagForLocation } from "@/lib/location-flag";
 import type { ProfileStatus } from "@/types";
 
 function formatCount(count: number): string {
@@ -64,8 +65,12 @@ export default function CreatorProfilePage() {
             as="h2"
             action={
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <span>@{profile.username}</span>
-                <span className="h-4 w-px bg-border" />
+                {profile.location && (
+                  <>
+                    <span>{getFlagForLocation(profile.location)} {profile.location}</span>
+                    <span className="h-4 w-px bg-border" />
+                  </>
+                )}
                 <div className="flex items-center gap-1.5">
                   <Users className="size-4" />
                   <span className="font-semibold text-foreground">

@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { PackageTypeBadge } from "./package-type-badge";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { Clock, RotateCcw, Handshake } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
@@ -14,6 +15,7 @@ interface PackagePublicCardProps {
 
 export function PackagePublicCard({ pkg, onSelect }: PackagePublicCardProps) {
   const { t, locale } = useTranslation();
+
 
   return (
     <Card className="transition-all hover:shadow-md hover:scale-[1.01]">
@@ -35,16 +37,26 @@ export function PackagePublicCard({ pkg, onSelect }: PackagePublicCardProps) {
           <div className="flex flex-wrap items-center gap-2">
             <PackageTypeBadge type={pkg.type} />
             {pkg.deliveryDays && (
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="size-3" />
-                {pkg.deliveryDays}d
-              </span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Clock className="size-3" />
+                    {pkg.deliveryDays}d
+                  </TooltipTrigger>
+                  <TooltipContent>{t("packages.tooltip.delivery", { days: pkg.deliveryDays })}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
             {pkg.revisions > 0 && (
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <RotateCcw className="size-3" />
-                {pkg.revisions}
-              </span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <RotateCcw className="size-3" />
+                    {pkg.revisions}
+                  </TooltipTrigger>
+                  <TooltipContent>{t("packages.tooltip.revisions", { count: pkg.revisions })}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </div>
           {onSelect && (

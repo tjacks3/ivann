@@ -65,7 +65,7 @@ export default function PackagesPage() {
 
       {/* Sheet modal for create/edit */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent side="right" className="flex w-full flex-col overflow-hidden p-0 sm:max-w-2xl" showCloseButton={false}>
+        <SheetContent side="right" className="flex w-full flex-col overflow-hidden p-0 sm:max-w-md" showCloseButton={false}>
           <div className="flex h-14 shrink-0 items-center justify-between border-b px-4">
             <SheetTitle className="text-base font-bold">
               {editingPkg ? t("packages.edit") : t("packages.create")}

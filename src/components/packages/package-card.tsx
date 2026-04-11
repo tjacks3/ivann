@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PackageTypeBadge } from "./package-type-badge";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { Pencil, Trash2, Loader2, Clock, RotateCcw } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import { deletePackage } from "@/app/(app)/packages/actions";
@@ -58,16 +59,26 @@ export function PackageCard({ pkg, onEdit, onDeleted }: PackageCardProps) {
             {t(`packages.status.${pkg.status}`)}
           </span>
           {pkg.deliveryDays && (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Clock className="size-3" />
-              {pkg.deliveryDays}d
-            </span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="size-3" />
+                  {pkg.deliveryDays}d
+                </TooltipTrigger>
+                <TooltipContent>{t("packages.tooltip.delivery", { days: pkg.deliveryDays })}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
           {pkg.revisions > 0 && (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <RotateCcw className="size-3" />
-              {pkg.revisions} {pkg.revisions === 1 ? "revision" : "revisions"}
-            </span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <RotateCcw className="size-3" />
+                  {pkg.revisions} {pkg.revisions === 1 ? "revision" : "revisions"}
+                </TooltipTrigger>
+                <TooltipContent>{t("packages.tooltip.revisions", { count: pkg.revisions })}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
 

@@ -61,6 +61,9 @@
   "packages.type.bundle": "Bundle",
   "packages.type.custom": "Custom",
 
+  "packages.tooltip.delivery": "Estimated delivery: {days} days",
+  "packages.tooltip.revisions": "{count} revision(s) included",
+
   "packages.status.draft": "Draft",
   "packages.status.active": "Active",
   "packages.status.archived": "Archived",

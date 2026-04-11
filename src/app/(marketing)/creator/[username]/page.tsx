@@ -23,6 +23,7 @@ import {
 import { useUser } from "@/hooks/use-user";
 import { useTranslation } from "@/i18n";
 import { ArrowLeft, Users, UserX, Handshake, X } from "lucide-react";
+import { getFlagForLocation } from "@/lib/location-flag";
 import { getPublicCreatorProfile } from "./actions";
 
 function formatCount(count: number): string {
@@ -103,7 +104,7 @@ export default function PublicCreatorProfilePage({
               <Handshake className="size-3.5" />
               {t("profile.sendOffer")}
             </SheetTrigger>
-            <SheetContent side="right" className="flex w-full flex-col overflow-hidden p-0 sm:max-w-2xl" showCloseButton={false}>
+            <SheetContent side="right" className="flex w-full flex-col overflow-hidden p-0 sm:max-w-md" showCloseButton={false}>
               <div className="flex h-14 shrink-0 items-center justify-between border-b px-4">
                 <SheetTitle className="text-base font-bold">
                   {t("collab.form.title", { name: profile.fullName || "" })}
@@ -143,8 +144,12 @@ export default function PublicCreatorProfilePage({
               as="h2"
               action={
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <span>@{profile.username}</span>
-                  <span className="h-4 w-px bg-border" />
+                  {profile.location && (
+                    <>
+                      <span>{getFlagForLocation(profile.location)} {profile.location}</span>
+                      <span className="h-4 w-px bg-border" />
+                    </>
+                  )}
                   <div className="flex items-center gap-1.5">
                     <Users className="size-4" />
                     <span className="font-semibold text-foreground">

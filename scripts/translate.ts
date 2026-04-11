@@ -81,7 +81,9 @@ function removeStaleKeys(
   return cleaned;
 }
 
-async function translateBatch(
+const BATCH_SIZE = 50; // keys per API call to avoid token truncation
+
+async function translateChunk(
   client: Anthropic,
   entries: Record<string, string>,
   languageName: string,
@@ -103,7 +105,7 @@ ${JSON.stringify(entries, null, 2)}`;
 
   const response = await client.messages.create({
     model: "claude-sonnet-4-20250514",
-    max_tokens: 4096,
+    max_tokens: 8192,
     messages: [{ role: "user", content: prompt }],
   });
 
@@ -117,6 +119,39 @@ ${JSON.stringify(entries, null, 2)}`;
   }
 
   return JSON.parse(jsonMatch[0]);
+}
+
+async function translateBatch(
+  client: Anthropic,
+  entries: Record<string, string>,
+  languageName: string,
+): Promise<Record<string, string>> {
+  const keys = Object.keys(entries);
+
+  // If small enough, translate in one call
+  if (keys.length <= BATCH_SIZE) {
+    return translateChunk(client, entries, languageName);
+  }
+
+  // Split into chunks
+  const result: Record<string, string> = {};
+  const totalChunks = Math.ceil(keys.length / BATCH_SIZE);
+
+  for (let i = 0; i < keys.length; i += BATCH_SIZE) {
+    const chunkKeys = keys.slice(i, i + BATCH_SIZE);
+    const chunk: Record<string, string> = {};
+    for (const key of chunkKeys) {
+      chunk[key] = entries[key];
+    }
+
+    const chunkNum = Math.floor(i / BATCH_SIZE) + 1;
+    console.log(`   📦 Chunk ${chunkNum}/${totalChunks} (${chunkKeys.length} keys)...`);
+
+    const translated = await translateChunk(client, chunk, languageName);
+    Object.assign(result, translated);
+  }
+
+  return result;
 }
 
 // ---------------------------------------------------------------------------

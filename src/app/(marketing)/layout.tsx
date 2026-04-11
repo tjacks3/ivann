@@ -9,7 +9,7 @@ export default function MarketingLayout({
   return (
     <>
       <Header variant="marketing" />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pb-24">{children}</main>
       <Footer />
     </>
   );

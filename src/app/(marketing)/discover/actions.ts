@@ -41,9 +41,10 @@ export async function searchCreators(params: DiscoverFilters) {
     ];
 
     if (keyword?.trim()) {
-      const escaped = keyword.trim().replace(/'/g, "''");
+      const raw = keyword.trim().replace(/'/g, "''");
+      const stripped = raw.replace(/^@/, "");
       conditions.push(
-        `(u.full_name ILIKE '%${escaped}%' OR u.username ILIKE '%${escaped}%' OR u.bio ILIKE '%${escaped}%')`,
+        `(u.full_name ILIKE '%${raw}%' OR u.username ILIKE '%${stripped}%' OR u.bio ILIKE '%${raw}%')`,
       );
     }
 

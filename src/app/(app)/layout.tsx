@@ -9,7 +9,7 @@ export default function AppLayout({
   return (
     <>
       <Header variant="app" />
-      <main className="flex-1 pb-16 md:pb-0">
+      <main className="flex-1 pb-24 md:pb-24">
         {children}
       </main>
       <MobileNav />

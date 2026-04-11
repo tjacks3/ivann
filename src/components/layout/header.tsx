@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { UserMenu } from "@/components/layout/user-menu";
 import { useUser } from "@/hooks/use-user";
+import { useUnreadCount } from "@/hooks/use-unread-count";
 import { useTranslation } from "@/i18n";
 import { Menu, Compass, MessageSquare, User, LayoutDashboard, Handshake, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
   const { t } = useTranslation();
   const { user, isAuthenticated } = useUser();
   const pathname = usePathname();
+  const unreadCount = useUnreadCount();
 
   const marketingLinks = [
     { href: "/", label: t("nav.home") },
@@ -66,20 +68,28 @@ export function Header({ variant = "marketing" }: HeaderProps) {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 md:flex">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-                pathname === link.href
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {links.map((link) => {
+            const isMessages = link.href === "/messages";
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "relative rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+                  pathname === link.href || (isMessages && pathname.startsWith("/messages"))
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {link.label}
+                {isMessages && unreadCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right side */}

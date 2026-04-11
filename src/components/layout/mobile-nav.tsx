@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Compass, MessageSquare, User, LayoutDashboard, Handshake, Settings } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
+import { useUnreadCount } from "@/hooks/use-unread-count";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +12,7 @@ export function MobileNav() {
   const { t } = useTranslation();
   const { user } = useUser();
   const pathname = usePathname();
+  const unreadCount = useUnreadCount();
 
   const creatorTabs = [
     { href: "/creator/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
@@ -35,16 +37,22 @@ export function MobileNav() {
       <div className="flex items-center justify-around pb-[env(safe-area-inset-bottom)]">
         {tabs.map((tab) => {
           const isActive = pathname.startsWith(tab.href);
+          const isMessages = tab.href === "/messages";
           return (
             <Link
               key={tab.href}
               href={tab.href}
               className={cn(
-                "flex flex-col items-center gap-0.5 px-2 py-2 text-[10px] font-medium transition-colors",
+                "relative flex flex-col items-center gap-0.5 px-2 py-2 text-[10px] font-medium transition-colors",
                 isActive ? "text-primary" : "text-muted-foreground",
               )}
             >
               <tab.icon className="size-5" />
+              {isMessages && unreadCount > 0 && (
+                <span className="absolute right-0 top-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-white">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
               <span className="truncate">{tab.label}</span>
             </Link>
           );

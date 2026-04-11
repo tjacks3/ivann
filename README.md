@@ -161,3 +161,21 @@ Brand tracks:
 
 1. Navigate to Collaborations
 2. See sent requests with current status
+
+#### Flow
+
+1. Brand sends collab request → Creator accepts → Thread auto-created
+2. Both users see thread in Messages inbox with unread indicator
+3. Click thread → full chat view with message history
+4. Type + Enter or click Send → message appears instantly
+5. Other user sees unread badge update via 30s polling + Supabase Realtime on INSERT
+6. Opening thread marks it as read, clearing the badge
+
+### Color Palette
+
+Role Hex Variable
+#040f0f Primary text --foreground, --card-foreground, --popover-foreground
+#248232 Ivann green --primary, --ring, --sidebar-primary
+#2ba84a Secondary green --secondary-foreground, --accent-foreground, --highlight
+#F8F8F8 Background --background
+White #fff Button text on green --primary-foreground

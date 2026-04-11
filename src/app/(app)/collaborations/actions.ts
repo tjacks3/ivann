@@ -2,7 +2,7 @@
 
 import { getAuthUser } from "@/lib/auth/get-auth-user";
 import { db } from "@/db";
-import { users, collaborationRequests, packages } from "@/db/schema";
+import { users, collaborationRequests, packages, messageThreads, messageThreadMembers } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { collaborationRequestSchema } from "@/lib/validations/collaboration";
 import type { CollaborationRequestValues } from "@/lib/validations/collaboration";
@@ -169,20 +169,44 @@ export async function acceptCollaboration(id: string) {
     return { success: false as const, error: "UNAUTHORIZED" };
   }
 
-  await db
-    .update(collaborationRequests)
-    .set({
-      status: "accepted",
-      respondedAt: new Date(),
-      updatedAt: new Date(),
-    })
+  // Get the collab request to find brandId and title
+  const [collab] = await db
+    .select()
+    .from(collaborationRequests)
     .where(
       and(
         eq(collaborationRequests.id, id),
         eq(collaborationRequests.creatorId, user.id),
         eq(collaborationRequests.status, "pending"),
       ),
-    );
+    )
+    .limit(1);
+
+  if (!collab) return { success: false as const, error: "NOT_FOUND" };
+
+  const now = new Date();
+
+  // Update status
+  await db
+    .update(collaborationRequests)
+    .set({ status: "accepted", respondedAt: now, updatedAt: now })
+    .where(eq(collaborationRequests.id, id));
+
+  // Create message thread
+  const [thread] = await db
+    .insert(messageThreads)
+    .values({
+      collabRequestId: collab.id,
+      subject: collab.title,
+      lastMessageAt: now,
+    })
+    .returning();
+
+  // Add both users as thread members
+  await db.insert(messageThreadMembers).values([
+    { threadId: thread.id, userId: collab.brandId },
+    { threadId: thread.id, userId: user.id },
+  ]);
 
   return { success: true as const };
 }

@@ -27,7 +27,13 @@
   "dashboard.subtitle": "Your overview and stats will appear here.",
 
   "messages.title": "Messages",
-  "messages.subtitle": "Real-time messaging will go here.",
+  "messages.subtitle": "Your conversations with creators and brands.",
+  "messages.placeholder": "Type a message...",
+  "messages.back": "Inbox",
+  "messages.noMessages": "No messages yet. Send the first one!",
+  "messages.empty.title": "No conversations yet",
+  "messages.empty.description": "When you accept or send a collaboration request, a conversation will start here.",
+  "messages.empty.browse": "Browse Creators",
 
   "packages.title": "Your Packages",
   "packages.subtitle": "Create and manage your service offerings.",

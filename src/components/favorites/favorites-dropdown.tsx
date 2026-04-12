@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Heart } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { FavoriteCreatorItem } from "./favorite-creator-item";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useTranslation } from "@/i18n";
@@ -30,19 +31,18 @@ export function FavoritesDropdown() {
 
   return (
     <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="relative cursor-pointer rounded-full p-1.5 text-muted-foreground transition-colors hover:text-foreground"
-        aria-label={t("favorites.title")}
-      >
-        <Heart className="size-5" />
-        {count > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-            {count > 9 ? "9+" : count}
-          </span>
-        )}
-      </button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger
+            onClick={() => setOpen(!open)}
+            className="cursor-pointer rounded-full p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+            aria-label={t("favorites.title")}
+          >
+            <Heart className="size-5" />
+          </TooltipTrigger>
+          {!open && <TooltipContent>{t("favorites.title")}</TooltipContent>}
+        </Tooltip>
+      </TooltipProvider>
 
       {open && (
         <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border bg-popover shadow-lg">

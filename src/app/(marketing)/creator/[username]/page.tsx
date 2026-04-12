@@ -20,6 +20,8 @@ import {
   SheetTitle,
   SheetClose,
 } from "@/components/ui/sheet";
+import { FavoriteButton } from "@/components/discover/favorite-button";
+import { useFavoriteIds } from "@/hooks/use-favorites";
 import { useUser } from "@/hooks/use-user";
 import { useTranslation } from "@/i18n";
 import { ArrowLeft, Users, UserX, Handshake, X } from "lucide-react";
@@ -42,6 +44,8 @@ export default function PublicCreatorProfilePage({
   const { user, isAuthenticated } = useUser();
   const [selectedPackageId, setSelectedPackageId] = useState<string | undefined>();
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  const favoriteIds = useFavoriteIds();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["public-creator", username],
@@ -82,6 +86,7 @@ export default function PublicCreatorProfilePage({
   const isVerified = (profile.socialAccounts ?? []).some((sa) => sa.isVerified);
   const activePackages = (profile.packages ?? []).filter((pkg) => pkg.status === "active");
   const isBrand = isAuthenticated && user?.role === "brand";
+  const isFavorited = isBrand && favoriteIds.has(profile.id);
 
   const handleSelectPackage = (packageId: string) => {
     setSelectedPackageId(packageId);
@@ -97,6 +102,8 @@ export default function PublicCreatorProfilePage({
           {t("publicProfile.backToDiscover")}
         </Link>
         {isBrand && (
+          <div className="flex items-center gap-2">
+            <FavoriteButton creatorId={profile.id} isFavorited={isFavorited} />
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger
               className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/85"
@@ -122,6 +129,7 @@ export default function PublicCreatorProfilePage({
               />
             </SheetContent>
           </Sheet>
+          </div>
         )}
       </div>
 

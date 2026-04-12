@@ -45,6 +45,8 @@
   "favorites.saved": "saved",
   "favorites.empty": "No favorite creators yet.",
   "favorites.viewAll": "View all favorites",
+  "favorites.addToFavorites": "Add to Favorites",
+  "favorites.removeFromFavorites": "Remove from Favorites",
   "favorites.dashboardTitle": "Saved Creators",
   "favorites.emptyDashboard.title": "No favorite creators yet",
   "favorites.emptyDashboard.description": "Save creators from the Discover page to view them here.",

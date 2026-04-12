@@ -13,6 +13,7 @@ import { socialAccounts } from "./social-accounts";
 import { packages } from "./packages";
 import { collaborationRequests } from "./collaboration-requests";
 import { messageThreadMembers } from "./message-thread-members";
+import { favorites } from "./favorites";
 import { messages } from "./messages";
 import { notifications } from "./notifications";
 
@@ -69,6 +70,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   threadMemberships: many(messageThreadMembers),
   sentMessages: many(messages),
   notifications: many(notifications),
+  brandFavorites: many(favorites, { relationName: "brandFavorites" }),
+  favoritedBy: many(favorites, { relationName: "creatorFavoritedBy" }),
 }));
 
 export type User = typeof users.$inferSelect;

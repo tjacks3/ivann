@@ -5,6 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Users, BadgeCheck } from "lucide-react";
 import { getPlatformMeta } from "@/lib/social/platforms";
+import { FavoriteButton } from "./favorite-button";
 import { useTranslation } from "@/i18n";
 import type { CreatorResult } from "@/app/(marketing)/discover/actions";
 
@@ -16,9 +17,11 @@ function formatCount(count: number): string {
 
 interface CreatorCardProps {
   creator: CreatorResult;
+  isFavorited?: boolean;
+  showFavorite?: boolean;
 }
 
-export function CreatorCard({ creator }: CreatorCardProps) {
+export function CreatorCard({ creator, isFavorited = false, showFavorite = false }: CreatorCardProps) {
   const { t } = useTranslation();
   const initials = (creator.fullName || "?")
     .split(" ")
@@ -32,7 +35,12 @@ export function CreatorCard({ creator }: CreatorCardProps) {
 
   return (
     <Link href={`/creator/${creator.username}`} className="block">
-    <Card className="transition-all hover:shadow-md hover:scale-[1.01]">
+    <Card className="relative transition-all hover:shadow-md hover:scale-[1.01]">
+      {showFavorite && (
+        <div className="absolute right-3 top-3 z-10">
+          <FavoriteButton creatorId={creator.id} isFavorited={isFavorited} />
+        </div>
+      )}
       <CardContent className="space-y-3 pt-4">
         {/* Header: avatar + name */}
         <div className="flex items-center gap-3">

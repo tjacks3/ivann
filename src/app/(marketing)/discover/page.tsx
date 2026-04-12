@@ -10,11 +10,16 @@ import { DiscoverSort } from "@/components/discover/discover-sort";
 import { FilterDrawer } from "@/components/discover/filter-drawer";
 import { Button } from "@/components/ui/button";
 import { useDiscover } from "@/hooks/use-discover";
+import { useFavoriteIds } from "@/hooks/use-favorites";
+import { useUser } from "@/hooks/use-user";
 import { useTranslation } from "@/i18n";
 import { Compass, Loader2, SearchX } from "lucide-react";
 
 export default function DiscoverPage() {
   const { t } = useTranslation();
+  const { user, isAuthenticated } = useUser();
+  const favoriteIds = useFavoriteIds();
+  const isBrand = isAuthenticated && user?.role === "brand";
   const {
     creators,
     total,
@@ -105,7 +110,12 @@ export default function DiscoverPage() {
             <>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {creators.map((creator) => (
-                  <CreatorCard key={creator.id} creator={creator} />
+                  <CreatorCard
+                    key={creator.id}
+                    creator={creator}
+                    showFavorite={isBrand}
+                    isFavorited={favoriteIds.has(creator.id)}
+                  />
                 ))}
               </div>
 

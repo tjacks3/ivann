@@ -7,6 +7,7 @@ export * from "./message-threads";
 export * from "./message-thread-members";
 export * from "./messages";
 export * from "./notifications";
+export * from "./favorites";
 
 export * from "./social-tokens";
 

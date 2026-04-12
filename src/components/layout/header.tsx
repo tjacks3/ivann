@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { UserMenu } from "@/components/layout/user-menu";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
+import { FavoritesDropdown } from "@/components/favorites/favorites-dropdown";
 import { useUser } from "@/hooks/use-user";
 import { useUnreadCount } from "@/hooks/use-unread-count";
 import { useTranslation } from "@/i18n";
@@ -97,6 +98,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
         <div className="flex items-center gap-3">
           {isAuthenticated && user ? (
             <div className="flex items-center gap-2">
+              {user.role === "brand" && <FavoritesDropdown />}
               <NotificationDropdown />
               <span className="hidden text-sm font-medium md:inline">
                 {user.name}

@@ -171,6 +171,15 @@ Brand tracks:
 5. Other user sees unread badge update via 30s polling + Supabase Realtime on INSERT
 6. Opening thread marks it as read, clearing the badge
 
+### Notifications
+
+Trigger Summary
+Event Recipient In-App Email
+New collab request Creator Yes Yes
+Collab accepted Brand Yes Yes
+Collab declined Brand Yes Yes
+New message Other thread member Yes No
+
 ### Color Palette
 
 Role Hex Variable
@@ -179,6 +188,28 @@ Role Hex Variable
 #2ba84a Secondary green --secondary-foreground, --accent-foreground, --highlight
 #F8F8F8 Background --background
 White #fff Button text on green --primary-foreground
+
+### Landing Pages
+
+Landing Pages (3)
+Main (/) — main-landing.tsx
+Hero → Stats bar → How it works (3 steps) → For Creators value prop → For Brands value prop → Platform features (8-grid) → Final CTA
+
+Creators (/creators) — creator-landing.tsx
+Hero (creator-focused) → Why creators choose ivann (3 features) → Profile showcase → Service packages → Collaboration flow → More features (4-grid) → FAQ (6 questions) → Final CTA
+
+Brands (/brands) — brand-landing.tsx
+Hero (brand-focused) → Stats bar → Why brands use ivann (3 features) → Discovery → Collaboration flow → Campaign management → Built for efficiency (4-grid) → FAQ (6 questions) → Final CTA
+
+Modified Files
+footer.tsx — Added "For Creators" and "For Brands" links, two-row layout
+page.tsx — Rewritten with metadata + MainLandingPage component
+Architecture
+Logo always links to / (unchanged)
+/creators and /brands are standalone marketing routes, not in main nav
+All pages share the marketing layout (header + footer)
+Each page has unique Metadata with title, description, and OG tags
+Reusable components mean new persona pages can be built quickly
 
 ### Simple commands
 

@@ -106,7 +106,7 @@ export default function PublicCreatorProfilePage({
             <FavoriteButton creatorId={profile.id} isFavorited={isFavorited} />
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger
-              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/85"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/85"
             >
               <Handshake className="size-3.5" />
               {t("profile.sendOffer")}

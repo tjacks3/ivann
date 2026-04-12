@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth/get-auth-user";
 import { db } from "@/db";
 import { users, collaborationRequests, packages, messageThreads, messageThreadMembers } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
+import { createAndEmail, createNotification } from "@/lib/notifications/create";
 import { collaborationRequestSchema } from "@/lib/validations/collaboration";
 import type { CollaborationRequestValues } from "@/lib/validations/collaboration";
 
@@ -42,6 +43,27 @@ export async function createCollaborationRequest(data: CollaborationRequestValue
       status: "pending",
     })
     .returning();
+
+  // Notify creator
+  const [creator] = await db
+    .select({ id: users.id, email: users.email, fullName: users.fullName })
+    .from(users)
+    .where(eq(users.id, parsed.data.creatorId))
+    .limit(1);
+
+  if (creator) {
+    createAndEmail({
+      userId: creator.id,
+      type: "collab_request",
+      title: `New collaboration request from ${user.fullName ?? "a brand"}`,
+      body: parsed.data.title,
+      actionUrl: "/collaborations",
+      referenceId: created.id,
+      referenceType: "collab_request",
+      email: creator.email,
+      emailSubject: `New collaboration request: ${parsed.data.title}`,
+    }).catch(() => {});
+  }
 
   return { success: true as const, id: created.id };
 }
@@ -208,6 +230,27 @@ export async function acceptCollaboration(id: string) {
     { threadId: thread.id, userId: user.id },
   ]);
 
+  // Notify brand
+  const [brand] = await db
+    .select({ id: users.id, email: users.email })
+    .from(users)
+    .where(eq(users.id, collab.brandId))
+    .limit(1);
+
+  if (brand) {
+    createAndEmail({
+      userId: brand.id,
+      type: "collab_update",
+      title: `${user.fullName ?? "A creator"} accepted your request`,
+      body: collab.title,
+      actionUrl: "/collaborations",
+      referenceId: collab.id,
+      referenceType: "collab_request",
+      email: brand.email,
+      emailSubject: `Collaboration accepted: ${collab.title}`,
+    }).catch(() => {});
+  }
+
   return { success: true as const };
 }
 
@@ -217,6 +260,21 @@ export async function declineCollaboration(id: string, reason?: string) {
     return { success: false as const, error: "UNAUTHORIZED" };
   }
 
+  // Get collab for brand info
+  const [collab] = await db
+    .select()
+    .from(collaborationRequests)
+    .where(
+      and(
+        eq(collaborationRequests.id, id),
+        eq(collaborationRequests.creatorId, user.id),
+        eq(collaborationRequests.status, "pending"),
+      ),
+    )
+    .limit(1);
+
+  if (!collab) return { success: false as const, error: "NOT_FOUND" };
+
   await db
     .update(collaborationRequests)
     .set({
@@ -225,13 +283,28 @@ export async function declineCollaboration(id: string, reason?: string) {
       respondedAt: new Date(),
       updatedAt: new Date(),
     })
-    .where(
-      and(
-        eq(collaborationRequests.id, id),
-        eq(collaborationRequests.creatorId, user.id),
-        eq(collaborationRequests.status, "pending"),
-      ),
-    );
+    .where(eq(collaborationRequests.id, id));
+
+  // Notify brand
+  const [brand] = await db
+    .select({ id: users.id, email: users.email })
+    .from(users)
+    .where(eq(users.id, collab.brandId))
+    .limit(1);
+
+  if (brand) {
+    createAndEmail({
+      userId: brand.id,
+      type: "collab_update",
+      title: `${user.fullName ?? "A creator"} declined your request`,
+      body: collab.title,
+      actionUrl: "/collaborations",
+      referenceId: collab.id,
+      referenceType: "collab_request",
+      email: brand.email,
+      emailSubject: `Collaboration declined: ${collab.title}`,
+    }).catch(() => {});
+  }
 
   return { success: true as const };
 }

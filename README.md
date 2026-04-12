@@ -179,3 +179,12 @@ Role Hex Variable
 #2ba84a Secondary green --secondary-foreground, --accent-foreground, --highlight
 #F8F8F8 Background --background
 White #fff Button text on green --primary-foreground
+
+### Simple commands
+
+Prefer simple, maintainable patterns
+reduce duplication
+improve responsive behavior for tablet and mobile
+improve loading, empty, and error states
+keep the UI polished and minimal
+do not rewrite unrelated parts of the codebase

@@ -10,6 +10,7 @@ import {
   messages,
 } from "@/db/schema";
 import { eq, and, desc, sql, ne } from "drizzle-orm";
+import { createNotification } from "@/lib/notifications/create";
 
 async function getUserId(): Promise<string | null> {
   const authUser = await getAuthUser();
@@ -261,6 +262,36 @@ export async function sendMessage(threadId: string, body: string) {
     .update(messageThreads)
     .set({ lastMessageAt: now, updatedAt: now })
     .where(eq(messageThreads.id, threadId));
+
+  // Notify the other thread member (in-app only, no email for messages)
+  const [otherMember] = await db
+    .select({ userId: messageThreadMembers.userId })
+    .from(messageThreadMembers)
+    .where(
+      and(
+        eq(messageThreadMembers.threadId, threadId),
+        ne(messageThreadMembers.userId, userId),
+      ),
+    )
+    .limit(1);
+
+  if (otherMember) {
+    const [sender] = await db
+      .select({ fullName: users.fullName })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    createNotification({
+      userId: otherMember.userId,
+      type: "message",
+      title: `New message from ${sender?.fullName ?? "someone"}`,
+      body: body.trim().slice(0, 100),
+      actionUrl: `/messages/${threadId}`,
+      referenceId: threadId,
+      referenceType: "message",
+    }).catch(() => {});
+  }
 
   return { success: true as const };
 }

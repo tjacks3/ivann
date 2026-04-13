@@ -8,16 +8,16 @@ import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { LoadingState } from "@/components/shared/loading-state";
 import { EmptyState } from "@/components/shared/empty-state";
-import { FavoriteButton } from "@/components/discover/favorite-button";
+import { RequestCard } from "@/components/collaborations/request-card";
 import { useBrandProfile } from "@/hooks/use-brand-profile";
-import { useFavorites } from "@/hooks/use-favorites";
+import { useCollaborations } from "@/hooks/use-collaborations";
 import { useTranslation } from "@/i18n";
-import { Compass, Globe, LayoutDashboard, Heart } from "lucide-react";
+import { Compass, Globe, Handshake, Zap } from "lucide-react";
 
 export default function BrandDashboardPage() {
   const { t } = useTranslation();
   const { profile, isLoading } = useBrandProfile();
-  const { favorites, isLoading: favoritesLoading } = useFavorites();
+  const { collaborations, isLoading: collabsLoading, refetch: refetchCollabs } = useCollaborations();
 
   if (isLoading) {
     return <LoadingState variant="page" />;
@@ -81,6 +81,20 @@ export default function BrandDashboardPage() {
 
           <Card className="transition-colors hover:border-primary/30">
             <CardContent className="pt-4">
+              <Link href="/brand/quick-collab" className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Zap className="size-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">{t("quickCollab.cta.title")}</p>
+                  <p className="text-xs text-muted-foreground">{t("quickCollab.cta.hint")}</p>
+                </div>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="transition-colors hover:border-primary/30">
+            <CardContent className="pt-4">
               <Link href="/discover" className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Compass className="size-4" />
@@ -95,27 +109,27 @@ export default function BrandDashboardPage() {
         </div>
       </div>
 
-      {/* Saved Creators */}
-      <div id="favorites" className="mt-12">
+      {/* Collaborations */}
+      <div className="mt-12">
         <SectionHeader
-          title={t("favorites.dashboardTitle")}
+          title={t("collab.sentTitle")}
           as="h2"
           action={
-            favorites.length > 0 && (
+            collaborations.length > 0 && (
               <span className="text-sm text-muted-foreground">
-                {favorites.length} {t("favorites.saved")}
+                {collaborations.length} {t("brandDashboard.collabCount")}
               </span>
             )
           }
         />
         <div className="mt-4">
-          {favoritesLoading ? (
+          {collabsLoading ? (
             <LoadingState variant="skeleton" count={3} />
-          ) : favorites.length === 0 ? (
+          ) : collaborations.length === 0 ? (
             <EmptyState
-              icon={<Heart className="size-6" />}
-              title={t("favorites.emptyDashboard.title")}
-              description={t("favorites.emptyDashboard.description")}
+              icon={<Handshake className="size-6" />}
+              title={t("collab.empty.brandTitle")}
+              description={t("collab.empty.brandDescription")}
               action={
                 <Link href="/discover" className={buttonVariants()}>
                   {t("nav.discover")}
@@ -123,68 +137,18 @@ export default function BrandDashboardPage() {
               }
             />
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {favorites.map((creator) => {
-                const creatorInitials = (creator.fullName || "?")
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()
-                  .slice(0, 2);
-
-                return (
-                  <Card key={creator.id} className="relative transition-all hover:shadow-md hover:scale-[1.01]">
-                    <div className="absolute right-3 top-3 z-10">
-                      <FavoriteButton creatorId={creator.id} isFavorited />
-                    </div>
-                    <Link href={`/creator/${creator.username}`}>
-                      <CardContent className="space-y-3 pt-4">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="size-10">
-                            {creator.avatarUrl && (
-                              <AvatarImage src={creator.avatarUrl} alt={creator.fullName || ""} />
-                            )}
-                            <AvatarFallback className="text-xs">{creatorInitials}</AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold">{creator.fullName}</p>
-                            <p className="truncate text-xs text-muted-foreground">@{creator.username}</p>
-                          </div>
-                        </div>
-                        {creator.categories.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5">
-                            {creator.categories.slice(0, 3).map((cat) => (
-                              <span
-                                key={cat}
-                                className="rounded-full border border-primary bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
-                              >
-                                {t(`onboarding.category.${cat}`)}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Link>
-                  </Card>
-                );
-              })}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {collaborations.map((collab) => (
+                <RequestCard
+                  key={collab.id}
+                  collab={collab}
+                  viewAs="brand"
+                  onUpdated={refetchCollabs}
+                />
+              ))}
             </div>
           )}
         </div>
-      </div>
-
-      {/* Collaborations placeholder */}
-      <div className="mt-12">
-        <EmptyState
-          icon={<LayoutDashboard className="size-6" />}
-          title={t("brandDashboard.emptyTitle")}
-          description={t("brandDashboard.emptyDescription")}
-          action={
-            <Link href="/discover" className={buttonVariants()}>
-              {t("nav.discover")}
-            </Link>
-          }
-        />
       </div>
     </PageContainer>
   );

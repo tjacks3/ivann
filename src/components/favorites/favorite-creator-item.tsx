@@ -33,9 +33,11 @@ export function FavoriteCreatorItem({ creator, onClose }: FavoriteCreatorItemPro
   };
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={handleClick}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleClick(); }}
       className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/50"
     >
       <Avatar className="size-8 shrink-0">
@@ -56,6 +58,6 @@ export function FavoriteCreatorItem({ creator, onClose }: FavoriteCreatorItemPro
       >
         <Heart className="size-3.5 fill-current" />
       </button>
-    </button>
+    </div>
   );
 }

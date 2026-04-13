@@ -8,10 +8,13 @@ import { Progress } from "@/components/ui/progress";
 import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { LoadingState } from "@/components/shared/loading-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ProfileStatusBadge } from "@/components/profile/profile-status-badge";
+import { RequestCard } from "@/components/collaborations/request-card";
 import { useCreatorProfile } from "@/hooks/use-creator-profile";
+import { useCollaborations } from "@/hooks/use-collaborations";
 import { useTranslation } from "@/i18n";
-import { Pencil, Eye, Package } from "lucide-react";
+import { Pencil, Eye, Package, Handshake } from "lucide-react";
 import type { ProfileStatus } from "@/types";
 
 function getProfileCompletion(profile: {
@@ -38,6 +41,7 @@ function getProfileCompletion(profile: {
 export default function CreatorDashboardPage() {
   const { t } = useTranslation();
   const { profile, isLoading } = useCreatorProfile();
+  const { collaborations, isLoading: collabsLoading, refetch: refetchCollabs } = useCollaborations();
 
   if (isLoading) {
     return <LoadingState variant="page" />;
@@ -142,6 +146,43 @@ export default function CreatorDashboardPage() {
               </Link>
             </CardContent>
           </Card>
+        </div>
+      </div>
+
+      {/* Collaborations */}
+      <div className="mt-12">
+        <SectionHeader
+          title={t("collab.incomingTitle")}
+          as="h2"
+          action={
+            collaborations.length > 0 && (
+              <span className="text-sm text-muted-foreground">
+                {collaborations.length} {t("creatorDashboard.collabCount")}
+              </span>
+            )
+          }
+        />
+        <div className="mt-4">
+          {collabsLoading ? (
+            <LoadingState variant="skeleton" count={3} />
+          ) : collaborations.length === 0 ? (
+            <EmptyState
+              icon={<Handshake className="size-6" />}
+              title={t("collab.empty.creatorTitle")}
+              description={t("collab.empty.creatorDescription")}
+            />
+          ) : (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {collaborations.map((collab) => (
+                <RequestCard
+                  key={collab.id}
+                  collab={collab}
+                  viewAs="creator"
+                  onUpdated={refetchCollabs}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </PageContainer>

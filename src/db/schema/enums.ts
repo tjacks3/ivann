@@ -62,3 +62,56 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "message",
   "system",
 ]);
+
+// QuickCollab enums
+export const qcBusinessCategoryEnum = pgEnum("qc_business_category", [
+  "fashion",
+  "tech",
+  "lifestyle",
+  "fitness",
+  "food",
+  "travel",
+  "education",
+  "entertainment",
+  "business",
+  "other",
+]);
+
+export const qcCollabTypeEnum = pgEnum("qc_collab_type", [
+  "instagram_story",
+  "instagram_post",
+  "youtube_promo",
+  "tiktok_post",
+  "podcast_mention",
+  "other",
+]);
+
+export const qcBudgetRangeEnum = pgEnum("qc_budget_range", [
+  "under_50",
+  "50_100",
+  "100_250",
+  "250_500",
+  "500_plus",
+]);
+
+export const qcTimingEnum = pgEnum("qc_timing", [
+  "asap",
+  "this_week",
+  "this_month",
+  "flexible",
+]);
+
+export const qcMatchStatusEnum = pgEnum("qc_match_status", [
+  "recommended",
+  "selected",
+  "skipped",
+]);
+
+export const qcOutreachStatusEnum = pgEnum("qc_outreach_status", [
+  "draft",
+  "sent",
+  "viewed",
+  "replied",
+  "accepted",
+  "declined",
+]);

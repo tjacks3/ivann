@@ -28,10 +28,10 @@ export interface ScoredCreator extends CreatorForMatching {
 
 export interface MatchResult {
   creators: ScoredCreator[];
-  /** True when strict filters returned < 3 results and criteria were relaxed */
-  relaxed: boolean;
-  /** Describes what was relaxed, e.g. "location" */
-  relaxedReason: string | null;
+  /** True when localOnly was on and few results were found */
+  localLowResults: boolean;
+  /** Number of results found (useful for UI messaging) */
+  totalFound: number;
 }
 
 // ─── Maps ───────────────────────────────────────────────────────────────────
@@ -45,11 +45,6 @@ const COLLAB_TYPE_TO_PLATFORMS: Record<string, string[]> = {
   other: ["instagram", "youtube", "tiktok", "twitter", "linkedin", "twitch"],
 };
 
-/**
- * Category mapping with tiers:
- * - primary: direct niche match (e.g. restaurant → food) — full points
- * - secondary: tangential relevance (e.g. restaurant → travel) — partial points
- */
 const BUSINESS_CATEGORY_MAP: Record<
   string,
   { primary: string[]; secondary: string[] }
@@ -77,10 +72,6 @@ const BUDGET_RANGE_TO_FOLLOWER_RANGE: Record<
   "500_plus": { min: 25_000, max: Infinity },
 };
 
-/**
- * US state abbreviation → full name mapping for flexible location matching.
- * Handles "FL" matching "Florida", "CA" matching "California", etc.
- */
 const US_STATE_ABBREV: Record<string, string> = {
   al: "alabama", ak: "alaska", az: "arizona", ar: "arkansas",
   ca: "california", co: "colorado", ct: "connecticut", de: "delaware",
@@ -97,7 +88,6 @@ const US_STATE_ABBREV: Record<string, string> = {
   wi: "wisconsin", wy: "wyoming",
 };
 
-// Reverse map: full name → abbreviation
 const US_STATE_FULL_TO_ABBREV: Record<string, string> = {};
 for (const [abbrev, full] of Object.entries(US_STATE_ABBREV)) {
   US_STATE_FULL_TO_ABBREV[full] = abbrev;
@@ -105,58 +95,45 @@ for (const [abbrev, full] of Object.entries(US_STATE_ABBREV)) {
 
 // ─── Location Helpers ───────────────────────────────────────────────────────
 
-/**
- * Check if a creator's location matches the requested city/state.
- * Returns: "city" | "state" | null
- *
- * Handles formats like "Miami, FL", "Miami, Florida", "San Francisco, CA"
- */
 function matchLocation(
   creatorLocation: string | null,
   requestCity: string,
   requestState: string,
 ): "city" | "state" | null {
-  if (!creatorLocation) return null;
+  if (!creatorLocation || (!requestCity && !requestState)) return null;
 
   const loc = creatorLocation.toLowerCase().trim();
   const city = requestCity.toLowerCase().trim();
   const state = requestState.toLowerCase().trim();
 
-  // Normalize the requested state to both abbreviation and full name
   const stateAbbrev = US_STATE_FULL_TO_ABBREV[state] ?? state;
   const stateFull = US_STATE_ABBREV[state] ?? state;
 
-  // Check city match (city name appears in the location string)
   const cityMatch = city.length > 1 && loc.includes(city);
-
-  // Check state match — try abbreviation and full name
   const stateMatch =
     (stateAbbrev.length === 2 && loc.includes(`, ${stateAbbrev}`)) ||
     loc.includes(stateFull) ||
     loc.includes(state);
 
   if (cityMatch && stateMatch) return "city";
-  if (cityMatch) return "city"; // city name match alone is strong
+  if (cityMatch) return "city";
   if (stateMatch) return "state";
-
   return null;
 }
 
 // ─── Scoring ────────────────────────────────────────────────────────────────
 
-const MIN_STRICT_RESULTS = 3;
-const STRICT_THRESHOLD = 55; // Strict mode: only high-relevance creators
-const RELAXED_THRESHOLD = 40; // Relaxed mode: when strict returns too few
-
-interface ScoringOptions {
-  enforceLocation: boolean;
-  enforceCategory: boolean;
-}
-
-function scoreCreatorsInternal(
+/**
+ * Score creators with two distinct modes:
+ *
+ * Global mode (localOnly=false): Platform + Category + Budget. No location.
+ * Local mode (localOnly=true): Platform + Category + Location + Budget.
+ *   Location is a hard filter — non-local creators are excluded.
+ */
+function scoreCreatorsForMode(
   request: QuickCollabRequest,
   creators: CreatorForMatching[],
-  options: ScoringOptions,
+  localOnly: boolean,
 ): ScoredCreator[] {
   const requiredPlatforms = COLLAB_TYPE_TO_PLATFORMS[request.collabType] ?? [];
   const categoryMap =
@@ -165,16 +142,11 @@ function scoreCreatorsInternal(
     min: 0,
     max: Infinity,
   };
-  const hasRadius = request.radius != null && request.radius > 0;
 
   const scored: ScoredCreator[] = [];
 
   for (const creator of creators) {
     const reasons: string[] = [];
-    let platformScore = 0;
-    let categoryScore = 0;
-    let locationScore = 0;
-    let budgetScore = 0;
     let budgetFit = false;
 
     const creatorPlatforms = creator.socialAccounts.map((sa) => sa.platform);
@@ -183,15 +155,21 @@ function scoreCreatorsInternal(
       0,
     );
 
-    // ── Platform match (0–25 points) — HARD REQUIREMENT ──
+    // ── Platform match — HARD REQUIREMENT ──
     const matchedPlatforms = requiredPlatforms.filter((p) =>
       creatorPlatforms.includes(p),
     );
     if (matchedPlatforms.length === 0) continue;
-    platformScore = 25;
+
+    let platformScore: number;
+    if (localOnly) {
+      platformScore = 25;
+    } else {
+      platformScore = 30;
+    }
     reasons.push(`Active on ${matchedPlatforms.join(", ")}`);
 
-    // ── Category match (0–35 points) — weighted by tier ──
+    // ── Category match ──
     const primaryOverlap = creator.categories.filter((c) =>
       categoryMap.primary.includes(c),
     );
@@ -199,65 +177,76 @@ function scoreCreatorsInternal(
       categoryMap.secondary.includes(c),
     );
 
+    let categoryScore = 0;
+    const maxCategoryPoints = localOnly ? 30 : 40;
+
     if (primaryOverlap.length > 0) {
-      // Primary category match = strong signal
-      categoryScore = Math.min(35, 25 + (primaryOverlap.length - 1) * 10);
+      categoryScore = Math.min(maxCategoryPoints, maxCategoryPoints - 10 + primaryOverlap.length * 10);
       reasons.push(`Strong category match: ${primaryOverlap.join(", ")}`);
     } else if (secondaryOverlap.length > 0) {
-      // Secondary only = weak signal
       categoryScore = Math.min(15, secondaryOverlap.length * 8);
       reasons.push(`Related category: ${secondaryOverlap.join(", ")}`);
     } else if (categoryMap.primary.length === 0) {
-      // "other" business — give everyone baseline
       categoryScore = 10;
       reasons.push("Broad content fit");
     }
 
-    // If enforcing category, skip creators with 0 category overlap
-    if (options.enforceCategory && categoryScore === 0) continue;
+    // Skip creators with no category relevance
+    if (categoryScore === 0) continue;
 
-    // ── Location match (0–25 points) ──
-    const locMatch = matchLocation(creator.location, request.city, request.state);
+    // ── Location (only when localOnly=true) ──
+    let locationScore = 0;
+    if (localOnly) {
+      const locMatch = matchLocation(
+        creator.location,
+        request.city,
+        request.state,
+      );
 
-    if (locMatch === "city") {
-      locationScore = 25;
-      reasons.push(`Located in ${request.city}`);
-    } else if (locMatch === "state") {
-      locationScore = 15;
-      reasons.push(`Located in ${request.state}`);
+      if (locMatch === "city") {
+        locationScore = 25;
+        reasons.push(`Located in ${request.city}`);
+      } else if (locMatch === "state") {
+        locationScore = 15;
+        reasons.push(`Located in ${request.state}`);
+      } else {
+        // Hard filter: skip non-local creators
+        continue;
+      }
     }
 
-    // If radius is set and we're enforcing location, skip non-local creators
-    if (options.enforceLocation && hasRadius && locationScore === 0) continue;
+    // ── Budget/follower fit ──
+    let budgetScore = 0;
+    const maxBudgetPoints = localOnly ? 20 : 30;
 
-    // ── Budget/follower fit (0–15 points) ──
     if (
       totalFollowers >= followerRange.min &&
       totalFollowers <= followerRange.max
     ) {
       budgetFit = true;
-      budgetScore = 15;
+      budgetScore = maxBudgetPoints;
       reasons.push("Good fit for your budget range");
     } else {
-      // Close to range (within 50% of bounds)
       const lowerBound = followerRange.min * 0.5;
       const upperBound =
         followerRange.max === Infinity ? Infinity : followerRange.max * 1.5;
       if (totalFollowers >= lowerBound && totalFollowers <= upperBound) {
-        budgetScore = 7;
+        budgetScore = Math.round(maxBudgetPoints * 0.5);
         reasons.push("Near your budget range");
       }
     }
 
     const totalScore = platformScore + categoryScore + locationScore + budgetScore;
 
-    // Assign fit label based on strongest signal
+    // Assign fit label
     let fitLabel: string;
-    if (primaryOverlap.length > 0 && locationScore >= 15) {
+    if (localOnly && primaryOverlap.length > 0 && locationScore >= 15) {
       fitLabel = "Top match";
+    } else if (primaryOverlap.length > 0 && budgetFit) {
+      fitLabel = "Strong niche match";
     } else if (primaryOverlap.length > 0) {
       fitLabel = "Strong niche match";
-    } else if (locationScore >= 15 && categoryScore > 0) {
+    } else if (localOnly && locationScore >= 15 && categoryScore > 0) {
       fitLabel = "Great local fit";
     } else if (budgetFit && categoryScore >= 10) {
       fitLabel = "Good budget fit";
@@ -282,55 +271,47 @@ function scoreCreatorsInternal(
 
 // ─── Public API ─────────────────────────────────────────────────────────────
 
+const GLOBAL_THRESHOLD = 50;
+const GLOBAL_RELAXED_THRESHOLD = 35;
+const LOCAL_THRESHOLD = 50;
+
 export function scoreCreators(
   request: QuickCollabRequest,
   creators: CreatorForMatching[],
 ): MatchResult {
-  const hasRadius = request.radius != null && request.radius > 0;
+  const localOnly = request.localOnly;
 
-  // Pass 1: Strict — enforce location (if radius set) + enforce category
-  const strict = scoreCreatorsInternal(request, creators, {
-    enforceLocation: hasRadius,
-    enforceCategory: true,
-  }).filter((c) => c.matchScore >= STRICT_THRESHOLD);
+  if (localOnly) {
+    // Local mode: strict location filter, no fallback to non-local
+    const results = scoreCreatorsForMode(request, creators, true)
+      .filter((c) => c.matchScore >= LOCAL_THRESHOLD);
 
-  if (strict.length >= MIN_STRICT_RESULTS) {
+    return {
+      creators: results.slice(0, 7),
+      localLowResults: results.length < 3 && results.length > 0,
+      totalFound: results.length,
+    };
+  }
+
+  // Global mode: no location, category + platform + budget
+  const strict = scoreCreatorsForMode(request, creators, false)
+    .filter((c) => c.matchScore >= GLOBAL_THRESHOLD);
+
+  if (strict.length >= 3) {
     return {
       creators: strict.slice(0, 7),
-      relaxed: false,
-      relaxedReason: null,
+      localLowResults: false,
+      totalFound: strict.length,
     };
   }
 
-  // Pass 2: Relax location (keep category enforced)
-  if (hasRadius) {
-    const relaxedLocation = scoreCreatorsInternal(request, creators, {
-      enforceLocation: false,
-      enforceCategory: true,
-    }).filter((c) => c.matchScore >= RELAXED_THRESHOLD);
+  // Relaxed: lower threshold
+  const relaxed = scoreCreatorsForMode(request, creators, false)
+    .filter((c) => c.matchScore >= GLOBAL_RELAXED_THRESHOLD);
 
-    if (relaxedLocation.length >= MIN_STRICT_RESULTS) {
-      return {
-        creators: relaxedLocation.slice(0, 7),
-        relaxed: true,
-        relaxedReason: "location",
-      };
-    }
-  }
-
-  // Pass 3: Relax both location and strict category
-  const relaxedAll = scoreCreatorsInternal(request, creators, {
-    enforceLocation: false,
-    enforceCategory: false,
-  }).filter((c) => c.matchScore >= RELAXED_THRESHOLD);
-
-  if (relaxedAll.length > 0) {
-    return {
-      creators: relaxedAll.slice(0, 7),
-      relaxed: true,
-      relaxedReason: hasRadius ? "location and category" : "category",
-    };
-  }
-
-  return { creators: [], relaxed: true, relaxedReason: "all criteria" };
+  return {
+    creators: relaxed.slice(0, 7),
+    localLowResults: false,
+    totalFound: relaxed.length,
+  };
 }

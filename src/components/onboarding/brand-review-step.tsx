@@ -11,6 +11,7 @@ interface BrandReviewStepProps {
     companyWebsite?: string;
     bio?: string;
     industry?: string;
+    location?: string;
   };
   onEditStep: (step: number) => void;
 }
@@ -58,7 +59,13 @@ export function BrandReviewStep({ data, onEditStep }: BrandReviewStepProps) {
             {data.industry && (
               <div>
                 <dt className="text-xs text-muted-foreground">{t("onboarding.brandProfile.industry")}</dt>
-                <dd className="mt-1 font-medium">{t(`onboarding.industry.${data.industry}`)}</dd>
+                <dd className="mt-1 font-medium">{t(`onboarding.category.${data.industry}`)}</dd>
+              </div>
+            )}
+            {data.location && (
+              <div>
+                <dt className="text-xs text-muted-foreground">{t("onboarding.brandProfile.location")}</dt>
+                <dd className="mt-1 font-medium">{data.location}</dd>
               </div>
             )}
             {data.bio && (

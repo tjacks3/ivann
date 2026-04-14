@@ -53,14 +53,35 @@ export async function createQuickCollabRequest(data: QuickCollabIntakeValues) {
   const parsed = quickCollabIntakeSchema.safeParse(data);
   if (!parsed.success) return { success: false as const, error: "VALIDATION_ERROR" };
 
+  // Auto-fill business name and category from profile
+  const businessName = user.brandName ?? user.fullName ?? "My Business";
+  const businessCategory = user.industry ?? "other";
+
+  // Auto-fill city/state from profile location when localOnly is true
+  let city = parsed.data.city ?? "";
+  let state = parsed.data.state ?? "";
+  if (parsed.data.localOnly && !city && !state && user.location) {
+    const parts = user.location.split(",").map((s) => s.trim());
+    city = parts[0] ?? "";
+    state = parts[1] ?? "";
+  }
+
   const [created] = await db
     .insert(quickCollabRequests)
     .values({
       brandId: user.id,
-      ...parsed.data,
-      notes: parsed.data.notes ?? null,
-      radius: parsed.data.radius ?? null,
+      businessName,
+      businessCategory: businessCategory as typeof parsed.data.businessCategory,
+      collabType: parsed.data.collabType,
       collabTypeOther: parsed.data.collabTypeOther ?? null,
+      campaignIntent: parsed.data.campaignIntent,
+      localOnly: parsed.data.localOnly,
+      city,
+      state,
+      radius: parsed.data.localOnly ? (parsed.data.radius ?? null) : null,
+      budgetRange: parsed.data.budgetRange,
+      timing: parsed.data.timing,
+      notes: parsed.data.notes ?? null,
     })
     .returning();
 
@@ -165,8 +186,8 @@ export async function matchCreators(requestId: string) {
     return {
       success: true as const,
       matches: [],
-      relaxed: matchResult.relaxed,
-      relaxedReason: matchResult.relaxedReason,
+      localLowResults: false,
+      totalFound: 0,
     };
   }
 
@@ -215,8 +236,8 @@ export async function matchCreators(requestId: string) {
   return {
     success: true as const,
     matches,
-    relaxed: matchResult.relaxed,
-    relaxedReason: matchResult.relaxedReason,
+    localLowResults: matchResult.localLowResults,
+    totalFound: matchResult.totalFound,
   };
 }
 
@@ -446,6 +467,7 @@ export async function generateOutreachMessages(campaignId: string) {
       request,
       scoredCreator,
       brandContactName,
+      user.location,
     );
 
     return {
@@ -678,7 +700,6 @@ export async function getQuickCollabTracking(): Promise<TrackingItem[]> {
   if (outreaches.length === 0) return [];
 
   // Batch fetch creators
-  const creatorIds = [...new Set(outreaches.map((o) => o.creatorId))];
   const creatorsData = await db
     .select({
       id: users.id,
@@ -702,7 +723,6 @@ export async function getQuickCollabTracking(): Promise<TrackingItem[]> {
   }
 
   // Fetch request info for each outreach via campaign
-  const campaignIds = [...new Set(outreaches.map((o) => o.campaignId))];
   const campaigns = await db
     .select({
       id: quickCollabCampaigns.id,

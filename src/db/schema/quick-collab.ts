@@ -35,6 +35,7 @@ export const quickCollabRequests = pgTable(
     collabType: qcCollabTypeEnum("collab_type").notNull(),
     collabTypeOther: varchar("collab_type_other", { length: 200 }),
     campaignIntent: varchar("campaign_intent", { length: 500 }).notNull(),
+    localOnly: boolean("local_only").notNull().default(false),
     city: varchar("city", { length: 100 }).notNull(),
     state: varchar("state", { length: 100 }).notNull(),
     radius: integer("radius"),

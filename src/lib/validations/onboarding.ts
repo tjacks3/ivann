@@ -26,6 +26,7 @@ export const brandProfileSchema = z.object({
   companyWebsite: z.string().url().optional().or(z.literal("")),
   bio: z.string().max(500).optional().or(z.literal("")),
   industry: z.string().min(1, "Required"),
+  location: z.string().min(1, "Required").max(100),
 });
 
 export type RoleValues = z.infer<typeof roleSchema>;

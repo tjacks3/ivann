@@ -136,6 +136,7 @@ export function generateOutreachMessage(
   request: QuickCollabRequest,
   creator: ScoredCreator,
   brandContactName: string,
+  brandLocation: string | null,
 ): string {
   const firstName = creator.fullName?.split(" ")[0] ?? "there";
   const categoryLabel =
@@ -158,10 +159,16 @@ export function generateOutreachMessage(
   const topFitReason =
     creator.fitReasons[0]?.toLowerCase() ?? "your content is a great fit";
 
+  // Resolve location for the intro line
+  const location = request.city || brandLocation || "";
+  const introLine = location
+    ? `I run ${request.businessName}, a ${categoryLabel} in ${location}. ${intentOpener}`
+    : `I run ${request.businessName}, a ${categoryLabel}. ${intentOpener}`;
+
   const lines = [
     `Hi ${firstName},`,
     "",
-    `I run ${request.businessName}, a local ${categoryLabel} in ${request.city}. ${intentOpener}`,
+    introLine,
     "",
     `I came across your profile and think you'd be a great fit — ${topFitReason}.`,
     "",

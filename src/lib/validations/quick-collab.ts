@@ -24,8 +24,9 @@ export const quickCollabIntakeSchema = z.object({
   ]),
   collabTypeOther: z.string().max(200).optional(),
   campaignIntent: z.string().min(1).max(500),
-  city: z.string().min(1).max(100),
-  state: z.string().min(1).max(100),
+  localOnly: z.boolean(),
+  city: z.string().max(100).optional(),
+  state: z.string().max(100).optional(),
   radius: z.number().int().positive().optional(),
   budgetRange: z.enum([
     "under_50",

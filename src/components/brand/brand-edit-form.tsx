@@ -25,8 +25,9 @@ import { updateBrandProfile } from "@/app/(app)/brand/profile/actions";
 import type { User } from "@/db/schema/users";
 
 const INDUSTRIES = [
-  "fashion", "tech", "food", "health", "beauty",
-  "travel", "finance", "education", "entertainment", "other",
+  "fashion", "tech", "lifestyle", "fitness",
+  "food", "travel", "education", "entertainment",
+  "business", "other",
 ] as const;
 
 interface BrandEditFormProps {
@@ -49,6 +50,7 @@ export function BrandEditForm({ profile, onSaved }: BrandEditFormProps) {
       companyWebsite: profile.companyWebsite || "",
       bio: profile.bio || "",
       industry: profile.industry || "",
+      location: profile.location || "",
     },
   });
 
@@ -133,12 +135,22 @@ export function BrandEditForm({ profile, onSaved }: BrandEditFormProps) {
               <SelectContent>
                 {INDUSTRIES.map((ind) => (
                   <SelectItem key={ind} value={ind}>
-                    {t(`onboarding.industry.${ind}`)}
+                    {t(`onboarding.category.${ind}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {errors.industry && <p className="text-xs text-destructive">{errors.industry.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location">{t("brandProfile.edit.location")}</Label>
+            <Input
+              id="location"
+              placeholder={t("brandProfile.edit.locationPlaceholder")}
+              {...register("location")}
+            />
+            {errors.location && <p className="text-xs text-destructive">{errors.location.message}</p>}
           </div>
         </CardContent>
       </Card>

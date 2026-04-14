@@ -15,8 +15,9 @@ import {
 import { useTranslation } from "@/i18n";
 
 const INDUSTRIES = [
-  "fashion", "tech", "food", "health", "beauty",
-  "travel", "finance", "education", "entertainment", "other",
+  "fashion", "tech", "lifestyle", "fitness",
+  "food", "travel", "education", "entertainment",
+  "business", "other",
 ] as const;
 
 interface BrandProfileStepProps {
@@ -73,12 +74,22 @@ export function BrandProfileStep({ form }: BrandProfileStepProps) {
             <SelectContent>
               {INDUSTRIES.map((ind) => (
                 <SelectItem key={ind} value={ind}>
-                  {t(`onboarding.industry.${ind}`)}
+                  {t(`onboarding.category.${ind}`)}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           {errors.industry && <p className="text-xs text-destructive">{errors.industry.message}</p>}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="location">{t("onboarding.brandProfile.location")}</Label>
+          <Input
+            id="location"
+            placeholder={t("onboarding.brandProfile.locationPlaceholder")}
+            {...register("location")}
+          />
+          {errors.location && <p className="text-xs text-destructive">{errors.location.message}</p>}
         </div>
       </div>
     </div>

@@ -54,7 +54,7 @@ export default function BrandDashboardPage() {
               <div className="flex-1 text-center sm:text-left">
                 <h2 className="text-lg font-semibold">{profile.brandName}</h2>
                 {profile.industry && (
-                  <p className="text-sm text-muted-foreground">{profile.industry}</p>
+                  <p className="text-sm text-muted-foreground">{t(`onboarding.category.${profile.industry}`)}</p>
                 )}
                 {profile.bio && (
                   <p className="mt-2 line-clamp-2 max-w-md text-sm text-muted-foreground">{profile.bio}</p>

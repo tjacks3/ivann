@@ -219,3 +219,34 @@ improve responsive behavior for tablet and mobile
 improve loading, empty, and error states
 keep the UI polished and minimal
 do not rewrite unrelated parts of the codebase
+
+### Matching Algorithm Restructured
+
+Global mode (localOnly=false): Weights are Platform (30), Category (40), Budget (30). Zero location influence.
+Local mode (localOnly=true): Location is a hard filter — non-local creators are excluded entirely. No fallback to irrelevant creators. If <3 results found, shows a low-results banner. If 0 results, shows a dedicated empty state suggesting to expand radius or disable local-only.
+
+### How Campaign Goal Works
+
+Here's how the "What's your campaign goal?" step works:
+
+Two input modes — presets or custom free text.
+
+The brand sees a row of 5 preset pill buttons:
+
+Build local awareness
+Promote a new menu item
+Announce a grand opening
+Drive weekend visits
+Promote a special offer
+Plus a "Custom" button at the end.
+
+Preset mode (default): The brand taps one pill — it highlights in green, and that preset key (e.g. local_awareness) is stored as the campaignIntent value. Only one can be selected at a time.
+
+Custom mode: If none of the presets fit, the brand taps "Custom" — a textarea appears where they can type a free-text goal (up to 500 characters). The presets deselect.
+
+How it's used downstream:
+
+The campaignIntent value flows into templates.ts where it maps preset keys to opener sentences for the outreach message (e.g. local_awareness → "We're looking to build more local awareness for our business."). Custom text is used as-is.
+It also populates the campaign plan's goal field that the brand reviews before sending.
+The value is stored in the quick_collab_requests table for record-keeping.
+It does not affect creator matching — the matching algorithm uses platform, category, budget, and optionally location, but not the campaign intent.

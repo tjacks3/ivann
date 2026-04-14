@@ -34,6 +34,7 @@ export async function updateBrandProfile(data: BrandEditProfileValues) {
         companyWebsite: parsed.data.companyWebsite || null,
         bio: parsed.data.bio || null,
         industry: parsed.data.industry,
+        location: parsed.data.location,
         updatedAt: new Date(),
       })
       .where(eq(users.authId, authUser.id));

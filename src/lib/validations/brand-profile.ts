@@ -6,6 +6,7 @@ export const brandEditProfileSchema = z.object({
   companyWebsite: z.string().url("Enter a valid URL").optional().or(z.literal("")),
   bio: z.string().max(500).optional().or(z.literal("")),
   industry: z.string().min(1, "Required"),
+  location: z.string().min(1, "Required").max(100),
 });
 
 export type BrandEditProfileValues = z.infer<typeof brandEditProfileSchema>;

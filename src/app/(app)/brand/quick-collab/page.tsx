@@ -7,10 +7,9 @@ import { LoadingState } from "@/components/shared/loading-state";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { IntakeStepper } from "@/components/quick-collab/intake-stepper";
-import { StepBusinessInfo } from "@/components/quick-collab/step-business-info";
 import { StepCollabType } from "@/components/quick-collab/step-collab-type";
 import { StepCampaignIntent } from "@/components/quick-collab/step-campaign-intent";
-import { StepLocation } from "@/components/quick-collab/step-location";
+import { StepLocalPreference } from "@/components/quick-collab/step-local-preference";
 import { StepBudget } from "@/components/quick-collab/step-budget";
 import { StepTiming } from "@/components/quick-collab/step-timing";
 import { CreatorMatchList } from "@/components/quick-collab/creator-match-list";
@@ -20,15 +19,14 @@ import { OutreachEditor } from "@/components/quick-collab/outreach-editor";
 import { useQuickCollab } from "@/hooks/use-quick-collab";
 import { useBrandProfile } from "@/hooks/use-brand-profile";
 import { useTranslation } from "@/i18n";
-import { ArrowLeft, ArrowRight, Loader2, CheckCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 import type { MatchedCreator, OutreachDraft } from "@/app/(app)/brand/quick-collab/actions";
 import type { QuickCollabCampaign } from "@/db/schema/quick-collab";
 
 type WizardStep =
-  | "business_info"
   | "collab_type"
   | "campaign_intent"
-  | "location"
+  | "local_preference"
   | "budget"
   | "timing"
   | "matching"
@@ -37,10 +35,9 @@ type WizardStep =
   | "success";
 
 const INTAKE_STEPS: WizardStep[] = [
-  "business_info",
   "collab_type",
   "campaign_intent",
-  "location",
+  "local_preference",
   "budget",
   "timing",
 ];
@@ -68,18 +65,17 @@ export default function QuickCollabPage() {
   } = useQuickCollab();
 
   // Wizard state
-  const [step, setStep] = useState<WizardStep>("business_info");
+  const [step, setStep] = useState<WizardStep>("collab_type");
   const [loading, setLoading] = useState(false);
 
   // Intake form data
-  const businessName = profile?.brandName ?? "";
-  const [businessCategory, setBusinessCategory] = useState("");
   const [collabType, setCollabType] = useState("");
   const [collabTypeOther, setCollabTypeOther] = useState("");
   const [campaignIntent, setCampaignIntent] = useState("");
+  const [localOnly, setLocalOnly] = useState(false);
+  const [radius, setRadius] = useState(30);
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [radius, setRadius] = useState<number | undefined>();
   const [budgetRange, setBudgetRange] = useState("");
   const [timing, setTiming] = useState("");
   const [notes, setNotes] = useState("");
@@ -93,21 +89,19 @@ export default function QuickCollabPage() {
   const [campaign, setCampaign] = useState<QuickCollabCampaign | null>(null);
   const [outreaches, setOutreaches] = useState<OutreachDraft[]>([]);
   const [sentCount, setSentCount] = useState(0);
-  const [matchRelaxed, setMatchRelaxed] = useState(false);
-  const [matchRelaxedReason, setMatchRelaxedReason] = useState<string | null>(null);
+  const [matchLocalLowResults, setMatchLocalLowResults] = useState(false);
+  const [matchLocalOnly, setMatchLocalOnly] = useState(false);
 
   // Detail drawer
   const [detailMatch, setDetailMatch] = useState<MatchedCreator | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const stepIndex = ALL_STEPS.indexOf(step);
-  const isIntakeStep = INTAKE_STEPS.includes(step);
 
   const STEP_LABELS: Record<WizardStep, string> = {
-    business_info: t("quickCollab.stepLabel.businessInfo"),
     collab_type: t("quickCollab.stepLabel.collabType"),
     campaign_intent: t("quickCollab.stepLabel.intent"),
-    location: t("quickCollab.stepLabel.location"),
+    local_preference: t("quickCollab.stepLabel.localPreference"),
     budget: t("quickCollab.stepLabel.budget"),
     timing: t("quickCollab.stepLabel.timing"),
     matching: t("quickCollab.stepLabel.matching"),
@@ -119,15 +113,16 @@ export default function QuickCollabPage() {
   // Validation per step
   const canProceed = useCallback((): boolean => {
     switch (step) {
-      case "business_info":
-        return businessCategory !== "";
       case "collab_type":
         if (collabType === "other") return collabTypeOther.trim() !== "";
         return collabType !== "";
       case "campaign_intent":
         return campaignIntent.trim() !== "";
-      case "location":
-        return city.trim() !== "" && state.trim() !== "";
+      case "local_preference":
+        if (localOnly && !profile?.location) {
+          return city.trim() !== "" && state.trim() !== "";
+        }
+        return true;
       case "budget":
         return budgetRange !== "";
       case "timing":
@@ -143,11 +138,11 @@ export default function QuickCollabPage() {
     }
   }, [
     step,
-    businessName,
-    businessCategory,
     collabType,
     collabTypeOther,
     campaignIntent,
+    localOnly,
+    profile?.location,
     city,
     state,
     budgetRange,
@@ -161,15 +156,35 @@ export default function QuickCollabPage() {
     if (step === "timing") {
       // Submit intake + run matching
       setLoading(true);
+
+      // Auto-fill from profile
+      const businessName = profile?.brandName ?? profile?.fullName ?? "My Business";
+      const businessCategory = profile?.industry ?? "other";
+
+      // Location: use profile location or manual input when localOnly
+      let reqCity = "";
+      let reqState = "";
+      if (localOnly) {
+        if (profile?.location) {
+          const parts = profile.location.split(",").map((s) => s.trim());
+          reqCity = parts[0] ?? "";
+          reqState = parts[1] ?? "";
+        } else {
+          reqCity = city.trim();
+          reqState = state.trim();
+        }
+      }
+
       const result = await createRequest({
-        businessName: businessName.trim(),
+        businessName,
         businessCategory: businessCategory as "fashion" | "tech" | "lifestyle" | "fitness" | "food" | "travel" | "education" | "entertainment" | "business" | "other",
         collabType: collabType as "instagram_story" | "instagram_post" | "youtube_promo" | "tiktok_post" | "podcast_mention" | "other",
         collabTypeOther: collabType === "other" ? collabTypeOther.trim() : undefined,
         campaignIntent: campaignIntent.trim(),
-        city: city.trim(),
-        state: state.trim(),
-        radius: radius || undefined,
+        localOnly,
+        city: reqCity || undefined,
+        state: reqState || undefined,
+        radius: localOnly ? radius : undefined,
         budgetRange: budgetRange as "under_50" | "50_100" | "100_250" | "250_500" | "500_plus",
         timing: timing as "asap" | "this_week" | "this_month" | "flexible",
         notes: notes.trim() || undefined,
@@ -180,8 +195,8 @@ export default function QuickCollabPage() {
         const matchResult = await matchCreators(result.requestId);
         if (matchResult.success) {
           setMatches(matchResult.matches);
-          setMatchRelaxed(matchResult.relaxed ?? false);
-          setMatchRelaxedReason(matchResult.relaxedReason ?? null);
+          setMatchLocalLowResults(matchResult.localLowResults ?? false);
+          setMatchLocalOnly(localOnly);
           const initialStatuses: Record<string, "recommended"> = {};
           matchResult.matches.forEach((m) => {
             initialStatuses[m.matchId] = "recommended";
@@ -192,7 +207,6 @@ export default function QuickCollabPage() {
       setLoading(false);
       setStep("matching");
     } else if (step === "matching") {
-      // Generate campaign
       if (!requestId) return;
       setLoading(true);
       const result = await generateCampaign(requestId);
@@ -202,7 +216,6 @@ export default function QuickCollabPage() {
       setLoading(false);
       setStep("campaign");
     } else if (step === "campaign") {
-      // Generate outreach messages
       if (!campaign) return;
       setLoading(true);
       const result = await generateMessages(campaign.id);
@@ -212,7 +225,6 @@ export default function QuickCollabPage() {
       setLoading(false);
       setStep("outreach");
     } else {
-      // Simple step navigation
       const nextIndex = stepIndex + 1;
       if (nextIndex < ALL_STEPS.length) {
         setStep(ALL_STEPS[nextIndex]);
@@ -330,14 +342,6 @@ export default function QuickCollabPage() {
       <div className="mt-8">
         {loading && <LoadingState variant="spinner" />}
 
-        {!loading && step === "business_info" && (
-          <StepBusinessInfo
-            businessName={businessName}
-            businessCategory={businessCategory}
-            onBusinessCategoryChange={setBusinessCategory}
-          />
-        )}
-
         {!loading && step === "collab_type" && (
           <StepCollabType
             collabType={collabType}
@@ -354,14 +358,17 @@ export default function QuickCollabPage() {
           />
         )}
 
-        {!loading && step === "location" && (
-          <StepLocation
+        {!loading && step === "local_preference" && (
+          <StepLocalPreference
+            localOnly={localOnly}
+            radius={radius}
+            brandLocation={profile?.location ?? null}
             city={city}
             state={state}
-            radius={radius}
+            onLocalOnlyChange={setLocalOnly}
+            onRadiusChange={setRadius}
             onCityChange={setCity}
             onStateChange={setState}
-            onRadiusChange={setRadius}
           />
         )}
 
@@ -385,8 +392,8 @@ export default function QuickCollabPage() {
           <CreatorMatchList
             matches={matches}
             matchStatuses={matchStatuses}
-            relaxed={matchRelaxed}
-            relaxedReason={matchRelaxedReason}
+            localOnly={matchLocalOnly}
+            localLowResults={matchLocalLowResults}
             onSelect={handleSelectMatch}
             onSkip={handleSkipMatch}
             onViewDetails={(match) => {

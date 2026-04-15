@@ -9,6 +9,7 @@ export * from "./messages";
 export * from "./notifications";
 export * from "./favorites";
 export * from "./quick-collab";
+export * from "./deals";
 
 export * from "./social-tokens";
 

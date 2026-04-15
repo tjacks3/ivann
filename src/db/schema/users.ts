@@ -16,6 +16,7 @@ import { messageThreadMembers } from "./message-thread-members";
 import { favorites } from "./favorites";
 import { messages } from "./messages";
 import { notifications } from "./notifications";
+import { deals } from "./deals";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -72,6 +73,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   notifications: many(notifications),
   brandFavorites: many(favorites, { relationName: "brandFavorites" }),
   favoritedBy: many(favorites, { relationName: "creatorFavoritedBy" }),
+  brandDeals: many(deals, { relationName: "brandDeals" }),
+  creatorDeals: many(deals, { relationName: "creatorDeals" }),
 }));
 
 export type User = typeof users.$inferSelect;

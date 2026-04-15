@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Select,
   SelectTrigger,
@@ -18,7 +20,7 @@ import { Loader2, CheckCircle2 } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { collaborationRequestSchema } from "@/lib/validations/collaboration";
 import type { CollaborationRequestValues } from "@/lib/validations/collaboration";
-import { createCollaborationRequest } from "@/app/(app)/collaborations/actions";
+import { createDeal } from "@/app/(app)/deals/actions";
 import { getCurrencyForLocale, fromCents, toCents } from "@/lib/currency";
 import type { Package } from "@/db/schema/packages";
 
@@ -38,6 +40,7 @@ export function RequestForm({
   onClose,
 }: RequestFormProps) {
   const { t, locale } = useTranslation();
+  const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -90,10 +93,17 @@ export function RequestForm({
     setSaving(true);
     setServerError(null);
 
-    const result = await createCollaborationRequest(data);
+    const result = await createDeal({
+      creatorId: data.creatorId,
+      title: data.title,
+      deliverables: data.message ?? undefined,
+      budget: data.budget ?? undefined,
+      currency: data.currency,
+      timeline: data.deadline ?? undefined,
+    });
 
     if (result.success) {
-      setSuccess(true);
+      router.push(`/deals/${result.dealId}`);
     } else if (result.error === "UNAUTHORIZED") {
       setServerError(t("collab.form.unauthorized"));
     } else {
@@ -152,12 +162,11 @@ export function RequestForm({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="message">{t("collab.form.message")}</Label>
-          <Textarea
-            id="message"
-            rows={4}
+          <Label>{t("collab.form.message")}</Label>
+          <RichTextEditor
+            value={watch("message") ?? ""}
+            onChange={(val) => setValue("message", val, { shouldValidate: true })}
             placeholder={t("collab.form.messagePlaceholder")}
-            {...register("message")}
           />
           {errors.message && <p className="text-xs text-destructive">{errors.message.message}</p>}
         </div>

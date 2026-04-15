@@ -17,7 +17,7 @@ import { FavoritesDropdown } from "@/components/favorites/favorites-dropdown";
 import { useUser } from "@/hooks/use-user";
 import { useUnreadCount } from "@/hooks/use-unread-count";
 import { useTranslation } from "@/i18n";
-import { Menu, Compass, MessageSquare, User, LayoutDashboard, Zap, X } from "lucide-react";
+import { Menu, Compass, MessageSquare, User, LayoutDashboard, Zap, Handshake, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { HeaderVariant } from "@/types";
 
@@ -39,6 +39,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
   const creatorLinks = [
     { href: "/creator/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
     { href: "/creator/profile", label: t("nav.myProfile"), icon: User },
+    { href: "/deals", label: t("nav.deals"), icon: Handshake },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
   ];
 
@@ -46,6 +47,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
     { href: "/brand/dashboard", label: t("nav.brandDashboard"), icon: LayoutDashboard },
     { href: "/brand/quick-collab", label: t("nav.quickCollab"), icon: Zap },
     { href: "/discover", label: t("nav.discover"), icon: Compass },
+    { href: "/deals", label: t("nav.deals"), icon: Handshake },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
   ];
 

@@ -63,6 +63,17 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "system",
 ]);
 
+// Deal statuses
+export const dealStatusEnum = pgEnum("deal_status", [
+  "draft",
+  "negotiating",
+  "accepted",
+  "in_progress",
+  "delivered",
+  "completed",
+  "cancelled",
+]);
+
 // QuickCollab enums
 export const qcBusinessCategoryEnum = pgEnum("qc_business_category", [
   "fashion",

@@ -8,16 +8,17 @@ import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { LoadingState } from "@/components/shared/loading-state";
 import { EmptyState } from "@/components/shared/empty-state";
-import { RequestCard } from "@/components/collaborations/request-card";
+import { DealStatusBadge } from "@/components/deals/deal-status-badge";
 import { useBrandProfile } from "@/hooks/use-brand-profile";
-import { useCollaborations } from "@/hooks/use-collaborations";
+import { useMyDeals } from "@/hooks/use-deals";
 import { useTranslation } from "@/i18n";
+import { formatPrice } from "@/lib/currency";
 import { Compass, Globe, Handshake, Zap } from "lucide-react";
 
 export default function BrandDashboardPage() {
   const { t } = useTranslation();
   const { profile, isLoading } = useBrandProfile();
-  const { collaborations, isLoading: collabsLoading, refetch: refetchCollabs } = useCollaborations();
+  const { deals, isLoading: dealsLoading } = useMyDeals();
 
   if (isLoading) {
     return <LoadingState variant="page" />;
@@ -109,27 +110,27 @@ export default function BrandDashboardPage() {
         </div>
       </div>
 
-      {/* Collaborations */}
+      {/* Deals */}
       <div className="mt-12">
         <SectionHeader
-          title={t("collab.sentTitle")}
+          title={t("deal.dashboardTitle")}
           as="h2"
           action={
-            collaborations.length > 0 && (
+            deals.length > 0 && (
               <span className="text-sm text-muted-foreground">
-                {collaborations.length} {t("brandDashboard.collabCount")}
+                {deals.length} {t("deal.totalCount")}
               </span>
             )
           }
         />
         <div className="mt-4">
-          {collabsLoading ? (
+          {dealsLoading ? (
             <LoadingState variant="skeleton" count={3} />
-          ) : collaborations.length === 0 ? (
+          ) : deals.length === 0 ? (
             <EmptyState
               icon={<Handshake className="size-6" />}
-              title={t("collab.empty.brandTitle")}
-              description={t("collab.empty.brandDescription")}
+              title={t("deal.emptyBrandTitle")}
+              description={t("deal.emptyBrandDescription")}
               action={
                 <Link href="/discover" className={buttonVariants()}>
                   {t("nav.discover")}
@@ -138,13 +139,29 @@ export default function BrandDashboardPage() {
             />
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {collaborations.map((collab) => (
-                <RequestCard
-                  key={collab.id}
-                  collab={collab}
-                  viewAs="brand"
-                  onUpdated={refetchCollabs}
-                />
+              {deals.map((deal) => (
+                <Link key={deal.id} href={`/deals/${deal.id}`}>
+                  <Card className="transition-all hover:shadow-md hover:scale-[1.01]">
+                    <CardContent className="space-y-2 pt-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate font-semibold">{deal.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {deal.otherPartyName}
+                            {deal.otherPartyUsername && ` @${deal.otherPartyUsername}`}
+                          </p>
+                        </div>
+                        <DealStatusBadge status={deal.status} />
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                        {deal.budget && (
+                          <span>{formatPrice(deal.budget, deal.currency, "en")}</span>
+                        )}
+                        {deal.timeline && <span>{deal.timeline}</span>}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           )}

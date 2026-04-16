@@ -250,3 +250,17 @@ The campaignIntent value flows into templates.ts where it maps preset keys to op
 It also populates the campaign plan's goal field that the brand reviews before sending.
 The value is stored in the quick_collab_requests table for record-keeping.
 It does not affect creator matching — the matching algorithm uses platform, category, budget, and optionally location, but not the campaign intent.
+
+### NEW TEST BRAND USERS
+
+Brand Email Password
+Green Plate Kitchen brand@greenplate.example.com TestPass123!
+FitPulse brand@fitpulse.example.com TestPass123!
+WanderLuxe Travel brand@wanderluxe.example.com TestPass123!
+GlowUp Beauty brand@glowup.example.com TestPass123!
+LearnLoop brand@learnloop.example.com TestPass123!
+NovaStream brand@novastream.example.com TestPass123!
+Urban Roots Co. brand@urbanroots.example.com TestPass123!
+Peak Capital Advisors brand@peakcapital.example.com TestPass123!
+ByteCraft brand@bytecraft.example.com TestPass123!
+TrailBlaze Outdoors brand@trailblaze.example.com TestPass123!

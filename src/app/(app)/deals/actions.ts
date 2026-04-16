@@ -11,6 +11,7 @@ import {
 } from "@/db/schema";
 import { eq, or, desc, asc } from "drizzle-orm";
 import { createAndEmail } from "@/lib/notifications/create";
+import { releasePayment, refundPayment } from "./payment-actions";
 import {
   createDealSchema,
   updateDealSchema,
@@ -510,6 +511,13 @@ export async function updateDealStatus(dealId: string, newStatus: string) {
     .update(deals)
     .set({ status: newStatus as typeof deal.status, updatedAt: new Date() })
     .where(eq(deals.id, dealId));
+
+  // Auto-release payment on completion, auto-refund on cancellation
+  if (newStatus === "completed") {
+    releasePayment(dealId).catch(() => {});
+  } else if (newStatus === "cancelled") {
+    refundPayment(dealId).catch(() => {});
+  }
 
   // Notify the other party
   const otherUserId = isBrand ? deal.creatorId : deal.brandId;

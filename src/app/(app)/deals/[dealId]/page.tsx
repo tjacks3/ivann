@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Card, CardContent } from "@/components/ui/card";
 import { DealSummaryCard } from "@/components/deals/deal-summary-card";
+import { DealPaymentSection } from "@/components/deals/deal-payment-section";
 import { DealEditSheet } from "@/components/deals/deal-edit-sheet";
 import { DealCounterSheet } from "@/components/deals/deal-counter-sheet";
 import { DealRevisionTimeline } from "@/components/deals/deal-revision-timeline";
@@ -21,6 +22,12 @@ import {
   getDealRevisions,
   type RevisionItem,
 } from "@/app/(app)/deals/actions";
+import {
+  initFunding,
+  confirmFunding,
+  getDealPayment,
+  type DealPaymentInfo,
+} from "@/app/(app)/deals/payment-actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "@/i18n";
 import {
@@ -49,16 +56,19 @@ export default function DealWorkspacePage({
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [revisions, setRevisions] = useState<RevisionItem[]>([]);
+  const [payment, setPayment] = useState<DealPaymentInfo | null>(null);
 
-  // Load revisions
+  // Load revisions + payment
   useEffect(() => {
     if (dealId) {
       getDealRevisions(dealId).then(setRevisions);
+      getDealPayment(dealId).then(setPayment);
     }
   }, [dealId]);
 
   const refreshAll = () => {
     refetch();
+    getDealPayment(dealId).then(setPayment);
     getDealRevisions(dealId).then(setRevisions);
     queryClient.invalidateQueries({ queryKey: ["deals"] });
   };
@@ -116,6 +126,14 @@ export default function DealWorkspacePage({
       refreshAll();
     }
     setStatusLoading(false);
+  };
+
+  const handleFundDeal = async () => {
+    const result = await initFunding(deal.id);
+    if (result.success) {
+      await confirmFunding(result.paymentId);
+      refreshAll();
+    }
   };
 
   // Status actions based on role + current status
@@ -219,6 +237,18 @@ export default function DealWorkspacePage({
           )}
         </div>
       )}
+
+      {/* Payment section */}
+      <div className="mt-4">
+        <DealPaymentSection
+          payment={payment}
+          dealBudget={deal.budget}
+          dealCurrency={deal.currency}
+          isBrand={!!isBrand}
+          dealStatus={deal.status}
+          onFund={handleFundDeal}
+        />
+      </div>
 
       {/* Revision timeline */}
       {revisions.length > 0 && (

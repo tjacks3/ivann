@@ -600,5 +600,28 @@
   "deal.cancel.brandMessage": "Are you sure you want to cancel this deal? Any downpayment you may have made will be lost and cannot be recovered.",
   "deal.cancel.creatorMessage": "Are you sure you want to cancel this deal? You will not receive any payment, and any work you have started will be lost.",
   "deal.cancel.goBack": "Go Back",
-  "deal.cancel.confirm": "Cancel Deal"
+  "deal.cancel.confirm": "Cancel Deal",
+
+  "deal.payment.unpaidBrand": "Fund this deal to get started",
+  "deal.payment.unpaidCreator": "Awaiting payment from brand",
+  "deal.payment.processing": "Processing payment...",
+  "deal.payment.secured": "Payment Secured",
+  "deal.payment.heldBrand": "Funds held securely until you approve completion",
+  "deal.payment.heldCreator": "Funds will be released when the deal is completed",
+  "deal.payment.releasedBrand": "Payment Released",
+  "deal.payment.releasedCreator": "Payment Received",
+  "deal.payment.refunded": "Payment Refunded",
+  "deal.payment.fundDeal": "Fund Deal",
+
+  "deal.payment.status.unpaid": "Unpaid",
+  "deal.payment.status.funding_pending": "Processing",
+  "deal.payment.status.funded": "Funded",
+  "deal.payment.status.released": "Released",
+  "deal.payment.status.refunded": "Refunded",
+
+  "deal.payment.summary.totalSpent": "Total Spent",
+  "deal.payment.summary.totalEarned": "Total Earned",
+  "deal.payment.summary.fundsHeld": "Funds Held",
+  "deal.payment.summary.pendingFunds": "Pending Funds",
+  "deal.payment.summary.recentTransactions": "Recent Transactions"
 }

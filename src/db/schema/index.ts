@@ -10,10 +10,10 @@ export * from "./notifications";
 export * from "./favorites";
 export * from "./quick-collab";
 export * from "./deals";
+export * from "./deal-payments";
 
 export * from "./social-tokens";
 
 // Later — uncomment when building these features:
 // export * from "./social-stat-snapshots";
 // export * from "./creator-public-metrics";
-// export * from "./payments";

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button-variants";
@@ -11,10 +12,12 @@ import { LoadingState } from "@/components/shared/loading-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ProfileStatusBadge } from "@/components/profile/profile-status-badge";
 import { DealStatusBadge } from "@/components/deals/deal-status-badge";
+import { PaymentSummaryCard } from "@/components/deals/payment-summary-card";
 import { useCreatorProfile } from "@/hooks/use-creator-profile";
 import { useMyDeals } from "@/hooks/use-deals";
 import { useTranslation } from "@/i18n";
 import { formatPrice } from "@/lib/currency";
+import { getPaymentSummary, type PaymentSummary } from "@/app/(app)/deals/payment-actions";
 import { Pencil, Eye, Package, Handshake } from "lucide-react";
 import type { ProfileStatus } from "@/types";
 
@@ -43,6 +46,11 @@ export default function CreatorDashboardPage() {
   const { t } = useTranslation();
   const { profile, isLoading } = useCreatorProfile();
   const { deals, isLoading: dealsLoading } = useMyDeals();
+  const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
+
+  useEffect(() => {
+    getPaymentSummary().then(setPaymentSummary);
+  }, []);
 
   if (isLoading) {
     return <LoadingState variant="page" />;
@@ -149,6 +157,13 @@ export default function CreatorDashboardPage() {
           </Card>
         </div>
       </div>
+
+      {/* Payment Summary */}
+      {paymentSummary && (paymentSummary.totalReleased > 0 || paymentSummary.totalFunded > 0 || paymentSummary.recentTransactions.length > 0) && (
+        <div className="mt-8">
+          <PaymentSummaryCard summary={paymentSummary} isBrand={false} />
+        </div>
+      )}
 
       {/* Deals */}
       <div className="mt-12">

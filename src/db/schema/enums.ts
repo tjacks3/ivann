@@ -74,6 +74,15 @@ export const dealStatusEnum = pgEnum("deal_status", [
   "cancelled",
 ]);
 
+// Escrow payment statuses
+export const escrowStatusEnum = pgEnum("escrow_status", [
+  "unpaid",
+  "funding_pending",
+  "funded",
+  "released",
+  "refunded",
+]);
+
 // QuickCollab enums
 export const qcBusinessCategoryEnum = pgEnum("qc_business_category", [
   "fashion",

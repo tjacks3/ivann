@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button-variants";
@@ -9,16 +10,23 @@ import { SectionHeader } from "@/components/shared/section-header";
 import { LoadingState } from "@/components/shared/loading-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { DealStatusBadge } from "@/components/deals/deal-status-badge";
+import { PaymentSummaryCard } from "@/components/deals/payment-summary-card";
 import { useBrandProfile } from "@/hooks/use-brand-profile";
 import { useMyDeals } from "@/hooks/use-deals";
 import { useTranslation } from "@/i18n";
 import { formatPrice } from "@/lib/currency";
+import { getPaymentSummary, type PaymentSummary } from "@/app/(app)/deals/payment-actions";
 import { Compass, Globe, Handshake, Zap } from "lucide-react";
 
 export default function BrandDashboardPage() {
   const { t } = useTranslation();
   const { profile, isLoading } = useBrandProfile();
   const { deals, isLoading: dealsLoading } = useMyDeals();
+  const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
+
+  useEffect(() => {
+    getPaymentSummary().then(setPaymentSummary);
+  }, []);
 
   if (isLoading) {
     return <LoadingState variant="page" />;
@@ -109,6 +117,13 @@ export default function BrandDashboardPage() {
           </Card>
         </div>
       </div>
+
+      {/* Payment Summary */}
+      {paymentSummary && (paymentSummary.totalReleased > 0 || paymentSummary.totalFunded > 0 || paymentSummary.recentTransactions.length > 0) && (
+        <div className="mt-8">
+          <PaymentSummaryCard summary={paymentSummary} isBrand />
+        </div>
+      )}
 
       {/* Deals */}
       <div className="mt-12">

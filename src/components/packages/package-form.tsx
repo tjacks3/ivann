@@ -49,13 +49,24 @@ const PACKAGE_TYPES = [
   "custom",
 ] as const;
 
+interface TemplateDefaults {
+  title?: string;
+  description?: string;
+  type?: PackageFormValues["type"];
+  deliverables?: string[];
+  priceInCents?: number;
+  deliveryDays?: number;
+  revisions?: number;
+}
+
 interface PackageFormProps {
   pkg?: Package;
+  templateDefaults?: TemplateDefaults;
   onClose: () => void;
   onSaved: () => void;
 }
 
-export function PackageForm({ pkg, onClose, onSaved }: PackageFormProps) {
+export function PackageForm({ pkg, templateDefaults, onClose, onSaved }: PackageFormProps) {
   const { t, locale } = useTranslation();
   const [saving, setSaving] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -66,14 +77,14 @@ export function PackageForm({ pkg, onClose, onSaved }: PackageFormProps) {
   const form = useForm<PackageFormValues>({
     resolver: zodResolver(packageFormSchema),
     defaultValues: {
-      title: pkg?.title ?? "",
-      description: pkg?.description ?? "",
-      deliverables: pkg?.deliverables ?? "",
-      type: (pkg?.type as PackageFormValues["type"]) ?? "custom",
-      priceInCents: pkg?.priceInCents ?? 0,
+      title: pkg?.title ?? templateDefaults?.title ?? "",
+      description: pkg?.description ?? templateDefaults?.description ?? "",
+      deliverables: pkg?.deliverables ?? (templateDefaults?.deliverables ? JSON.stringify(templateDefaults.deliverables) : ""),
+      type: (pkg?.type as PackageFormValues["type"]) ?? templateDefaults?.type ?? "custom",
+      priceInCents: pkg?.priceInCents ?? templateDefaults?.priceInCents ?? 0,
       currency,
-      deliveryDays: pkg?.deliveryDays ?? undefined,
-      revisions: pkg?.revisions ?? 1,
+      deliveryDays: pkg?.deliveryDays ?? templateDefaults?.deliveryDays ?? undefined,
+      revisions: pkg?.revisions ?? templateDefaults?.revisions ?? 1,
       status: (pkg?.status as PackageFormValues["status"]) ?? "draft",
     },
   });

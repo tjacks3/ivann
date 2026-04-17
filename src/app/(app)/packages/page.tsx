@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingState } from "@/components/shared/loading-state";
 import { PackageCard } from "@/components/packages/package-card";
 import { PackageForm } from "@/components/packages/package-form";
+import { TemplatePicker } from "@/components/packages/template-picker";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -16,39 +17,57 @@ import {
 } from "@/components/ui/sheet";
 import { usePackages } from "@/hooks/use-packages";
 import { useTranslation } from "@/i18n";
-import { Package, Plus, X } from "lucide-react";
+import { Package, Plus, X, ArrowLeft } from "lucide-react";
 import type { Package as PackageType } from "@/db/schema/packages";
+import type { PackageTemplate } from "@/lib/packages/templates";
+
+type SheetStep = "template" | "form";
 
 export default function PackagesPage() {
   const { t } = useTranslation();
   const { packages, isLoading, refetch } = usePackages();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetStep, setSheetStep] = useState<SheetStep>("template");
   const [editingPkg, setEditingPkg] = useState<PackageType | undefined>();
+  const [selectedTemplate, setSelectedTemplate] = useState<PackageTemplate | null>(null);
 
   const handleCreate = () => {
     setEditingPkg(undefined);
+    setSelectedTemplate(null);
+    setSheetStep("template");
     setSheetOpen(true);
   };
 
   const handleEdit = (pkg: PackageType) => {
     setEditingPkg(pkg);
+    setSelectedTemplate(null);
+    setSheetStep("form");
     setSheetOpen(true);
+  };
+
+  const handleTemplateSelect = (template: PackageTemplate | null) => {
+    setSelectedTemplate(template);
+    setSheetStep("form");
   };
 
   const handleSaved = () => {
     setSheetOpen(false);
     setEditingPkg(undefined);
+    setSelectedTemplate(null);
     refetch();
   };
 
   const handleClose = () => {
     setSheetOpen(false);
     setEditingPkg(undefined);
+    setSelectedTemplate(null);
   };
 
   if (isLoading) {
     return <LoadingState variant="page" />;
   }
+
+  const isEditing = !!editingPkg;
 
   return (
     <PageContainer>
@@ -63,22 +82,49 @@ export default function PackagesPage() {
         }
       />
 
-      {/* Sheet modal for create/edit */}
+      {/* Sheet modal for template pick + create/edit */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent side="right" className="flex w-full flex-col overflow-hidden p-0 sm:max-w-md" showCloseButton={false}>
+        <SheetContent
+          side="right"
+          className="flex w-full flex-col overflow-hidden p-0 sm:max-w-md"
+          showCloseButton={false}
+        >
           <div className="flex h-14 shrink-0 items-center justify-between border-b px-4">
-            <SheetTitle className="text-base font-bold">
-              {editingPkg ? t("packages.edit") : t("packages.create")}
-            </SheetTitle>
+            <div className="flex items-center gap-2">
+              {sheetStep === "form" && !isEditing && (
+                <button
+                  type="button"
+                  onClick={() => setSheetStep("template")}
+                  className="cursor-pointer rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
+                  <ArrowLeft className="size-4" />
+                </button>
+              )}
+              <SheetTitle className="text-base font-bold">
+                {sheetStep === "template"
+                  ? t("packages.template.title")
+                  : isEditing
+                    ? t("packages.edit")
+                    : t("packages.create")}
+              </SheetTitle>
+            </div>
             <SheetClose>
               <X className="size-5" />
             </SheetClose>
           </div>
-          <PackageForm
-            pkg={editingPkg}
-            onClose={handleClose}
-            onSaved={handleSaved}
-          />
+
+          {sheetStep === "template" && (
+            <TemplatePicker onSelect={handleTemplateSelect} />
+          )}
+
+          {sheetStep === "form" && (
+            <PackageForm
+              pkg={editingPkg}
+              templateDefaults={selectedTemplate?.defaults}
+              onClose={handleClose}
+              onSaved={handleSaved}
+            />
+          )}
         </SheetContent>
       </Sheet>
 

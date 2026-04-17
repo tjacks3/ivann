@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { DynamicListInput } from "@/components/ui/dynamic-list-input";
 import { OngoingPartnershipFields } from "./ongoing-partnership-fields";
+import { LocalBoostFields } from "./local-boost-fields";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { packageFormSchema } from "@/lib/validations/package";
@@ -170,6 +171,19 @@ export function PackageForm({ pkg, templateDefaults, templateId, onClose, onSave
             hint={t("packages.form.deliverablesHint")}
           />
         </div>
+
+        {/* Local Boost conditional fields */}
+        {templateId === "local_boost" && (
+          <LocalBoostFields
+            initialDeliverables={parseDeliverables(watch("deliverables") ?? "")}
+            onDeliverablesChange={(items) => {
+              setValue("deliverables", JSON.stringify(items));
+            }}
+            onDescriptionChange={(desc) => {
+              setValue("description", desc);
+            }}
+          />
+        )}
 
         {/* Ongoing Partnership conditional fields */}
         {templateId === "ongoing_partnership" && (

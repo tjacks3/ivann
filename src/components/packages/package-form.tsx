@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DynamicListInput } from "@/components/ui/dynamic-list-input";
+import { OngoingPartnershipFields } from "./ongoing-partnership-fields";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { packageFormSchema } from "@/lib/validations/package";
@@ -62,11 +63,12 @@ interface TemplateDefaults {
 interface PackageFormProps {
   pkg?: Package;
   templateDefaults?: TemplateDefaults;
+  templateId?: string;
   onClose: () => void;
   onSaved: () => void;
 }
 
-export function PackageForm({ pkg, templateDefaults, onClose, onSaved }: PackageFormProps) {
+export function PackageForm({ pkg, templateDefaults, templateId, onClose, onSaved }: PackageFormProps) {
   const { t, locale } = useTranslation();
   const [saving, setSaving] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -168,6 +170,24 @@ export function PackageForm({ pkg, templateDefaults, onClose, onSaved }: Package
             hint={t("packages.form.deliverablesHint")}
           />
         </div>
+
+        {/* Ongoing Partnership conditional fields */}
+        {templateId === "ongoing_partnership" && (
+          <OngoingPartnershipFields
+            basePriceInCents={templateDefaults?.priceInCents ?? pkg?.priceInCents ?? 0}
+            onSummaryChange={(summary) => {
+              setValue("description", summary);
+            }}
+            onDeliveryDaysChange={(days) => {
+              setValue("deliveryDays", days);
+            }}
+            onDiscountedPriceChange={(cents) => {
+              if (cents !== null) {
+                setValue("priceInCents", cents);
+              }
+            }}
+          />
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">

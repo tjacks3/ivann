@@ -121,6 +121,7 @@ export default function PackagesPage() {
             <PackageForm
               pkg={editingPkg}
               templateDefaults={selectedTemplate?.defaults}
+              templateId={selectedTemplate?.id}
               onClose={handleClose}
               onSaved={handleSaved}
             />

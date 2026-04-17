@@ -277,3 +277,11 @@ TrailBlaze Outdoors brand@trailblaze.example.com TestPass123!
 8. Brand dashboard shows "Total Spent" + last 5 transactions
 9. Creator dashboard shows "Total Earned" + last 5 transactions
 10. Mobile responsive
+
+### Create Package Workflow - Select Template
+
+1. Creator clicks "Create Package" → sheet opens with template picker
+2. Picks a template (e.g. "Growth Bundle") → form opens pre-filled with title, description, type "bundle", 4 deliverables, $250 price, 14-day delivery, 2 revisions
+3. Creator customizes any field → saves
+4. "Start from scratch" → form opens empty (previous behavior)
+5. Editing an existing package → sheet opens directly to form (no template step)

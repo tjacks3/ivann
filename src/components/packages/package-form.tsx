@@ -14,6 +14,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
+import { DynamicListInput } from "@/components/ui/dynamic-list-input";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { packageFormSchema } from "@/lib/validations/package";
@@ -21,6 +22,22 @@ import type { PackageFormValues } from "@/lib/validations/package";
 import { createPackage, updatePackage } from "@/app/(app)/packages/actions";
 import { getCurrencyForLocale, fromCents, toCents } from "@/lib/currency";
 import type { Package } from "@/db/schema/packages";
+
+function parseDeliverables(value: string): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed))
+      return parsed.filter((s) => typeof s === "string" && s.trim());
+  } catch {
+    // Legacy plain text — split by newlines or return as single item
+    return value
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
 
 const PACKAGE_TYPES = [
   "ugc",
@@ -51,6 +68,7 @@ export function PackageForm({ pkg, onClose, onSaved }: PackageFormProps) {
     defaultValues: {
       title: pkg?.title ?? "",
       description: pkg?.description ?? "",
+      deliverables: pkg?.deliverables ?? "",
       type: (pkg?.type as PackageFormValues["type"]) ?? "custom",
       priceInCents: pkg?.priceInCents ?? 0,
       currency,
@@ -60,7 +78,13 @@ export function PackageForm({ pkg, onClose, onSaved }: PackageFormProps) {
     },
   });
 
-  const { register, formState: { errors }, setValue, watch, handleSubmit } = form;
+  const {
+    register,
+    formState: { errors },
+    setValue,
+    watch,
+    handleSubmit,
+  } = form;
 
   const priceDisplay = watch("priceInCents")
     ? fromCents(watch("priceInCents"), currency).toString()
@@ -71,7 +95,9 @@ export function PackageForm({ pkg, onClose, onSaved }: PackageFormProps) {
     if (isNaN(val)) {
       setValue("priceInCents", 0, { shouldValidate: true });
     } else {
-      setValue("priceInCents", toCents(val, currency), { shouldValidate: true });
+      setValue("priceInCents", toCents(val, currency), {
+        shouldValidate: true,
+      });
     }
   };
 
@@ -93,13 +119,18 @@ export function PackageForm({ pkg, onClose, onSaved }: PackageFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-1 flex-col overflow-hidden">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-1 flex-col overflow-hidden"
+    >
       {/* Scrollable fields */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="title">{t("packages.form.title")}</Label>
           <Input id="title" {...register("title")} />
-          {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
+          {errors.title && (
+            <p className="text-xs text-destructive">{errors.title.message}</p>
+          )}
         </div>
 
         <div className="space-y-1.5">
@@ -112,13 +143,30 @@ export function PackageForm({ pkg, onClose, onSaved }: PackageFormProps) {
           />
         </div>
 
+        <div className="space-y-1.5 mb-8">
+          <Label>{t("packages.form.deliverables")}</Label>
+          <DynamicListInput
+            items={parseDeliverables(watch("deliverables") ?? "")}
+            onChange={(items) =>
+              setValue("deliverables", JSON.stringify(items), {
+                shouldValidate: true,
+              })
+            }
+            placeholder={t("packages.form.deliverablesPlaceholder")}
+            addLabel={t("packages.form.addDeliverable")}
+            hint={t("packages.form.deliverablesHint")}
+          />
+        </div>
+
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label>{t("packages.form.type")}</Label>
             <Select
               value={watch("type")}
               onValueChange={(val) =>
-                setValue("type", val as PackageFormValues["type"], { shouldValidate: true })
+                setValue("type", val as PackageFormValues["type"], {
+                  shouldValidate: true,
+                })
               }
             >
               <SelectTrigger>
@@ -139,16 +187,24 @@ export function PackageForm({ pkg, onClose, onSaved }: PackageFormProps) {
             <Select
               value={watch("status")}
               onValueChange={(val) =>
-                setValue("status", val as PackageFormValues["status"], { shouldValidate: true })
+                setValue("status", val as PackageFormValues["status"], {
+                  shouldValidate: true,
+                })
               }
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="draft">{t("packages.status.draft")}</SelectItem>
-                <SelectItem value="active">{t("packages.status.active")}</SelectItem>
-                <SelectItem value="archived">{t("packages.status.archived")}</SelectItem>
+                <SelectItem value="draft">
+                  {t("packages.status.draft")}
+                </SelectItem>
+                <SelectItem value="active">
+                  {t("packages.status.active")}
+                </SelectItem>
+                <SelectItem value="archived">
+                  {t("packages.status.archived")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -170,12 +226,18 @@ export function PackageForm({ pkg, onClose, onSaved }: PackageFormProps) {
               onChange={handlePriceChange}
             />
           </div>
-          {errors.priceInCents && <p className="text-xs text-destructive">{errors.priceInCents.message}</p>}
+          {errors.priceInCents && (
+            <p className="text-xs text-destructive">
+              {errors.priceInCents.message}
+            </p>
+          )}
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 mb-8">
           <div className="space-y-1.5">
-            <Label htmlFor="deliveryDays">{t("packages.form.deliveryDays")}</Label>
+            <Label htmlFor="deliveryDays">
+              {t("packages.form.deliveryDays")}
+            </Label>
             <Input
               id="deliveryDays"
               type="number"
@@ -205,7 +267,12 @@ export function PackageForm({ pkg, onClose, onSaved }: PackageFormProps) {
       {/* Fixed footer */}
       <div className="shrink-0 border-t bg-background p-4">
         <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="flex-1"
+          >
             {t("packages.form.cancel")}
           </Button>
           <Button type="submit" disabled={saving} className="flex-1">

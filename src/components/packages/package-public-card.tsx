@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { PackageTypeBadge } from "./package-type-badge";
+import { DeliverablesList } from "./deliverables-list";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { Clock, RotateCcw, Handshake } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
@@ -31,6 +32,10 @@ export function PackagePublicCard({ pkg, onSelect }: PackagePublicCardProps) {
           <p className="line-clamp-2 text-sm text-muted-foreground">
             {pkg.description}
           </p>
+        )}
+
+        {pkg.deliverables && (
+          <DeliverablesList value={pkg.deliverables} limit={3} />
         )}
 
         <div className="flex items-center justify-between">

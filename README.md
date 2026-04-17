@@ -264,3 +264,16 @@ Urban Roots Co. brand@urbanroots.example.com TestPass123!
 Peak Capital Advisors brand@peakcapital.example.com TestPass123!
 ByteCraft brand@bytecraft.example.com TestPass123!
 TrailBlaze Outdoors brand@trailblaze.example.com TestPass123!
+
+### Escrow workflow
+
+1. Deal accepted → brand sees "Fund Deal" button with correct amount
+2. Brand clicks "Fund Deal" → payment status moves to funded
+3. Creator sees "Payment Secured" badge after funding
+4. Creator delivers + brand completes → payment auto-released
+5. Deal cancelled while funded → payment auto-refunded
+6. Duplicate funding prevented
+7. Payment section hidden for draft/negotiating deals
+8. Brand dashboard shows "Total Spent" + last 5 transactions
+9. Creator dashboard shows "Total Earned" + last 5 transactions
+10. Mobile responsive

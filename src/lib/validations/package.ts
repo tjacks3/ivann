@@ -3,6 +3,7 @@ import { z } from "zod";
 export const packageFormSchema = z.object({
   title: z.string().min(2, "Title is required").max(255),
   description: z.string().max(1000).optional().or(z.literal("")),
+  deliverables: z.string().max(2000).optional().or(z.literal("")),
   type: z.enum([
     "ugc",
     "sponsored_post",

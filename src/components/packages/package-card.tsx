@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PackageTypeBadge } from "./package-type-badge";
+import { DeliverablesList } from "./deliverables-list";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { Pencil, Trash2, Loader2, Clock, RotateCcw } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
@@ -50,6 +51,10 @@ export function PackageCard({ pkg, onEdit, onDeleted }: PackageCardProps) {
             {formatPrice(pkg.priceInCents, pkg.currency, locale)}
           </p>
         </div>
+
+        {pkg.deliverables && (
+          <DeliverablesList value={pkg.deliverables} limit={3} />
+        )}
 
         <div className="flex flex-wrap items-center gap-2">
           <PackageTypeBadge type={pkg.type} />

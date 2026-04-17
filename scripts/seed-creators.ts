@@ -21,6 +21,7 @@ interface CreatorDef {
   email: string;
   fullName: string;
   username: string;
+  avatarUrl: string;
   bio: string;
   categories: string[];
   location: string;
@@ -39,6 +40,7 @@ const CREATORS: CreatorDef[] = [
     email: "sofia.martinez@example.com",
     fullName: "Sofia Martinez",
     username: "sofiam",
+    avatarUrl: "https://randomuser.me/api/portraits/women/1.jpg",
     bio: "Beauty and skincare creator. Sharing my routines, honest reviews, and self-care tips.",
     categories: ["fashion", "lifestyle"],
     location: "Miami, FL",
@@ -54,6 +56,7 @@ const CREATORS: CreatorDef[] = [
     email: "james.wilson@example.com",
     fullName: "James Wilson",
     username: "jameswtech",
+    avatarUrl: "https://randomuser.me/api/portraits/men/1.jpg",
     bio: "Software engineer turned tech YouTuber. Breaking down complex topics into simple tutorials.",
     categories: ["tech", "education"],
     location: "San Francisco, CA",
@@ -68,6 +71,7 @@ const CREATORS: CreatorDef[] = [
     email: "priya.sharma@example.com",
     fullName: "Priya Sharma",
     username: "priyacooks",
+    avatarUrl: "https://randomuser.me/api/portraits/women/5.jpg",
     bio: "Indian fusion chef sharing recipes that bring families together. Cookbook author.",
     categories: ["food", "lifestyle"],
     location: "London, UK",
@@ -83,6 +87,7 @@ const CREATORS: CreatorDef[] = [
     email: "marcus.brown@example.com",
     fullName: "Marcus Brown",
     username: "marcusfits",
+    avatarUrl: "https://randomuser.me/api/portraits/men/5.jpg",
     bio: "Personal trainer and nutrition coach. Helping you build sustainable fitness habits.",
     categories: ["fitness", "food"],
     location: "Atlanta, GA",
@@ -98,6 +103,7 @@ const CREATORS: CreatorDef[] = [
     email: "emma.chen@example.com",
     fullName: "Emma Chen",
     username: "emmawanders",
+    avatarUrl: "https://randomuser.me/api/portraits/women/10.jpg",
     bio: "Full-time traveler documenting hidden gems across Asia and Europe. Solo travel advocate.",
     categories: ["travel", "lifestyle"],
     location: "Bali, Indonesia",
@@ -113,6 +119,7 @@ const CREATORS: CreatorDef[] = [
     email: "david.kim@example.com",
     fullName: "David Kim",
     username: "davidkgaming",
+    avatarUrl: "https://randomuser.me/api/portraits/men/10.jpg",
     bio: "Competitive gamer and streamer. Variety content from FPS to indie gems.",
     categories: ["entertainment", "tech"],
     location: "Seoul, South Korea",
@@ -128,6 +135,7 @@ const CREATORS: CreatorDef[] = [
     email: "olivia.taylor@example.com",
     fullName: "Olivia Taylor",
     username: "oliviastyle",
+    avatarUrl: "https://randomuser.me/api/portraits/women/15.jpg",
     bio: "Sustainable fashion advocate. Showing you how to look great without fast fashion.",
     categories: ["fashion"],
     location: "New York, NY",
@@ -142,6 +150,7 @@ const CREATORS: CreatorDef[] = [
     email: "carlos.garcia@example.com",
     fullName: "Carlos Garcia",
     username: "carlosfit",
+    avatarUrl: "https://randomuser.me/api/portraits/men/15.jpg",
     bio: "Calisthenics coach and movement specialist. No gym? No problem.",
     categories: ["fitness"],
     location: "Barcelona, Spain",
@@ -156,6 +165,7 @@ const CREATORS: CreatorDef[] = [
     email: "nina.johnson@example.com",
     fullName: "Nina Johnson",
     username: "ninafinance",
+    avatarUrl: "https://randomuser.me/api/portraits/women/20.jpg",
     bio: "Making personal finance accessible. Budgeting tips, investing basics, and money mindset.",
     categories: ["business", "education"],
     location: "Chicago, IL",
@@ -172,6 +182,7 @@ const CREATORS: CreatorDef[] = [
     email: "leo.park@example.com",
     fullName: "Leo Park",
     username: "leophotography",
+    avatarUrl: "https://randomuser.me/api/portraits/men/20.jpg",
     bio: "Landscape and street photographer. Capturing light in unexpected places.",
     categories: ["lifestyle", "travel"],
     location: "Tokyo, Japan",
@@ -186,6 +197,7 @@ const CREATORS: CreatorDef[] = [
     email: "aisha.rahman@example.com",
     fullName: "Aisha Rahman",
     username: "aishahealth",
+    avatarUrl: "https://randomuser.me/api/portraits/women/25.jpg",
     bio: "Holistic health and wellness. Yoga, meditation, and mindful living for busy professionals.",
     categories: ["fitness", "lifestyle"],
     location: "Dubai, UAE",
@@ -201,6 +213,7 @@ const CREATORS: CreatorDef[] = [
     email: "tyler.moore@example.com",
     fullName: "Tyler Moore",
     username: "tylerdiy",
+    avatarUrl: "https://randomuser.me/api/portraits/men/25.jpg",
     bio: "DIY home renovation and woodworking. Turning boring spaces into beautiful ones.",
     categories: ["lifestyle", "education"],
     location: "Portland, OR",
@@ -216,6 +229,7 @@ const CREATORS: CreatorDef[] = [
     email: "luna.rossi@example.com",
     fullName: "Luna Rossi",
     username: "lunabeauty",
+    avatarUrl: "https://randomuser.me/api/portraits/women/30.jpg",
     bio: "Makeup artist and beauty educator. Tutorials for every skin tone and skill level.",
     categories: ["fashion", "entertainment"],
     location: "Milan, Italy",
@@ -231,6 +245,7 @@ const CREATORS: CreatorDef[] = [
     email: "ryan.white@example.com",
     fullName: "Ryan White",
     username: "ryanreviews",
+    avatarUrl: "https://randomuser.me/api/portraits/men/30.jpg",
     bio: "Honest product reviews. No sponsorships, no bias — just the truth about what's worth your money.",
     categories: ["tech"],
     location: "Austin, TX",
@@ -245,6 +260,7 @@ const CREATORS: CreatorDef[] = [
     email: "sakura.tanaka@example.com",
     fullName: "Sakura Tanaka",
     username: "sakuravlog",
+    avatarUrl: "https://randomuser.me/api/portraits/women/35.jpg",
     bio: "Daily life in Japan. Language tips, cultural insights, and city exploration vlogs.",
     categories: ["travel", "education"],
     location: "Osaka, Japan",
@@ -260,6 +276,7 @@ const CREATORS: CreatorDef[] = [
     email: "mike.oconnor@example.com",
     fullName: "Mike O'Connor",
     username: "mikecooks",
+    avatarUrl: "https://randomuser.me/api/portraits/men/35.jpg",
     bio: "Home chef making restaurant-quality meals simple. Quick recipes for weeknight dinners.",
     categories: ["food"],
     location: "Dublin, Ireland",
@@ -274,6 +291,7 @@ const CREATORS: CreatorDef[] = [
     email: "zara.ahmed@example.com",
     fullName: "Zara Ahmed",
     username: "zarastyle",
+    avatarUrl: "https://randomuser.me/api/portraits/women/40.jpg",
     bio: "Modest fashion and lifestyle content. Proving style has no boundaries.",
     categories: ["fashion", "lifestyle"],
     location: "Toronto, Canada",
@@ -289,6 +307,7 @@ const CREATORS: CreatorDef[] = [
     email: "noah.anderson@example.com",
     fullName: "Noah Anderson",
     username: "noahoutdoors",
+    avatarUrl: "https://randomuser.me/api/portraits/men/40.jpg",
     bio: "Adventure filmmaker and outdoor guide. Mountains, rivers, and everything in between.",
     categories: ["travel", "entertainment"],
     location: "Denver, CO",
@@ -303,6 +322,7 @@ const CREATORS: CreatorDef[] = [
     email: "hannah.lee@example.com",
     fullName: "Hannah Lee",
     username: "hannahteaches",
+    avatarUrl: "https://randomuser.me/api/portraits/women/45.jpg",
     bio: "Former teacher now making education fun on social media. Science experiments and study tips.",
     categories: ["education"],
     location: "Boston, MA",
@@ -318,6 +338,7 @@ const CREATORS: CreatorDef[] = [
     email: "diego.lopez@example.com",
     fullName: "Diego Lopez",
     username: "diegomx",
+    avatarUrl: "https://randomuser.me/api/portraits/men/45.jpg",
     bio: "Mexican street food explorer. Documenting taquerias and hidden food spots across Mexico.",
     categories: ["food", "travel"],
     location: "Mexico City, Mexico",
@@ -333,6 +354,7 @@ const CREATORS: CreatorDef[] = [
     email: "rachel.green@example.com",
     fullName: "Rachel Green",
     username: "rachelstartup",
+    avatarUrl: "https://randomuser.me/api/portraits/women/50.jpg",
     bio: "Startup founder sharing the real journey. Fundraising, failures, and lessons learned.",
     categories: ["business"],
     location: "San Francisco, CA",
@@ -348,6 +370,7 @@ const CREATORS: CreatorDef[] = [
     email: "kai.nakamura@example.com",
     fullName: "Kai Nakamura",
     username: "kaimusic",
+    avatarUrl: "https://randomuser.me/api/portraits/men/50.jpg",
     bio: "Producer, beatmaker, and music educator. Tutorials on production, mixing, and music theory.",
     categories: ["entertainment", "education"],
     location: "Los Angeles, CA",
@@ -363,6 +386,7 @@ const CREATORS: CreatorDef[] = [
     email: "amara.obi@example.com",
     fullName: "Amara Obi",
     username: "amarawellness",
+    avatarUrl: "https://randomuser.me/api/portraits/women/55.jpg",
     bio: "Wellness coach specializing in burnout recovery. Mental health, journaling, and self-care.",
     categories: ["fitness", "lifestyle"],
     location: "Lagos, Nigeria",
@@ -377,6 +401,7 @@ const CREATORS: CreatorDef[] = [
     email: "ben.foster@example.com",
     fullName: "Ben Foster",
     username: "bencodes",
+    avatarUrl: "https://randomuser.me/api/portraits/men/55.jpg",
     bio: "Web developer sharing coding tutorials, career advice, and dev life content.",
     categories: ["tech", "education"],
     location: "Berlin, Germany",
@@ -391,6 +416,7 @@ const CREATORS: CreatorDef[] = [
     email: "chloe.dubois@example.com",
     fullName: "Chloe Dubois",
     username: "chloeparis",
+    avatarUrl: "https://randomuser.me/api/portraits/women/60.jpg",
     bio: "Parisian lifestyle, café culture, and French language tips for expats.",
     categories: ["lifestyle", "travel", "education"],
     location: "Paris, France",
@@ -430,7 +456,8 @@ async function run() {
       // Check if profile already exists
       const [existing] = await sql`SELECT id FROM users WHERE auth_id = ${authId}`;
       if (existing) {
-        console.log(`  ⏭  ${creator.fullName} (already exists)`);
+        await sql`UPDATE users SET avatar_url = ${creator.avatarUrl} WHERE id = ${existing.id}`;
+        console.log(`  ⏭  ${creator.fullName} (already exists — updated avatar)`);
         continue;
       }
 
@@ -439,13 +466,13 @@ async function run() {
         INSERT INTO users (
           auth_id, email, full_name, username, bio, role,
           categories, location, website, profile_status,
-          onboarding_completed, onboarding_step
+          onboarding_completed, onboarding_step, avatar_url
         ) VALUES (
           ${authId}, ${creator.email}, ${creator.fullName}, ${creator.username},
           ${creator.bio}, 'creator',
           ${sql.array(creator.categories)}, ${creator.location},
           ${creator.website}, ${creator.profileStatus},
-          true, 4
+          true, 4, ${creator.avatarUrl}
         ) RETURNING id
       `;
 

@@ -3,16 +3,17 @@
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
-import { Camera, Image, MonitorPlay, Music, Mic, MoreHorizontal } from "lucide-react";
+import { getPlatformMeta } from "@/lib/social/platforms";
+import { Mic, MoreHorizontal } from "lucide-react";
 
 const COLLAB_TYPES = [
-  { value: "instagram_story", icon: Camera },
-  { value: "instagram_post", icon: Image },
-  { value: "youtube_promo", icon: MonitorPlay },
-  { value: "tiktok_post", icon: Music },
-  { value: "podcast_mention", icon: Mic },
-  { value: "other", icon: MoreHorizontal },
-] as const;
+  { value: "instagram_story", icon: getPlatformMeta("instagram").icon, color: getPlatformMeta("instagram").color },
+  { value: "instagram_post", icon: getPlatformMeta("instagram").icon, color: getPlatformMeta("instagram").color },
+  { value: "youtube_promo", icon: getPlatformMeta("youtube").icon, color: getPlatformMeta("youtube").color },
+  { value: "tiktok_post", icon: getPlatformMeta("tiktok").icon, color: getPlatformMeta("tiktok").color },
+  { value: "podcast_mention", icon: Mic, color: undefined },
+  { value: "other", icon: MoreHorizontal, color: undefined },
+];
 
 interface StepCollabTypeProps {
   collabType: string;
@@ -39,7 +40,7 @@ export function StepCollabType({
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {COLLAB_TYPES.map(({ value, icon: Icon }) => (
+        {COLLAB_TYPES.map(({ value, icon: Icon, color }) => (
           <button
             key={value}
             type="button"
@@ -55,9 +56,10 @@ export function StepCollabType({
               className={cn(
                 "flex size-9 shrink-0 items-center justify-center rounded-lg",
                 collabType === value
-                  ? "bg-primary/20 text-primary"
-                  : "bg-muted text-muted-foreground",
+                  ? "bg-primary/20"
+                  : "bg-muted",
               )}
+              style={color && collabType !== value ? { color } : undefined}
             >
               <Icon className="size-4" />
             </div>

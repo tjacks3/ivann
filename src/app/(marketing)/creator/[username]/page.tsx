@@ -191,6 +191,7 @@ export default function PublicCreatorProfilePage({
                 <PackagePublicCard
                   key={pkg.id}
                   pkg={pkg}
+                  creatorName={profile.fullName ?? undefined}
                   onSelect={isBrand ? () => handleSelectPackage(pkg.id) : undefined}
                 />
               ))}

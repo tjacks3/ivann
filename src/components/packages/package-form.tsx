@@ -15,9 +15,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DynamicListInput } from "@/components/ui/dynamic-list-input";
+import { Progress } from "@/components/ui/progress";
 import { OngoingPartnershipFields } from "./ongoing-partnership-fields";
 import { LocalBoostFields } from "./local-boost-fields";
-import { Loader2 } from "lucide-react";
+import { Loader2, Lightbulb } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { packageFormSchema } from "@/lib/validations/package";
 import type { PackageFormValues } from "@/lib/validations/package";
@@ -69,9 +70,8 @@ interface PackageFormProps {
   onSaved: () => void;
 }
 
-export function PackageForm({ pkg, templateDefaults, templateId, onClose, onSaved }: PackageFormProps) {
+export function PackageForm({ pkg, templateDefaults, templateId, onClose: _onClose, onSaved }: PackageFormProps) {
   const { t, locale } = useTranslation();
-  const [saving, setSaving] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const isEditing = !!pkg;
 
@@ -97,7 +97,6 @@ export function PackageForm({ pkg, templateDefaults, templateId, onClose, onSave
     formState: { errors },
     setValue,
     watch,
-    handleSubmit,
   } = form;
 
   const priceDisplay = watch("priceInCents")
@@ -115,13 +114,48 @@ export function PackageForm({ pkg, templateDefaults, templateId, onClose, onSave
     }
   };
 
-  const onSubmit = async (data: PackageFormValues) => {
-    setSaving(true);
+  const [savingAs, setSavingAs] = useState<"draft" | "publish" | null>(null);
+
+  // Completeness calculation
+  const watchedTitle = watch("title");
+  const watchedDesc = watch("description");
+  const watchedDeliverables = watch("deliverables");
+  const watchedPrice = watch("priceInCents");
+  const watchedDeliveryDays = watch("deliveryDays");
+
+  const completenessFields = [
+    !!watchedTitle?.trim(),
+    !!watchedDesc?.trim(),
+    !!watchedDeliverables?.trim() && watchedDeliverables !== "[]",
+    watchedPrice > 0,
+    !!watchedDeliveryDays && watchedDeliveryDays > 0,
+  ];
+  const completeness = Math.round(
+    (completenessFields.filter(Boolean).length / completenessFields.length) * 100,
+  );
+  const canPublish = completeness === 100;
+
+  const handleSave = async (status: "draft" | "active") => {
+    setSavingAs(status === "draft" ? "draft" : "publish");
     setServerError(null);
+    setValue("status", status);
+
+    // Trigger validation manually
+    const isValid = await form.trigger();
+    if (!isValid && status === "active") {
+      setSavingAs(null);
+      return;
+    }
+
+    const data = form.getValues();
+    // For drafts, relax price validation
+    if (status === "draft" && data.priceInCents === 0) {
+      data.priceInCents = 100; // minimum to pass validation, will show as draft
+    }
 
     const result = isEditing
-      ? await updatePackage(pkg!.id, data)
-      : await createPackage(data);
+      ? await updatePackage(pkg!.id, { ...data, status })
+      : await createPackage({ ...data, status });
 
     if (result.success) {
       onSaved();
@@ -129,14 +163,11 @@ export function PackageForm({ pkg, templateDefaults, templateId, onClose, onSave
       setServerError(t("packages.form.error"));
     }
 
-    setSaving(false);
+    setSavingAs(null);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-1 flex-col overflow-hidden"
-    >
+    <div className="flex flex-1 flex-col overflow-hidden">
       {/* Scrollable fields */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         <div className="space-y-1.5">
@@ -203,56 +234,27 @@ export function PackageForm({ pkg, templateDefaults, templateId, onClose, onSave
           />
         )}
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label>{t("packages.form.type")}</Label>
-            <Select
-              value={watch("type")}
-              onValueChange={(val) =>
-                setValue("type", val as PackageFormValues["type"], {
-                  shouldValidate: true,
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PACKAGE_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {t(`packages.type.${type}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>{t("packages.form.status")}</Label>
-            <Select
-              value={watch("status")}
-              onValueChange={(val) =>
-                setValue("status", val as PackageFormValues["status"], {
-                  shouldValidate: true,
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="draft">
-                  {t("packages.status.draft")}
+        <div className="space-y-1.5">
+          <Label>{t("packages.form.type")}</Label>
+          <Select
+            value={watch("type")}
+            onValueChange={(val) =>
+              setValue("type", val as PackageFormValues["type"], {
+                shouldValidate: true,
+              })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PACKAGE_TYPES.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {t(`packages.type.${type}`)}
                 </SelectItem>
-                <SelectItem value="active">
-                  {t("packages.status.active")}
-                </SelectItem>
-                <SelectItem value="archived">
-                  {t("packages.status.archived")}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-1.5">
@@ -309,23 +311,58 @@ export function PackageForm({ pkg, templateDefaults, templateId, onClose, onSave
         )}
       </div>
 
-      {/* Fixed footer */}
-      <div className="shrink-0 border-t bg-background p-4">
+      {/* Fixed footer with completeness + actions */}
+      <div className="shrink-0 border-t bg-background px-4 py-3 space-y-3">
+        {/* Completeness meter */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-medium text-muted-foreground">
+              {t("packages.form.completeness")}
+            </span>
+            <span className={completeness === 100 ? "font-semibold text-primary" : "text-muted-foreground"}>
+              {completeness}%
+            </span>
+          </div>
+          <Progress value={completeness} className="h-1.5" />
+        </div>
+
+        {/* Nudge */}
+        {completeness < 100 && (
+          <div className="flex items-start gap-2 rounded-md bg-amber-500/5 px-2.5 py-2">
+            <Lightbulb className="mt-0.5 size-3 shrink-0 text-amber-600" />
+            <p className="text-[11px] text-amber-700">
+              {!watchedDeliverables?.trim() || watchedDeliverables === "[]"
+                ? t("packages.form.nudge.deliverables")
+                : !watchedDesc?.trim()
+                  ? t("packages.form.nudge.description")
+                  : t("packages.form.nudge.complete")}
+            </p>
+          </div>
+        )}
+
+        {/* Buttons */}
         <div className="flex gap-2">
           <Button
             type="button"
             variant="outline"
-            onClick={onClose}
-            className="flex-1"
+            onClick={() => handleSave("draft")}
+            disabled={savingAs !== null}
+            className="flex-1 cursor-pointer"
           >
-            {t("packages.form.cancel")}
+            {savingAs === "draft" && <Loader2 className="size-3 animate-spin" />}
+            {t("packages.form.saveDraft")}
           </Button>
-          <Button type="submit" disabled={saving} className="flex-1">
-            {saving && <Loader2 className="size-3 animate-spin" />}
-            {saving ? t("packages.form.saving") : t("packages.form.save")}
+          <Button
+            type="button"
+            onClick={() => handleSave("active")}
+            disabled={savingAs !== null || !canPublish}
+            className="flex-1 cursor-pointer"
+          >
+            {savingAs === "publish" && <Loader2 className="size-3 animate-spin" />}
+            {t("packages.form.publish")}
           </Button>
         </div>
       </div>
-    </form>
+    </div>
   );
 }

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PackageTypeBadge } from "./package-type-badge";
 import { DeliverablesList } from "./deliverables-list";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
-import { Pencil, Trash2, Loader2, Clock, RotateCcw } from "lucide-react";
+import { Pencil, Trash2, Loader2, Clock, RotateCcw, AlertCircle } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import { deletePackage } from "@/app/(app)/packages/actions";
 import { useTranslation } from "@/i18n";
@@ -87,15 +87,24 @@ export function PackageCard({ pkg, onEdit, onDeleted }: PackageCardProps) {
           )}
         </div>
 
+        {pkg.status === "draft" && (
+          <div className="flex items-center gap-2 rounded-md bg-amber-500/5 px-2.5 py-1.5">
+            <AlertCircle className="size-3 shrink-0 text-amber-600" />
+            <p className="text-[11px] text-amber-700">
+              {t("packages.card.draftNudge")}
+            </p>
+          </div>
+        )}
+
         <div className="flex items-center gap-2 pt-1">
           <Button
             size="sm"
-            variant="outline"
-            className="flex-1"
+            variant={pkg.status === "draft" ? "default" : "outline"}
+            className="flex-1 cursor-pointer"
             onClick={() => onEdit(pkg)}
           >
             <Pencil className="size-3" />
-            {t("packages.edit")}
+            {pkg.status === "draft" ? t("packages.card.finishAndPublish") : t("packages.edit")}
           </Button>
           {confirming ? (
             <div className="flex gap-1">

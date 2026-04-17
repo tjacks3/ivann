@@ -68,6 +68,9 @@ export default function PackagesPage() {
   }
 
   const isEditing = !!editingPkg;
+  const drafts = packages.filter((p) => p.status === "draft");
+  const published = packages.filter((p) => p.status === "active");
+  const archived = packages.filter((p) => p.status === "archived");
 
   return (
     <PageContainer>
@@ -143,15 +146,70 @@ export default function PackagesPage() {
             }
           />
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {packages.map((pkg) => (
-              <PackageCard
-                key={pkg.id}
-                pkg={pkg}
-                onEdit={handleEdit}
-                onDeleted={refetch}
-              />
-            ))}
+          <div className="space-y-8">
+            {/* Draft packages */}
+            {drafts.length > 0 && (
+              <div>
+                <div className="mb-3 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground">
+                    {t("packages.section.drafts")}
+                  </h3>
+                  <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-700">
+                    {drafts.length}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {drafts.map((pkg) => (
+                    <PackageCard
+                      key={pkg.id}
+                      pkg={pkg}
+                      onEdit={handleEdit}
+                      onDeleted={refetch}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Published packages */}
+            {published.length > 0 && (
+              <div>
+                {drafts.length > 0 && (
+                  <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
+                    {t("packages.section.published")}
+                  </h3>
+                )}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {published.map((pkg) => (
+                    <PackageCard
+                      key={pkg.id}
+                      pkg={pkg}
+                      onEdit={handleEdit}
+                      onDeleted={refetch}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Archived packages */}
+            {archived.length > 0 && (
+              <div>
+                <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
+                  {t("packages.section.archived")}
+                </h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {archived.map((pkg) => (
+                    <PackageCard
+                      key={pkg.id}
+                      pkg={pkg}
+                      onEdit={handleEdit}
+                      onDeleted={refetch}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

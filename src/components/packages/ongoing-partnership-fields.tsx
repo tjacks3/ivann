@@ -98,16 +98,16 @@ export function OngoingPartnershipFields({
     <div className="space-y-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <CalendarClock className="size-4 text-primary" />
-        <p className="text-sm font-semibold text-primary">
+        <CalendarClock className="size-4 text-foreground" />
+        <p className="text-sm font-semibold text-foreground">
           {t("packages.ongoing.title")}
         </p>
       </div>
 
       {/* Value messaging */}
-      <div className="flex items-start gap-2 rounded-md bg-background px-3 py-2">
-        <Info className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
-        <p className="text-xs text-muted-foreground">
+      <div className="flex items-start gap-2 rounded-md bg-primary/5 px-3 py-2">
+        <Info className="mt-0.5 size-3.5 shrink-0 text-foreground" />
+        <p className="text-xs text-foreground">
           {t("packages.ongoing.valueTip")}
         </p>
       </div>
@@ -117,7 +117,7 @@ export function OngoingPartnershipFields({
         <div className="space-y-1.5">
           <Label className="text-xs">{t("packages.ongoing.frequency")}</Label>
           <Select value={frequency} onValueChange={(v) => setFrequency(v as Frequency)}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-white">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -131,7 +131,7 @@ export function OngoingPartnershipFields({
         <div className="space-y-1.5">
           <Label className="text-xs">{t("packages.ongoing.duration")}</Label>
           <Select value={duration} onValueChange={(v) => setDuration(v as Duration)}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-white">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -181,7 +181,7 @@ export function OngoingPartnershipFields({
             value={discountPercent || ""}
             onChange={(e) => setDiscountPercent(parseInt(e.target.value, 10) || 0)}
             placeholder="0"
-            className="max-w-20"
+            className="max-w-20 bg-white"
           />
           <span className="text-sm text-muted-foreground">%</span>
           {discountPercent > 0 && (
@@ -193,12 +193,12 @@ export function OngoingPartnershipFields({
       </div>
 
       {/* Summary preview */}
-      <div className="rounded-md bg-background px-3 py-2.5">
+      <div className="rounded-md bg-primary/5 px-3 py-2.5">
         <div className="flex items-center gap-1.5">
-          <Repeat className="size-3.5 text-primary" />
-          <p className="text-sm font-medium">{summary}</p>
+          <Repeat className="size-3.5 text-foreground" />
+          <p className="text-sm font-medium text-foreground">{summary}</p>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">
+        <p className="mt-1 text-xs text-foreground">
           {t("packages.ongoing.summaryHint")}
         </p>
       </div>

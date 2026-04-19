@@ -3,8 +3,8 @@ import { useTranslation } from "@/i18n";
 import type { ProfileStatus } from "@/types";
 
 const statusStyles: Record<ProfileStatus, string> = {
-  draft: "border-yellow-500 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
-  published: "border-green-500 bg-green-500/10 text-green-700 dark:text-green-400",
+  draft: "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  published: "border-primary bg-primary/10 text-primary",
   archived: "border-gray-500 bg-gray-500/10 text-gray-600 dark:text-gray-400",
 };
 

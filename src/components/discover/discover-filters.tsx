@@ -47,7 +47,7 @@ export function DiscoverFiltersPanel({
     <div className="space-y-5">
       {/* Keyword */}
       <div className="space-y-1.5">
-        <Label className="text-xs">{t("discover.filter.keyword")}</Label>
+        <Label className="text-xs font-bold">{t("discover.filter.keyword")}</Label>
         <Input
           placeholder={t("discover.searchPlaceholder")}
           value={keyword}
@@ -57,7 +57,7 @@ export function DiscoverFiltersPanel({
 
       {/* Categories */}
       <div className="space-y-1.5">
-        <Label className="text-xs">{t("discover.filter.category")}</Label>
+        <Label className="text-xs font-bold">{t("discover.filter.category")}</Label>
         <CategorySelect
           selected={filters.categories ?? []}
           onChange={(cats) => onUpdate({ categories: cats.length > 0 ? cats : undefined })}
@@ -66,7 +66,7 @@ export function DiscoverFiltersPanel({
 
       {/* Platform */}
       <div className="space-y-1.5">
-        <Label className="text-xs">{t("discover.filter.platform")}</Label>
+        <Label className="text-xs font-bold">{t("discover.filter.platform")}</Label>
         <Select
           value={filters.platform ?? "all"}
           onValueChange={(v) => onUpdate({ platform: v === "all" || !v ? undefined : v })}
@@ -90,7 +90,7 @@ export function DiscoverFiltersPanel({
 
       {/* Follower Range */}
       <div className="space-y-1.5">
-        <Label className="text-xs">{t("discover.filter.followerRange")}</Label>
+        <Label className="text-xs font-bold">{t("discover.filter.followerRange")}</Label>
         <div className="flex gap-2">
           <Input
             type="number"
@@ -119,7 +119,7 @@ export function DiscoverFiltersPanel({
 
       {/* Location */}
       <div className="space-y-1.5">
-        <Label className="text-xs">{t("discover.filter.location")}</Label>
+        <Label className="text-xs font-bold">{t("discover.filter.location")}</Label>
         <Input
           placeholder={t("discover.filter.locationPlaceholder")}
           value={filters.location ?? ""}

@@ -16,4 +16,4 @@ export * from "./social-tokens";
 
 // Later — uncomment when building these features:
 // export * from "./social-stat-snapshots";
-// export * from "./creator-public-metrics";
+export * from "./creator-public-metrics";

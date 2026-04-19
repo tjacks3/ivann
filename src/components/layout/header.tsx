@@ -55,8 +55,8 @@ export function Header({ variant = "marketing" }: HeaderProps) {
   const links = isAuthenticated ? appLinks : marketingLinks;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="shrink-0">
           <Image
@@ -80,7 +80,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
                 className={cn(
                   "relative rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
                   pathname === link.href || (isMessages && pathname.startsWith("/messages"))
-                    ? "text-primary"
+                    ? "font-semibold text-foreground"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -149,7 +149,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
                           className={cn(
                             "block rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                             pathname === link.href
-                              ? "bg-secondary text-primary"
+                              ? "bg-secondary text-foreground"
                               : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                           )}
                         >

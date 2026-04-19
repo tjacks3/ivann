@@ -6,10 +6,10 @@ import { cn } from "@/lib/utils";
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
   negotiating: "bg-amber-500/10 text-amber-600",
-  accepted: "bg-green-500/10 text-green-600",
+  accepted: "bg-primary/10 text-primary",
   in_progress: "bg-blue-500/10 text-blue-600",
   delivered: "bg-purple-500/10 text-purple-600",
-  completed: "bg-green-500/10 text-green-700",
+  completed: "bg-primary/10 text-primary",
   cancelled: "bg-red-500/10 text-red-600",
 };
 

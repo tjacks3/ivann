@@ -69,7 +69,7 @@ export function DealPaymentSection({
           {/* Status icon */}
           {status === "unpaid" && (
             <div className="flex size-10 items-center justify-center rounded-full bg-muted">
-              <DollarSign className="size-5 text-muted-foreground" />
+              <DollarSign className="size-5 text-foreground" />
             </div>
           )}
           {status === "funding_pending" && (
@@ -78,13 +78,13 @@ export function DealPaymentSection({
             </div>
           )}
           {status === "funded" && (
-            <div className="flex size-10 items-center justify-center rounded-full bg-green-500/10">
-              <ShieldCheck className="size-5 text-green-600" />
+            <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
+              <ShieldCheck className="size-5 fill-primary text-primary-foreground" />
             </div>
           )}
           {status === "released" && (
-            <div className="flex size-10 items-center justify-center rounded-full bg-green-500/10">
-              <CheckCircle className="size-5 text-green-600" />
+            <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
+              <CheckCircle className="size-5 fill-primary text-primary-foreground" />
             </div>
           )}
           {status === "refunded" && (

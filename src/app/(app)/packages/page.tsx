@@ -78,7 +78,7 @@ export default function PackagesPage() {
         title={t("packages.title")}
         description={t("packages.subtitle")}
         action={
-          <Button size="sm" onClick={handleCreate}>
+          <Button onClick={handleCreate}>
             <Plus className="size-3.5" />
             {t("packages.create")}
           </Button>
@@ -158,7 +158,7 @@ export default function PackagesPage() {
                     {drafts.length}
                   </span>
                 </div>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {drafts.map((pkg) => (
                     <PackageCard
                       key={pkg.id}
@@ -179,7 +179,7 @@ export default function PackagesPage() {
                     {t("packages.section.published")}
                   </h3>
                 )}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {published.map((pkg) => (
                     <PackageCard
                       key={pkg.id}
@@ -198,7 +198,7 @@ export default function PackagesPage() {
                 <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
                   {t("packages.section.archived")}
                 </h3>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {archived.map((pkg) => (
                     <PackageCard
                       key={pkg.id}

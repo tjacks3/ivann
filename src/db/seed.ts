@@ -8,6 +8,7 @@ import { sql } from "drizzle-orm";
 import {
   users,
   socialAccounts,
+  creatorPublicMetrics,
   packages,
   collaborationRequests,
   messageThreads,
@@ -101,6 +102,7 @@ async function seed() {
     await tx.delete(messageThreads);
     await tx.delete(collaborationRequests);
     await tx.delete(packages);
+    await tx.delete(creatorPublicMetrics);
     await tx.delete(socialAccounts);
     await tx.execute(
       sql`DELETE FROM users WHERE id IN (${sql.raw(
@@ -269,6 +271,35 @@ async function seed() {
         followerCount: 720000,
         isVerified: true,
         connectedAt: new Date("2025-03-01"),
+      },
+    ]);
+
+    // --- Creator Public Metrics ---
+    console.log("  Seeding creator public metrics...");
+    await tx.insert(creatorPublicMetrics).values([
+      {
+        userId: CREATOR_1_ID,
+        totalFollowers: 825000, // 245K instagram + 580K tiktok
+        platformCount: 2,
+        avgEngagement: "3.20",
+        topPlatform: "tiktok",
+        lastUpdated: new Date(),
+      },
+      {
+        userId: CREATOR_2_ID,
+        totalFollowers: 165000, // 120K youtube + 45K twitter
+        platformCount: 2,
+        avgEngagement: "4.10",
+        topPlatform: "youtube",
+        lastUpdated: new Date(),
+      },
+      {
+        userId: CREATOR_3_ID,
+        totalFollowers: 1119000, // 310K instagram + 89K youtube + 720K tiktok
+        platformCount: 3,
+        avgEngagement: "2.80",
+        topPlatform: "tiktok",
+        lastUpdated: new Date(),
       },
     ]);
 

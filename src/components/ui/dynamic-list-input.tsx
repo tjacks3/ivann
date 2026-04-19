@@ -77,9 +77,9 @@ export function DynamicListInput({
     <div className="space-y-2">
       {/* Hint */}
       {hint && (
-        <div className="flex items-start gap-2 rounded-lg bg-muted/50 px-3 py-2">
-          <Info className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
-          <p className="text-xs text-muted-foreground">{hint}</p>
+        <div className="flex items-start gap-2 rounded-lg bg-primary/5 px-3 py-2">
+          <Info className="mt-0.5 size-3.5 shrink-0 text-foreground" />
+          <p className="text-xs text-foreground">{hint}</p>
         </div>
       )}
 
@@ -139,7 +139,7 @@ export function DynamicListInput({
                 </>
               ) : (
                 <>
-                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-foreground">
                     {index + 1}
                   </span>
                   <span className="flex-1 text-sm">{item}</span>

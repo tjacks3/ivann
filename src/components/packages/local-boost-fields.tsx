@@ -79,19 +79,19 @@ export function LocalBoostFields({
   };
 
   return (
-    <div className="space-y-4 rounded-lg border border-amber-500/20 bg-amber-500/5 p-4">
+    <div className="space-y-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <MapPin className="size-4 text-amber-600" />
-        <p className="text-sm font-semibold text-amber-700">
+        <MapPin className="size-4 text-foreground" />
+        <p className="text-sm font-semibold text-foreground">
           {t("packages.localBoost.title")}
         </p>
       </div>
 
       {/* Value messaging */}
-      <div className="flex items-start gap-2 rounded-md bg-background px-3 py-2">
-        <Info className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
-        <p className="text-xs text-muted-foreground">
+      <div className="flex items-start gap-2 rounded-md bg-primary/5 px-3 py-2">
+        <Info className="mt-0.5 size-3.5 shrink-0 text-foreground" />
+        <p className="text-xs text-foreground">
           {t("packages.localBoost.valueTip")}
         </p>
       </div>
@@ -126,6 +126,7 @@ export function LocalBoostFields({
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder={t("packages.localBoost.cityPlaceholder")}
+            className="bg-white"
           />
         </div>
       )}
@@ -142,8 +143,8 @@ export function LocalBoostFields({
               className={cn(
                 "cursor-pointer rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
                 businessCategory === cat
-                  ? "border-amber-500 bg-amber-500/10 text-amber-700"
-                  : "border-input text-muted-foreground hover:border-amber-500/30",
+                  ? "border-primary bg-primary text-white"
+                  : "border-input text-muted-foreground hover:border-primary hover:bg-primary hover:text-white",
               )}
             >
               {t(`packages.localBoost.category.${cat}`)}
@@ -177,10 +178,10 @@ export function LocalBoostFields({
       </div>
 
       {/* Brand-friendly helper */}
-      <div className="rounded-md bg-background px-3 py-2.5">
+      <div className="rounded-md bg-primary/5 px-3 py-2.5">
         <div className="flex items-center gap-1.5">
-          <Store className="size-3.5 text-amber-600" />
-          <p className="text-xs font-medium text-amber-700">
+          <Store className="mt-0.5 size-3.5 shrink-0 text-foreground" />
+          <p className="text-xs font-medium text-foreground">
             {t("packages.localBoost.brandHelper")}
           </p>
         </div>

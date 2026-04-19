@@ -51,7 +51,7 @@ export function ProfileHeader({
       <div className="flex flex-wrap items-center gap-2">
         <h1 className="text-5xl font-bold">{name}</h1>
         {isVerified && (
-          <BadgeCheck className="size-6 text-primary" />
+          <BadgeCheck className="size-6 fill-primary text-primary-foreground" />
         )}
         {profileStatus && isOwnProfile && (
           <ProfileStatusBadge status={profileStatus} />

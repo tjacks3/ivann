@@ -34,7 +34,7 @@ export default function SettingsPage() {
 
         <Card className="opacity-50">
           <CardContent className="flex items-center gap-3 py-4">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-foreground">
               <User className="size-4" />
             </div>
             <div>

@@ -391,10 +391,11 @@ const CREATORS: CreatorDef[] = [
     categories: ["fitness", "lifestyle"],
     location: "Lagos, Nigeria",
     website: null,
-    profileStatus: "draft", // Not published — won't appear in discover
+    profileStatus: "published",
     socials: [
       { platform: "instagram", handle: "amarawellness", followerCount: 95000, isVerified: false },
       { platform: "tiktok", handle: "amarawellness", followerCount: 180000, isVerified: false },
+      { platform: "youtube", handle: "AmaraObiWellness", followerCount: 32000, isVerified: false },
     ],
   },
   {
@@ -406,10 +407,11 @@ const CREATORS: CreatorDef[] = [
     categories: ["tech", "education"],
     location: "Berlin, Germany",
     website: "https://bencodes.dev",
-    profileStatus: "draft", // Not published — won't appear in discover
+    profileStatus: "published",
     socials: [
       { platform: "youtube", handle: "BenFosterCodes", followerCount: 42000, isVerified: false },
       { platform: "twitter", handle: "bencodes", followerCount: 18000, isVerified: false },
+      { platform: "tiktok", handle: "bencodes", followerCount: 75000, isVerified: false },
     ],
   },
   {
@@ -429,6 +431,67 @@ const CREATORS: CreatorDef[] = [
       { platform: "twitter", handle: "chloeparis", followerCount: 75000, isVerified: false },
     ],
   },
+  // --- Podcast-focused creators ---
+  {
+    email: "marcus.reed@example.com",
+    fullName: "Marcus Reed",
+    username: "marcuspod",
+    avatarUrl: "https://randomuser.me/api/portraits/men/60.jpg",
+    bio: "Host of 'The Hustle Hour' podcast. Weekly interviews with founders, investors, and operators building the future.",
+    categories: ["business", "education"],
+    location: "New York, NY",
+    website: "https://thehustlehour.fm",
+    profileStatus: "published",
+    socials: [
+      { platform: "website", handle: "thehustlehour.fm", followerCount: 125000, isVerified: false },
+      { platform: "twitter", handle: "marcusreedpod", followerCount: 48000, isVerified: true },
+    ],
+  },
+  {
+    email: "jenna.morales@example.com",
+    fullName: "Jenna Morales",
+    username: "jennapod",
+    avatarUrl: "https://randomuser.me/api/portraits/women/62.jpg",
+    bio: "True crime podcaster and investigative journalist. Host of 'Cold Trail' — a top 50 podcast on Apple Podcasts.",
+    categories: ["entertainment"],
+    location: "Nashville, TN",
+    website: "https://coldtrailpod.com",
+    profileStatus: "published",
+    socials: [
+      { platform: "website", handle: "coldtrailpod.com", followerCount: 310000, isVerified: false },
+      { platform: "instagram", handle: "coldtrailpod", followerCount: 85000, isVerified: false },
+    ],
+  },
+  {
+    email: "derek.shaw@example.com",
+    fullName: "Derek Shaw",
+    username: "derektalks",
+    avatarUrl: "https://randomuser.me/api/portraits/men/62.jpg",
+    bio: "Host of 'Mind Over Matter' — a mental health and self-improvement podcast. 200+ episodes and counting.",
+    categories: ["lifestyle", "fitness"],
+    location: "Seattle, WA",
+    website: "https://mindovermatterpod.com",
+    profileStatus: "published",
+    socials: [
+      { platform: "website", handle: "mindovermatterpod.com", followerCount: 190000, isVerified: false },
+    ],
+  },
+  {
+    email: "tanya.wright@example.com",
+    fullName: "Tanya Wright",
+    username: "tanyatalkstech",
+    avatarUrl: "https://randomuser.me/api/portraits/women/65.jpg",
+    bio: "Tech podcast host breaking down AI, crypto, and startups for everyday people. 'Tech Unfiltered' drops every Tuesday.",
+    categories: ["tech", "business"],
+    location: "Austin, TX",
+    website: "https://techunfiltered.show",
+    profileStatus: "published",
+    socials: [
+      { platform: "website", handle: "techunfiltered.show", followerCount: 88000, isVerified: false },
+      { platform: "twitter", handle: "tanyatalkstech", followerCount: 62000, isVerified: true },
+      { platform: "linkedin", handle: "tanyawright", followerCount: 34000, isVerified: false },
+    ],
+  },
 ];
 
 async function ensureAuthUser(email: string): Promise<string> {
@@ -446,7 +509,7 @@ async function ensureAuthUser(email: string): Promise<string> {
 }
 
 async function run() {
-  console.log("🌱 Seeding 25 test creators...\n");
+  console.log("🌱 Seeding 29 test creators...\n");
 
   for (const creator of CREATORS) {
     try {
@@ -455,43 +518,85 @@ async function run() {
 
       // Check if profile already exists
       const [existing] = await sql`SELECT id FROM users WHERE auth_id = ${authId}`;
+      let userId: string;
+
       if (existing) {
-        await sql`UPDATE users SET avatar_url = ${creator.avatarUrl} WHERE id = ${existing.id}`;
-        console.log(`  ⏭  ${creator.fullName} (already exists — updated avatar)`);
-        continue;
+        userId = existing.id;
+        await sql`
+          UPDATE users SET
+            avatar_url = ${creator.avatarUrl},
+            bio = ${creator.bio},
+            categories = ${sql.array(creator.categories)},
+            location = ${creator.location},
+            website = ${creator.website},
+            profile_status = ${creator.profileStatus}
+          WHERE id = ${userId}
+        `;
+      } else {
+        // Insert user profile
+        const [user] = await sql`
+          INSERT INTO users (
+            auth_id, email, full_name, username, bio, role,
+            categories, location, website, profile_status,
+            onboarding_completed, onboarding_step, avatar_url
+          ) VALUES (
+            ${authId}, ${creator.email}, ${creator.fullName}, ${creator.username},
+            ${creator.bio}, 'creator',
+            ${sql.array(creator.categories)}, ${creator.location},
+            ${creator.website}, ${creator.profileStatus},
+            true, 4, ${creator.avatarUrl}
+          ) RETURNING id
+        `;
+        userId = user.id;
       }
 
-      // Insert user profile
-      const [user] = await sql`
-        INSERT INTO users (
-          auth_id, email, full_name, username, bio, role,
-          categories, location, website, profile_status,
-          onboarding_completed, onboarding_step, avatar_url
-        ) VALUES (
-          ${authId}, ${creator.email}, ${creator.fullName}, ${creator.username},
-          ${creator.bio}, 'creator',
-          ${sql.array(creator.categories)}, ${creator.location},
-          ${creator.website}, ${creator.profileStatus},
-          true, 4, ${creator.avatarUrl}
-        ) RETURNING id
-      `;
-
-      // Insert social accounts
+      // Upsert social accounts — delete old ones and re-insert
+      await sql`DELETE FROM social_accounts WHERE user_id = ${userId}`;
       for (const social of creator.socials) {
         await sql`
           INSERT INTO social_accounts (
             user_id, platform, handle, follower_count, is_verified, status, connected_at
           ) VALUES (
-            ${user.id}, ${social.platform}, ${social.handle},
+            ${userId}, ${social.platform}, ${social.handle},
             ${social.followerCount}, ${social.isVerified}, 'connected', NOW()
           )
         `;
       }
 
+      // Upsert creator_public_metrics
       const totalFollowers = creator.socials.reduce((s, a) => s + a.followerCount, 0);
+      const platformCount = creator.socials.length;
+      // Generate a realistic avg engagement rate based on follower count
+      // Smaller creators tend to have higher engagement
+      const avgEngagement = totalFollowers > 500000
+        ? (1.5 + Math.random() * 1.5).toFixed(2)
+        : totalFollowers > 100000
+          ? (2.5 + Math.random() * 2.0).toFixed(2)
+          : (3.5 + Math.random() * 3.0).toFixed(2);
+      // Top platform = the one with the most followers
+      const topPlatform = creator.socials.reduce((top, s) =>
+        s.followerCount > top.followerCount ? s : top,
+      ).platform;
+
+      await sql`
+        INSERT INTO creator_public_metrics (
+          user_id, total_followers, platform_count, avg_engagement, top_platform, last_updated
+        ) VALUES (
+          ${userId}, ${totalFollowers}, ${platformCount}, ${avgEngagement}, ${topPlatform}, NOW()
+        )
+        ON CONFLICT (user_id) DO UPDATE SET
+          total_followers = EXCLUDED.total_followers,
+          platform_count = EXCLUDED.platform_count,
+          avg_engagement = EXCLUDED.avg_engagement,
+          top_platform = EXCLUDED.top_platform,
+          last_updated = NOW(),
+          updated_at = NOW()
+      `;
+
       const verified = creator.socials.some((s) => s.isVerified) ? "✓" : " ";
+      const label = existing ? "updated" : "created";
       console.log(
-        `  ✅ ${creator.fullName.padEnd(20)} ${verified} ${creator.socials.length} platforms  ${(totalFollowers / 1000).toFixed(0)}K followers  [${creator.profileStatus}]`,
+        `  ✅ ${creator.fullName.padEnd(20)} ${verified} ${platformCount} platforms  ${(totalFollowers / 1000).toFixed(0)}K followers  ${avgEngagement}% eng  [${label}]`,
       );
     } catch (err) {
       console.error(`  ❌ ${creator.fullName}: ${(err as Error).message}`);
@@ -499,7 +604,7 @@ async function run() {
   }
 
   console.log("\n📋 All creators use password: TestPass123!");
-  console.log("   23 published (visible in Discover), 2 draft (hidden)");
+  console.log("   29 published (visible in Discover), 0 draft");
   await sql.end();
 }
 

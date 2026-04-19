@@ -217,6 +217,7 @@
   "social.status.error": "Error",
   "social.status.expired": "Expired",
 
+  "collab.sectionTitle": "Collaboration Requests",
   "collab.incomingTitle": "Incoming Requests",
   "collab.incomingSubtitle": "Collaboration requests from brands.",
   "collab.sentTitle": "Sent Requests",
@@ -348,6 +349,7 @@
   "discover.filters": "Filters",
   "discover.clearFilters": "Clear filters",
   "discover.results": "{count} creators found",
+  "discover.resultsLabel": "creators found",
   "discover.loadMore": "Load more",
 
   "discover.sort.followers": "Most followers",
@@ -374,6 +376,8 @@
   "brandDashboard.emptyDescription": "Start by discovering creators and sending offers.",
   "brandDashboard.editProfile": "Edit Profile",
   "brandDashboard.quickActions": "Quick Actions",
+  "brandDashboard.trackOutreach": "Track Outreach",
+  "brandDashboard.trackOutreachHint": "View status of your QuickCollab campaigns.",
   "brandDashboard.discoverCreators": "Discover Creators",
   "brandDashboard.discoverCreatorsHint": "Find creators for your next campaign.",
   "brandDashboard.collabCount": "total",
@@ -498,7 +502,7 @@
   "onboarding.category.business": "Business & Finance",
   "onboarding.category.other": "Other",
 
-  "nav.quickCollab": "QuickCollab",
+  "nav.quickCollab": "Start QuickCollab",
 
   "quickCollab.step": "Step {current} of {total}",
   "quickCollab.back": "Back",
@@ -628,7 +632,7 @@
 
   "quickCollab.tracking.title": "QuickCollab Tracking",
   "quickCollab.tracking.subtitle": "Monitor the status of your outreach campaigns.",
-  "quickCollab.tracking.newQuickCollab": "New QuickCollab",
+  "quickCollab.tracking.newQuickCollab": "Start QuickCollab",
   "quickCollab.tracking.sentOn": "Sent",
   "quickCollab.tracking.goToMessages": "Messages",
   "quickCollab.tracking.emptyTitle": "No outreach campaigns yet",
@@ -642,9 +646,10 @@
   "quickCollab.tracking.status.accepted": "Accepted",
   "quickCollab.tracking.status.declined": "Declined",
 
-  "deal.pageTitle": "Deals",
-  "deal.pageSubtitle": "View and manage your collaboration deals.",
-  "deal.dashboardTitle": "Deals",
+  "deal.pageTitle": "Deals & Collaborations",
+  "deal.pageSubtitle": "View and manage your collaboration requests and deals.",
+  "deal.dashboardTitle": "Deals & Collaborations",
+  "deal.sectionTitle": "Deals",
   "deal.totalCount": "total",
   "deal.brand": "Brand",
   "deal.creator": "Creator",

@@ -21,7 +21,7 @@ export default function QuickCollabTrackingPage() {
   } = useQuickCollabTracking();
 
   return (
-    <PageContainer>
+    <PageContainer size="narrow">
       <div className="mb-6 flex items-center gap-3">
         <Link
           href="/brand/dashboard"

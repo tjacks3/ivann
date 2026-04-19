@@ -41,29 +41,27 @@ export function CampaignSummary({ campaign, onSave }: CampaignSummaryProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="text-center flex-1">
-          <h2 className="text-lg font-semibold">{t("quickCollab.campaign.title")}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("quickCollab.campaign.subtitle")}
-          </p>
-        </div>
-        {!editing && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setEditing(true)}
-            className="cursor-pointer"
-          >
-            <Pencil className="size-3.5" />
-            {t("quickCollab.campaign.edit")}
-          </Button>
-        )}
+    <div className="mx-auto max-w-xl space-y-4">
+      <div className="text-center">
+        <h2 className="text-lg font-semibold">{t("quickCollab.campaign.title")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {t("quickCollab.campaign.subtitle")}
+        </p>
       </div>
 
       <Card>
-        <CardContent className="space-y-4 pt-4">
+        <CardContent className="relative space-y-4 pt-4">
+          {!editing && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setEditing(true)}
+              className="absolute right-4 top-4 cursor-pointer"
+            >
+              <Pencil className="size-3.5" />
+              {t("quickCollab.campaign.edit")}
+            </Button>
+          )}
           {editing ? (
             <>
               <div className="space-y-2">
@@ -135,29 +133,29 @@ export function CampaignSummary({ campaign, onSave }: CampaignSummaryProps) {
           ) : (
             <div className="space-y-3">
               <div>
-                <p className="text-xs font-medium uppercase text-muted-foreground">
+                <p className="text-xs font-bold uppercase text-foreground">
                   {t("quickCollab.campaign.goal")}
                 </p>
-                <p className="mt-0.5 text-sm">{campaign.goal}</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">{campaign.goal}</p>
               </div>
               <div>
-                <p className="text-xs font-medium uppercase text-muted-foreground">
+                <p className="text-xs font-bold uppercase text-foreground">
                   {t("quickCollab.campaign.deliverable")}
                 </p>
-                <p className="mt-0.5 text-sm">{campaign.deliverable}</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">{campaign.deliverable}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs font-medium uppercase text-muted-foreground">
+                  <p className="text-xs font-bold uppercase text-foreground">
                     {t("quickCollab.campaign.budgetPerCreator")}
                   </p>
-                  <p className="mt-0.5 text-sm">{campaign.budgetPerCreator}</p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">{campaign.budgetPerCreator}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase text-muted-foreground">
+                  <p className="text-xs font-bold uppercase text-foreground">
                     {t("quickCollab.campaign.timeline")}
                   </p>
-                  <p className="mt-0.5 text-sm">{campaign.timeline}</p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">{campaign.timeline}</p>
                 </div>
               </div>
             </div>

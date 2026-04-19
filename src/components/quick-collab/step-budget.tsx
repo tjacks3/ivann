@@ -41,7 +41,7 @@ export function StepBudget({
             className={cn(
               "flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors",
               budgetRange === range
-                ? "border-primary bg-primary/10 text-primary"
+                ? "border-primary text-foreground"
                 : "border-input text-muted-foreground hover:border-primary/30 hover:text-foreground",
             )}
           >

@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ProfileHeader } from "@/components/profile/profile-header";
@@ -44,6 +44,10 @@ export default function PublicCreatorProfilePage({
   const { user, isAuthenticated } = useUser();
   const [selectedPackageId, setSelectedPackageId] = useState<string | undefined>();
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const favoriteIds = useFavoriteIds();
 

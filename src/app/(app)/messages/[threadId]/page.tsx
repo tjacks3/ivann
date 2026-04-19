@@ -16,9 +16,9 @@ export default function ChatPage({
   const { t } = useTranslation();
 
   return (
-    <div className="fixed inset-0 top-[3.5rem] z-40 flex flex-col bg-background">
+    <div className="fixed inset-0 top-16 z-40 flex flex-col bg-background">
       {/* Back to inbox */}
-      <div className="shrink-0 border-b px-4 py-2">
+      <div className="shrink-0 border-b px-4 py-3">
         <Link
           href="/messages"
           className={buttonVariants({ variant: "ghost", size: "sm" })}

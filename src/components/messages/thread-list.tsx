@@ -37,7 +37,7 @@ export function ThreadList({ threads }: ThreadListProps) {
           <Link
             key={thread.id}
             href={`/messages/${thread.id}`}
-            className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/50"
+            className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/50 hover:text-foreground"
           >
             <div className="relative shrink-0">
               <Avatar className="size-10">

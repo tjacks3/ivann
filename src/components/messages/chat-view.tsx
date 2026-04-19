@@ -66,42 +66,46 @@ export function ChatView({ threadId }: ChatViewProps) {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Chat header */}
-      <div className="flex shrink-0 items-center gap-3 border-b px-4 py-3">
-        <Avatar className="size-9">
-          {otherUserAvatar && (
-            <AvatarImage src={otherUserAvatar} alt={otherUserName || ""} />
-          )}
-          <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-        </Avatar>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">{otherUserName}</p>
+      <div className="shrink-0 border-b">
+        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
+          <Avatar className="size-9">
+            {otherUserAvatar && (
+              <AvatarImage src={otherUserAvatar} alt={otherUserName || ""} />
+            )}
+            <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold">{otherUserName}</p>
+          </div>
         </div>
       </div>
 
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
+        className="flex-1 overflow-y-auto"
       >
-        {messages.length === 0 ? (
-          <p className="py-12 text-center text-sm text-muted-foreground">
-            {t("messages.noMessages")}
-          </p>
-        ) : (
-          messages.map((msg) => (
-            <MessageBubble
-              key={msg.id}
-              body={msg.body}
-              timestamp={msg.createdAt}
-              isOwn={msg.isOwn}
-            />
-          ))
-        )}
+        <div className="mx-auto max-w-3xl space-y-3 px-4 py-4">
+          {messages.length === 0 ? (
+            <p className="py-12 text-center text-sm text-muted-foreground">
+              {t("messages.noMessages")}
+            </p>
+          ) : (
+            messages.map((msg) => (
+              <MessageBubble
+                key={msg.id}
+                body={msg.body}
+                timestamp={msg.createdAt}
+                isOwn={msg.isOwn}
+              />
+            ))
+          )}
+        </div>
       </div>
 
       {/* Send input */}
-      <div className="shrink-0 border-t bg-background px-4 py-3">
-        <div className="flex gap-2">
+      <div className="shrink-0 border-t bg-background">
+        <div className="mx-auto flex max-w-3xl gap-2 px-4 py-3">
           <Input
             value={text}
             onChange={(e) => setText(e.target.value)}

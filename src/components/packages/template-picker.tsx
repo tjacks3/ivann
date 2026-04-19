@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { PACKAGE_TEMPLATES, type PackageTemplate } from "@/lib/packages/templates";
 import { useTranslation } from "@/i18n";
 import { Check, FileEdit } from "lucide-react";
@@ -75,14 +76,10 @@ export function TemplatePicker({ onSelect }: TemplatePickerProps) {
 
       {/* Fixed footer — always visible */}
       <div className="shrink-0 border-t bg-background px-4 py-3 text-center">
-        <button
-          type="button"
-          onClick={() => onSelect(null)}
-          className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
+        <Button onClick={() => onSelect(null)} className="w-full">
           <FileEdit className="size-3.5" />
           {t("packages.template.scratch")}
-        </button>
+        </Button>
       </div>
     </>
   );

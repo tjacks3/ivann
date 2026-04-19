@@ -33,7 +33,7 @@ export function SocialButtons({ onError }: SocialButtonsProps) {
       <Button
         variant="outline"
         size="lg"
-        className="w-full"
+        className="w-full text-[#4285F4] hover:text-[#4285F4]"
         disabled={loadingProvider !== null}
         onClick={() => handleOAuth("google")}
       >
@@ -61,7 +61,7 @@ export function SocialButtons({ onError }: SocialButtonsProps) {
       <Button
         variant="outline"
         size="lg"
-        className="w-full"
+        className="w-full text-[#1877F2] hover:text-[#1877F2]"
         disabled={loadingProvider !== null}
         onClick={() => handleOAuth("facebook")}
       >

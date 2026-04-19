@@ -59,7 +59,7 @@ export function NotificationItem({ notification, onClose }: NotificationItemProp
       )}
     >
       <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-muted">
-        <Icon className="size-4 text-muted-foreground" />
+        <Icon className="size-4 text-foreground" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">

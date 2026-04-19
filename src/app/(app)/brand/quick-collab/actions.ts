@@ -639,7 +639,7 @@ export async function sendOutreaches(outreachIds: string[]) {
         type: "collab_request",
         title: `New collaboration request from ${user.brandName ?? user.fullName ?? "a brand"}`,
         body: collabRequest.title,
-        actionUrl: "/collaborations",
+        actionUrl: "/deals",
         referenceId: collabRequest.id,
         referenceType: "collab_request",
         email: creator.email,

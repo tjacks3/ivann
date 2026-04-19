@@ -17,7 +17,7 @@ import type { MatchedCreator } from "@/app/(app)/brand/quick-collab/actions";
 const FIT_LABEL_COLORS: Record<string, string> = {
   "Strong niche match": "bg-purple-500/10 text-purple-600 border-purple-500/30",
   "Good budget fit": "bg-blue-500/10 text-blue-600 border-blue-500/30",
-  "Great local fit": "bg-green-500/10 text-green-600 border-green-500/30",
+  "Great local fit": "bg-primary/10 text-primary border-primary/30",
   "Potential match": "bg-amber-500/10 text-amber-600 border-amber-500/30",
 };
 

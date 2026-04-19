@@ -54,7 +54,7 @@ export function CreatorCard({ creator, isFavorited = false, showFavorite = false
             <div className="flex items-center gap-1.5">
               <p className="font-semibold truncate">{creator.fullName}</p>
               {creator.isVerified && (
-                <BadgeCheck className="size-4 shrink-0 text-primary" />
+                <BadgeCheck className="size-4 shrink-0 fill-primary text-primary-foreground" />
               )}
             </div>
             <p className="text-sm text-muted-foreground truncate">

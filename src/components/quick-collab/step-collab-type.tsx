@@ -48,18 +48,13 @@ export function StepCollabType({
             className={cn(
               "flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3.5 text-left transition-colors",
               collabType === value
-                ? "border-primary bg-primary/10 text-primary"
+                ? "border-primary text-foreground"
                 : "border-input text-muted-foreground hover:border-primary/30 hover:text-foreground",
             )}
           >
             <div
-              className={cn(
-                "flex size-9 shrink-0 items-center justify-center rounded-lg",
-                collabType === value
-                  ? "bg-primary/20"
-                  : "bg-muted",
-              )}
-              style={color && collabType !== value ? { color } : undefined}
+              className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted"
+              style={color ? { color } : undefined}
             >
               <Icon className="size-4" />
             </div>

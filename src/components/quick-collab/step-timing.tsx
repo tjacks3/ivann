@@ -42,7 +42,7 @@ export function StepTiming({
               className={cn(
                 "flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2.5 text-left transition-colors",
                 timing === option
-                  ? "border-primary bg-primary/10 text-primary"
+                  ? "border-primary text-foreground"
                   : "border-input text-muted-foreground hover:border-primary/30 hover:text-foreground",
               )}
             >

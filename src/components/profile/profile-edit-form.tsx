@@ -183,7 +183,7 @@ export function ProfileEditForm({ profile, onSaved }: ProfileEditFormProps) {
 
       {/* Status Messages */}
       {success && (
-        <div className="flex items-center gap-2 rounded-lg bg-green-500/10 px-4 py-3 text-sm text-green-700 dark:text-green-400">
+        <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-3 text-sm text-primary">
           <CheckCircle2 className="size-4" />
           {t("profile.edit.success")}
         </div>

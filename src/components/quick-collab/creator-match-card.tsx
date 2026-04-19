@@ -3,8 +3,7 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, Users, Check, X, Eye } from "lucide-react";
+import { MapPin, Users, Eye } from "lucide-react";
 import { getPlatformMeta } from "@/lib/social/platforms";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -19,7 +18,7 @@ function formatCount(count: number): string {
 const FIT_LABEL_COLORS: Record<string, string> = {
   "Strong niche match": "bg-purple-500/10 text-purple-600 border-purple-500/30",
   "Good budget fit": "bg-blue-500/10 text-blue-600 border-blue-500/30",
-  "Great local fit": "bg-green-500/10 text-green-600 border-green-500/30",
+  "Great local fit": "bg-primary/10 text-primary border-primary/30",
   "Potential match": "bg-amber-500/10 text-amber-600 border-amber-500/30",
 };
 
@@ -49,13 +48,22 @@ export function CreatorMatchCard({
 
   const displayCategories = match.categories?.slice(0, 3) ?? [];
 
+  const handleCardClick = () => {
+    if (status === "selected") {
+      onSkip();
+    } else {
+      onSelect();
+    }
+  };
+
   return (
     <Card
       className={cn(
-        "relative transition-all",
+        "relative cursor-pointer transition-all hover:shadow-md",
         status === "selected" && "ring-2 ring-primary",
         status === "skipped" && "opacity-50",
       )}
+      onClick={handleCardClick}
     >
       <CardContent className="space-y-3.5 p-5">
         {/* Fit label */}
@@ -160,48 +168,19 @@ export function CreatorMatchCard({
         )}
 
         {/* Actions */}
-        <div className="grid grid-cols-2 gap-2 pt-1">
+        <div className="pt-1">
           <Button
             size="sm"
             variant="ghost"
-            onClick={onViewDetails}
-            className="cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewDetails();
+            }}
+            className="w-full cursor-pointer"
           >
             <Eye className="size-3.5" />
             {t("quickCollab.match.viewDetails")}
           </Button>
-          {status === "selected" ? (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={onSkip}
-              className="cursor-pointer"
-            >
-              <X className="size-3.5" />
-              {t("quickCollab.match.deselect")}
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                onClick={onSelect}
-                className="flex-1 cursor-pointer"
-              >
-                <Check className="size-3.5" />
-                {t("quickCollab.match.select")}
-              </Button>
-              {status !== "skipped" && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={onSkip}
-                  className="cursor-pointer"
-                >
-                  <X className="size-3.5" />
-                </Button>
-              )}
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>

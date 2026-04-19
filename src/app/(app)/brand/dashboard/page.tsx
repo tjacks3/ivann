@@ -16,7 +16,7 @@ import { useMyDeals } from "@/hooks/use-deals";
 import { useTranslation } from "@/i18n";
 import { formatPrice } from "@/lib/currency";
 import { getPaymentSummary, type PaymentSummary } from "@/app/(app)/deals/payment-actions";
-import { Compass, Globe, Handshake, Zap } from "lucide-react";
+import { Compass, Globe, Handshake, Zap, ClipboardList } from "lucide-react";
 
 export default function BrandDashboardPage() {
   const { t } = useTranslation();
@@ -97,6 +97,20 @@ export default function BrandDashboardPage() {
                 <div>
                   <p className="text-sm font-medium">{t("quickCollab.cta.title")}</p>
                   <p className="text-xs text-muted-foreground">{t("quickCollab.cta.hint")}</p>
+                </div>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="transition-colors hover:border-primary/30">
+            <CardContent className="pt-4">
+              <Link href="/brand/quick-collab/tracking" className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <ClipboardList className="size-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">{t("brandDashboard.trackOutreach")}</p>
+                  <p className="text-xs text-muted-foreground">{t("brandDashboard.trackOutreachHint")}</p>
                 </div>
               </Link>
             </CardContent>

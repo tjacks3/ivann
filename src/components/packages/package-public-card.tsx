@@ -56,37 +56,31 @@ export function PackagePublicCard({ pkg, creatorName, onSelect }: PackagePublicC
   return (
     <Card className="flex flex-col transition-all hover:shadow-md hover:scale-[1.01]">
       <CardContent className="flex flex-1 flex-col space-y-4 pt-5">
-        {/* Top badges row */}
-        <div className="flex flex-wrap items-center gap-2">
-          <PackageTypeBadge type={pkg.type} />
-          {isLocal && (
-            <span className="flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-700">
-              <MapPin className="size-3" />
-              {t("packages.preview.localTag")}
-            </span>
-          )}
-          {isOngoing && (
-            <span className="flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-              <Repeat className="size-3" />
-              {t("packages.preview.ongoingTag")}
-            </span>
-          )}
+        {/* Type badge — top left */}
+        <div className="flex justify-start">
+          <PackageTypeBadge type={pkg.type} className="px-2 py-0.5 text-[10px]" />
         </div>
 
-        {/* Title + Price */}
-        <div>
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="text-base font-semibold">{pkg.title}</h3>
-            <p className="shrink-0 text-xl font-bold">
-              {formatPrice(pkg.priceInCents, pkg.currency, locale)}
-            </p>
+        {/* Title */}
+        <h3 className="text-base font-semibold">{pkg.title}</h3>
+
+        {/* Contextual badges */}
+        {(isLocal || isOngoing) && (
+          <div className="flex flex-wrap items-center gap-2">
+            {isLocal && (
+              <span className="flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-700">
+                <MapPin className="size-3" />
+                {t("packages.preview.localTag")}
+              </span>
+            )}
+            {isOngoing && (
+              <span className="flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                <Repeat className="size-3" />
+                {t("packages.preview.ongoingTag")}
+              </span>
+            )}
           </div>
-          {creatorName && (
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {t("packages.preview.by")} {creatorName}
-            </p>
-          )}
-        </div>
+        )}
 
         {/* Best for label */}
         {bestFor && (
@@ -103,13 +97,18 @@ export function PackagePublicCard({ pkg, creatorName, onSelect }: PackagePublicC
 
         {/* Deliverables */}
         {pkg.deliverables && (
-          <div>
+          <div className="border-b border-dotted border-border pb-4">
             <p className="mb-1.5 text-xs font-medium uppercase text-muted-foreground">
               {t("packages.preview.whatsIncluded")}
             </p>
             <DeliverablesList value={pkg.deliverables} />
           </div>
         )}
+
+        {/* Price */}
+        <p className="text-xl font-bold">
+          {formatPrice(pkg.priceInCents, pkg.currency, locale)}
+        </p>
 
         {/* Meta: delivery + revisions */}
         <div className="flex items-center gap-3 text-xs text-muted-foreground">

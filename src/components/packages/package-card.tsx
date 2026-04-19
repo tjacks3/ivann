@@ -13,8 +13,8 @@ import { useTranslation } from "@/i18n";
 import type { Package } from "@/db/schema/packages";
 
 const statusStyles: Record<string, string> = {
-  draft: "border-yellow-500 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
-  active: "border-green-500 bg-green-500/10 text-green-700 dark:text-green-400",
+  draft: "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  active: "border-primary bg-primary/10 text-primary",
   archived: "border-gray-500 bg-gray-500/10 text-gray-600 dark:text-gray-400",
 };
 
@@ -36,39 +36,49 @@ export function PackageCard({ pkg, onEdit, onDeleted }: PackageCardProps) {
   };
 
   return (
-    <Card>
-      <CardContent className="space-y-3 pt-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold truncate">{pkg.title}</h3>
-            {pkg.description && (
-              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                {pkg.description}
-              </p>
-            )}
-          </div>
-          <p className="text-lg font-bold shrink-0">
-            {formatPrice(pkg.priceInCents, pkg.currency, locale)}
-          </p>
-        </div>
-
-        {pkg.deliverables && (
-          <DeliverablesList value={pkg.deliverables} limit={3} />
-        )}
-
-        <div className="flex flex-wrap items-center gap-2">
-          <PackageTypeBadge type={pkg.type} />
+    <Card className="flex flex-col">
+      <CardContent className="flex flex-1 flex-col space-y-4 pt-5">
+        {/* Type badge + status badge */}
+        <div className="flex items-center justify-between">
+          <PackageTypeBadge type={pkg.type} className="px-2 py-0.5 text-[10px]" />
           <span
-            className={`rounded-full border px-3 py-1.5 text-sm font-medium ${statusStyles[pkg.status] ?? ""}`}
+            className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${statusStyles[pkg.status] ?? ""}`}
           >
             {t(`packages.status.${pkg.status}`)}
           </span>
+        </div>
+
+        {/* Title */}
+        <h3 className="text-base font-semibold">{pkg.title}</h3>
+
+        {/* Description */}
+        {pkg.description && (
+          <p className="text-sm text-muted-foreground">{pkg.description}</p>
+        )}
+
+        {/* Deliverables */}
+        {pkg.deliverables && (
+          <div className="border-b border-dotted border-border pb-4">
+            <p className="mb-1.5 text-xs font-medium uppercase text-muted-foreground">
+              {t("packages.preview.whatsIncluded")}
+            </p>
+            <DeliverablesList value={pkg.deliverables} limit={3} />
+          </div>
+        )}
+
+        {/* Price */}
+        <p className="text-xl font-bold">
+          {formatPrice(pkg.priceInCents, pkg.currency, locale)}
+        </p>
+
+        {/* Meta: delivery + revisions */}
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
           {pkg.deliveryDays && (
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger className="flex items-center gap-1 text-xs text-muted-foreground">
+                <TooltipTrigger className="flex items-center gap-1">
                   <Clock className="size-3" />
-                  {pkg.deliveryDays}d
+                  {pkg.deliveryDays} {t("packages.preview.days")}
                 </TooltipTrigger>
                 <TooltipContent>{t("packages.tooltip.delivery", { days: pkg.deliveryDays })}</TooltipContent>
               </Tooltip>
@@ -77,9 +87,9 @@ export function PackageCard({ pkg, onEdit, onDeleted }: PackageCardProps) {
           {pkg.revisions > 0 && (
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger className="flex items-center gap-1 text-xs text-muted-foreground">
+                <TooltipTrigger className="flex items-center gap-1">
                   <RotateCcw className="size-3" />
-                  {pkg.revisions} {pkg.revisions === 1 ? "revision" : "revisions"}
+                  {pkg.revisions} {pkg.revisions === 1 ? t("packages.preview.revision") : t("packages.preview.revisions")}
                 </TooltipTrigger>
                 <TooltipContent>{t("packages.tooltip.revisions", { count: pkg.revisions })}</TooltipContent>
               </Tooltip>
@@ -87,6 +97,7 @@ export function PackageCard({ pkg, onEdit, onDeleted }: PackageCardProps) {
           )}
         </div>
 
+        {/* Draft nudge */}
         {pkg.status === "draft" && (
           <div className="flex items-center gap-2 rounded-md bg-amber-500/5 px-2.5 py-1.5">
             <AlertCircle className="size-3 shrink-0 text-amber-600" />
@@ -96,7 +107,11 @@ export function PackageCard({ pkg, onEdit, onDeleted }: PackageCardProps) {
           </div>
         )}
 
-        <div className="flex items-center gap-2 pt-1">
+        {/* Spacer to push actions to bottom */}
+        <div className="flex-1" />
+
+        {/* Actions */}
+        <div className="flex items-center gap-2">
           <Button
             size="sm"
             variant={pkg.status === "draft" ? "default" : "outline"}

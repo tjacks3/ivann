@@ -69,7 +69,7 @@ export default function DiscoverPage() {
               </div>
               {!isLoading && (
                 <p className="text-sm text-muted-foreground">
-                  {t("discover.results", { count: total })}
+                  <span className="font-bold text-foreground">{total}</span> {t("discover.resultsLabel")}
                 </p>
               )}
             </div>
@@ -123,7 +123,6 @@ export default function DiscoverPage() {
               {hasMore && (
                 <div className="mt-6 flex justify-center">
                   <Button
-                    variant="outline"
                     onClick={loadMore}
                     disabled={isLoadingMore}
                   >

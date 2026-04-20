@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { DynamicListInput } from "@/components/ui/dynamic-list-input";
 import {
   Select,
   SelectTrigger,
@@ -16,13 +16,23 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { collaborationRequestSchema } from "@/lib/validations/collaboration";
 import type { CollaborationRequestValues } from "@/lib/validations/collaboration";
 import { createDeal } from "@/app/(app)/deals/actions";
 import { getCurrencyForLocale, fromCents, toCents } from "@/lib/currency";
 import type { Package } from "@/db/schema/packages";
+
+const OFFER_TYPES = [
+  "ugc",
+  "sponsored_post",
+  "story",
+  "reel",
+  "video",
+  "bundle",
+  "custom",
+] as const;
 
 interface RequestFormProps {
   creatorId: string;
@@ -42,8 +52,8 @@ export function RequestForm({
   const { t, locale } = useTranslation();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [deliverableItems, setDeliverableItems] = useState<string[]>([]);
 
   const currency = getCurrencyForLocale(locale);
 
@@ -55,6 +65,9 @@ export function RequestForm({
       creatorId,
       packageId: preSelectedPackageId,
       title: preSelectedPkg ? `Collaboration: ${preSelectedPkg.title}` : "",
+      description: "",
+      deliverables: [],
+      type: preSelectedPkg?.type as CollaborationRequestValues["type"] ?? undefined,
       message: "",
       budget: preSelectedPkg?.priceInCents ?? undefined,
       currency,
@@ -71,12 +84,21 @@ export function RequestForm({
       setValue("packageId", undefined);
       setValue("title", "");
       setValue("budget", undefined);
+      setValue("type", undefined);
+      setDeliverableItems([]);
+      setValue("deliverables", []);
     } else {
       const pkg = availablePackages?.find((p) => p.id === pkgId);
       if (pkg) {
         setValue("packageId", pkg.id);
         setValue("title", `Collaboration: ${pkg.title}`);
         setValue("budget", pkg.priceInCents);
+        setValue("type", pkg.type as CollaborationRequestValues["type"]);
+        const pkgDeliverables = pkg.deliverables
+          ? pkg.deliverables.split("\n").map((s) => s.trim()).filter(Boolean)
+          : [];
+        setDeliverableItems(pkgDeliverables);
+        setValue("deliverables", pkgDeliverables);
       }
     }
   };
@@ -93,13 +115,18 @@ export function RequestForm({
     setSaving(true);
     setServerError(null);
 
+    const deliverablesText = deliverableItems.length > 0
+      ? deliverableItems.join("\n")
+      : data.description ?? "";
+
     const result = await createDeal({
       creatorId: data.creatorId,
       title: data.title,
-      deliverables: data.message ?? undefined,
+      deliverables: deliverablesText || undefined,
       budget: data.budget ?? undefined,
       currency: data.currency,
       timeline: data.deadline ?? undefined,
+      notes: data.message ?? undefined,
     });
 
     if (result.success) {
@@ -112,21 +139,6 @@ export function RequestForm({
 
     setSaving(false);
   };
-
-  if (success) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 py-8 text-center">
-        <CheckCircle2 className="size-10 text-green-500" />
-        <h3 className="font-semibold">{t("collab.form.successTitle")}</h3>
-        <p className="text-sm text-muted-foreground">
-          {t("collab.form.successDescription", { name: creatorName })}
-        </p>
-        <Button variant="outline" onClick={onClose}>
-          {t("collab.form.close")}
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-1 flex-col overflow-hidden">
@@ -155,22 +167,60 @@ export function RequestForm({
           </div>
         )}
 
+        {/* Title */}
         <div className="space-y-1.5">
           <Label htmlFor="title">{t("collab.form.requestTitle")}</Label>
-          <Input id="title" {...register("title")} />
+          <Input id="title" {...register("title")} placeholder={t("collab.form.titlePlaceholder")} />
           {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
         </div>
 
+        {/* Type */}
         <div className="space-y-1.5">
-          <Label>{t("collab.form.message")}</Label>
-          <RichTextEditor
-            value={watch("message") ?? ""}
-            onChange={(val) => setValue("message", val, { shouldValidate: true })}
-            placeholder={t("collab.form.messagePlaceholder")}
-          />
-          {errors.message && <p className="text-xs text-destructive">{errors.message.message}</p>}
+          <Label>{t("collab.form.type")}</Label>
+          <Select
+            value={watch("type") ?? "custom"}
+            onValueChange={(v) => setValue("type", v as CollaborationRequestValues["type"])}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {OFFER_TYPES.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {t(`packages.type.${type}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
+        {/* Description */}
+        <div className="space-y-1.5">
+          <Label htmlFor="description">{t("collab.form.description")}</Label>
+          <Textarea
+            id="description"
+            {...register("description")}
+            placeholder={t("collab.form.descriptionPlaceholder")}
+            className="min-h-20"
+          />
+        </div>
+
+        {/* Deliverables */}
+        <div className="space-y-1.5">
+          <Label>{t("collab.form.deliverables")}</Label>
+          <DynamicListInput
+            items={deliverableItems}
+            onChange={(items) => {
+              setDeliverableItems(items);
+              setValue("deliverables", items);
+            }}
+            placeholder={t("collab.form.deliverablePlaceholder")}
+            addLabel={t("collab.form.addDeliverable")}
+            hint={t("collab.form.deliverablesHint")}
+          />
+        </div>
+
+        {/* Budget + Deadline */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="budget">{t("collab.form.budget")}</Label>
@@ -199,6 +249,18 @@ export function RequestForm({
               {...register("deadline")}
             />
           </div>
+        </div>
+
+        {/* Message / Notes */}
+        <div className="space-y-1.5">
+          <Label htmlFor="message">{t("collab.form.message")}</Label>
+          <Textarea
+            id="message"
+            value={watch("message") ?? ""}
+            onChange={(e) => setValue("message", e.target.value)}
+            placeholder={t("collab.form.messagePlaceholder")}
+            className="min-h-20"
+          />
         </div>
 
         {serverError && (

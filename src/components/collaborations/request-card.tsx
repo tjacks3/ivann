@@ -1,15 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CollabStatusBadge } from "./status-badge";
-import { Calendar, DollarSign, Package, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, DollarSign, Package, Loader2, ChevronDown, ChevronUp, Rocket } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
-import { acceptCollaboration, declineCollaboration } from "@/app/(app)/collaborations/actions";
+import {
+  acceptCollaboration,
+  declineCollaboration,
+  launchCollaborationWorkspace,
+} from "@/app/(app)/collaborations/actions";
 import { useTranslation } from "@/i18n";
+import { useRouter } from "next/navigation";
 import type { CollabWithDetails } from "@/app/(app)/collaborations/actions";
 
 interface RequestCardProps {
@@ -20,10 +26,12 @@ interface RequestCardProps {
 
 export function RequestCard({ collab, viewAs, onUpdated }: RequestCardProps) {
   const { t, locale } = useTranslation();
+  const router = useRouter();
   const [expanded, setExpanded] = useState(false);
   const [declining, setDeclining] = useState(false);
   const [declineReason, setDeclineReason] = useState("");
   const [loading, setLoading] = useState(false);
+  const [launching, setLaunching] = useState(false);
 
   const otherName = viewAs === "creator" ? collab.brandName : collab.creatorName;
   const otherAvatar = viewAs === "creator" ? collab.brandAvatar : collab.creatorAvatar;
@@ -114,6 +122,45 @@ export function RequestCard({ collab, viewAs, onUpdated }: RequestCardProps) {
           <p className="text-sm text-destructive">
             {t("collab.declineReason")}: {collab.declinedReason}
           </p>
+        )}
+
+        {/* Accepted — link to collaboration workspace or create one */}
+        {collab.status === "accepted" && (
+          <div className="pt-1">
+            {collab.collaborationWorkspaceId ? (
+              <Link href={`/collaboration-workspace/${collab.collaborationWorkspaceId}`}>
+                <Button size="sm" className="w-full cursor-pointer">
+                  <Rocket className="size-3.5" />
+                  {t("collab.launchWorkspace")}
+                </Button>
+              </Link>
+            ) : (
+              <Button
+                size="sm"
+                className="w-full cursor-pointer"
+                disabled={launching}
+                onClick={async () => {
+                  setLaunching(true);
+                  const result = await launchCollaborationWorkspace(collab.id);
+                  if (result.success && result.collaborationWorkspaceId) {
+                    router.push(
+                      `/collaboration-workspace/${result.collaborationWorkspaceId}`,
+                    );
+                  } else {
+                    onUpdated();
+                  }
+                  setLaunching(false);
+                }}
+              >
+                {launching ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <Rocket className="size-3.5" />
+                )}
+                {t("collab.launchWorkspace")}
+              </Button>
+            )}
+          </div>
         )}
 
         {/* Creator actions for pending requests */}

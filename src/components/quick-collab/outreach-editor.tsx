@@ -119,6 +119,7 @@ export function OutreachEditor({
                       className="cursor-pointer"
                     >
                       <Pencil className="size-3.5" />
+                      {t("quickCollab.campaign.edit")}
                     </Button>
                   )}
                 </div>
@@ -173,7 +174,7 @@ export function OutreachEditor({
           ) : (
             <Send className="size-3.5" />
           )}
-          {t("quickCollab.outreach.send", { count: selectedIds.size })}
+          {t(selectedIds.size === 1 ? "quickCollab.outreach.sendOne" : "quickCollab.outreach.sendOther", { count: selectedIds.size })}
         </Button>
       </div>
     </div>

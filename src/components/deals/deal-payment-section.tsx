@@ -59,102 +59,143 @@ export function DealPaymentSection({
   return (
     <Card
       className={cn(
-        status === "funded" && "border-green-500/30 bg-green-500/5",
-        status === "released" && "border-green-500/30",
-        status === "refunded" && "border-amber-500/30 bg-amber-500/5",
+        "overflow-hidden",
+        status === "unpaid" && "border-muted",
+        status === "funding_pending" && "border-amber-500/30",
+        status === "funded" && "border-primary/30",
+        status === "released" && "border-primary/30",
+        status === "refunded" && "border-amber-500/30",
       )}
     >
-      <CardContent className="flex items-center justify-between gap-4 py-4">
-        <div className="flex items-center gap-3">
-          {/* Status icon */}
-          {status === "unpaid" && (
-            <div className="flex size-10 items-center justify-center rounded-full bg-muted">
-              <DollarSign className="size-5 text-foreground" />
-            </div>
-          )}
-          {status === "funding_pending" && (
-            <div className="flex size-10 items-center justify-center rounded-full bg-amber-500/10">
-              <Clock className="size-5 text-amber-600" />
-            </div>
-          )}
-          {status === "funded" && (
-            <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
-              <ShieldCheck className="size-5 fill-primary text-primary-foreground" />
-            </div>
-          )}
-          {status === "released" && (
-            <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
-              <CheckCircle className="size-5 fill-primary text-primary-foreground" />
-            </div>
-          )}
-          {status === "refunded" && (
-            <div className="flex size-10 items-center justify-center rounded-full bg-amber-500/10">
-              <ArrowDownCircle className="size-5 text-amber-600" />
-            </div>
-          )}
-
-          {/* Status text */}
-          <div>
+      <CardContent className="flex items-stretch gap-0 p-0">
+        {/* Status details — left panel */}
+        <div className="flex flex-1 items-center justify-between gap-4 px-5 py-5">
+          <div className="flex items-center gap-3">
+            {/* Status icon */}
             {status === "unpaid" && (
-              <>
+              <div className="flex size-10 items-center justify-center rounded-full bg-muted">
+                <DollarSign className="size-5 text-foreground" />
+              </div>
+            )}
+            {status === "funding_pending" && (
+              <div className="flex size-10 items-center justify-center rounded-full bg-amber-500/10">
+                <Clock className="size-5 text-amber-600" />
+              </div>
+            )}
+            {status === "funded" && (
+              <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
+                <ShieldCheck className="size-5 fill-primary text-primary-foreground" />
+              </div>
+            )}
+            {status === "released" && (
+              <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
+                <CheckCircle className="size-5 fill-primary text-primary-foreground" />
+              </div>
+            )}
+            {status === "refunded" && (
+              <div className="flex size-10 items-center justify-center rounded-full bg-amber-500/10">
+                <ArrowDownCircle className="size-5 text-amber-600" />
+              </div>
+            )}
+
+            {/* Status text */}
+            <div>
+              {status === "unpaid" && (
                 <p className="text-sm font-medium">
                   {isBrand
                     ? t("deal.payment.unpaidBrand")
                     : t("deal.payment.unpaidCreator")}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {formatPrice(amount, currency, locale)}
+              )}
+              {status === "funding_pending" && (
+                <p className="text-sm font-medium text-amber-600">
+                  {t("deal.payment.processing")}
                 </p>
-              </>
-            )}
-            {status === "funding_pending" && (
-              <p className="text-sm font-medium text-amber-600">
-                {t("deal.payment.processing")}
-              </p>
-            )}
-            {status === "funded" && (
-              <>
-                <p className="text-sm font-medium text-green-700">
-                  {t("deal.payment.secured")} — {formatPrice(amount, currency, locale)}
-                </p>
-                <p className="text-xs text-green-600/80">
+              )}
+              {status === "funded" && (
+                <>
+                  <p className="text-sm font-medium text-primary">
+                    {t("deal.payment.secured")}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {isBrand
+                      ? t("deal.payment.heldBrand")
+                      : t("deal.payment.heldCreator")}
+                  </p>
+                </>
+              )}
+              {status === "released" && (
+                <p className="text-sm font-medium text-primary">
                   {isBrand
-                    ? t("deal.payment.heldBrand")
-                    : t("deal.payment.heldCreator")}
+                    ? t("deal.payment.releasedBrand")
+                    : t("deal.payment.releasedCreator")}
                 </p>
-              </>
-            )}
-            {status === "released" && (
-              <p className="text-sm font-medium text-green-700">
-                {isBrand
-                  ? t("deal.payment.releasedBrand")
-                  : t("deal.payment.releasedCreator")}{" "}
-                — {formatPrice(amount, currency, locale)}
-              </p>
-            )}
-            {status === "refunded" && (
-              <p className="text-sm font-medium text-amber-700">
-                {t("deal.payment.refunded")} — {formatPrice(amount, currency, locale)}
-              </p>
-            )}
+              )}
+              {status === "refunded" && (
+                <p className="text-sm font-medium text-amber-700">
+                  {t("deal.payment.refunded")}
+                </p>
+              )}
+            </div>
           </div>
+
+          {/* Fund button (brand only, unpaid only) */}
+          {isBrand && status === "unpaid" && amount > 0 && (
+            <Button
+              onClick={handleFund}
+              disabled={funding}
+              className="cursor-pointer"
+            >
+              {funding ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Shield className="size-3.5" />
+              )}
+              {t("deal.payment.fundDeal")}
+            </Button>
+          )}
         </div>
 
-        {/* Fund button (brand only, unpaid only) */}
-        {isBrand && status === "unpaid" && amount > 0 && (
-          <Button
-            onClick={handleFund}
-            disabled={funding}
-            className="cursor-pointer"
-          >
-            {funding ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Shield className="size-3.5" />
+        {/* Amount — right panel with status-colored background */}
+        <div
+          className={cn(
+            "flex shrink-0 flex-col items-center justify-center px-6 py-5",
+            status === "unpaid" && "bg-muted",
+            status === "funding_pending" && "bg-amber-500/10",
+            status === "funded" && "bg-primary/10",
+            status === "released" && "bg-primary/10",
+            status === "refunded" && "bg-amber-500/10",
+          )}
+        >
+          <p
+            className={cn(
+              "text-2xl font-bold",
+              status === "unpaid" && "text-foreground",
+              status === "funding_pending" && "text-amber-700",
+              status === "funded" && "text-primary",
+              status === "released" && "text-primary",
+              status === "refunded" && "text-amber-700",
             )}
-            {t("deal.payment.fundDeal")}
-          </Button>
-        )}
+          >
+            {formatPrice(amount, currency, locale)}
+          </p>
+          <p
+            className={cn(
+              "mt-0.5 text-xs font-medium uppercase tracking-wide",
+              status === "unpaid" && "text-muted-foreground",
+              status === "funding_pending" && "text-amber-600",
+              status === "funded" && "text-primary/80",
+              status === "released" && "text-primary/80",
+              status === "refunded" && "text-amber-600",
+            )}
+          >
+            {status === "unpaid" && t("deal.payment.statusUnpaid")}
+            {status === "funding_pending" && t("deal.payment.statusPending")}
+            {status === "funded" && t("deal.payment.statusSecured")}
+            {status === "released" && t("deal.payment.statusReleased")}
+            {status === "refunded" && t("deal.payment.statusRefunded")}
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

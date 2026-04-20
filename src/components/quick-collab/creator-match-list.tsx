@@ -60,7 +60,7 @@ export function CreatorMatchList({
         </p>
         {selectedCount > 0 && (
           <p className="mt-1 text-sm font-medium text-primary">
-            {t("quickCollab.match.selectedCount", { count: selectedCount })}
+            {t(selectedCount === 1 ? "quickCollab.match.selectedCountOne" : "quickCollab.match.selectedCountOther", { count: selectedCount })}
           </p>
         )}
       </div>
@@ -74,7 +74,7 @@ export function CreatorMatchList({
               {t("quickCollab.match.localLowResults")}
             </p>
             <p className="mt-0.5 text-amber-600/80">
-              {t("quickCollab.match.localLowDescription", { count: matches.length })}
+              {t(matches.length === 1 ? "quickCollab.match.localLowDescriptionOne" : "quickCollab.match.localLowDescriptionOther", { count: matches.length })}
             </p>
           </div>
         </div>

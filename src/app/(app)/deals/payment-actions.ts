@@ -34,7 +34,7 @@ export async function initFunding(dealId: string) {
 
   if (!deal) return { success: false as const, error: "NOT_FOUND" };
   if (deal.brandId !== user.id) return { success: false as const, error: "UNAUTHORIZED" };
-  if (deal.status !== "accepted" && deal.status !== "in_progress") {
+  if (deal.status !== "accepted" && deal.status !== "in_progress" && deal.status !== "delivered") {
     return { success: false as const, error: "INVALID_STATUS" };
   }
   if (!deal.budget || deal.budget <= 0) {
@@ -306,7 +306,7 @@ export async function getPaymentSummary(): Promise<PaymentSummary> {
     .reduce((sum, p) => sum + p.amountInCents, 0);
 
   const totalFunded = allPayments
-    .filter((p) => p.status === "funded")
+    .filter((p) => p.status === "funded" || p.status === "funding_pending")
     .reduce((sum, p) => sum + p.amountInCents, 0);
 
   // Get recent 5 transactions with deal + other party info

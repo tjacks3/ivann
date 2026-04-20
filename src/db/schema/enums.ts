@@ -63,6 +63,16 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "system",
 ]);
 
+// Collaboration workspace states
+export const collaborationStateEnum = pgEnum("collaboration_state", [
+  "awaiting_brand_brief",
+  "awaiting_creator_confirmation",
+  "revision_requested",
+  "in_progress",
+  "submitted",
+  "completed",
+]);
+
 // Deal statuses
 export const dealStatusEnum = pgEnum("deal_status", [
   "draft",

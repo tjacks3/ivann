@@ -295,7 +295,7 @@ export default function QuickCollabPage() {
             {t("quickCollab.success.title")}
           </h2>
           <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-            {t("quickCollab.success.description", { count: sentCount })}
+            {t(sentCount === 1 ? "quickCollab.success.descriptionOne" : "quickCollab.success.descriptionOther", { count: sentCount })}
           </p>
           <div className="mt-8 flex items-center gap-3">
             <Link

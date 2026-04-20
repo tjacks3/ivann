@@ -519,6 +519,13 @@ export async function updateDealStatus(dealId: string, newStatus: string) {
     refundPayment(dealId).catch(() => {});
   }
 
+  // Auto-create collaboration workspace on acceptance
+  if (newStatus === "accepted") {
+    import("@/app/(app)/collaboration-workspace/actions")
+      .then(({ createCollaboration }) => createCollaboration(dealId))
+      .catch(() => {});
+  }
+
   // Notify the other party
   const otherUserId = isBrand ? deal.creatorId : deal.brandId;
   const [otherUser] = await db

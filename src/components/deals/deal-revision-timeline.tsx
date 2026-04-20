@@ -1,10 +1,10 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { DeliverablesList } from "@/components/packages/deliverables-list";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
-import { RichTextDisplay } from "@/components/ui/rich-text-display";
 import { FileText, DollarSign, Clock } from "lucide-react";
 import type { RevisionItem } from "@/app/(app)/deals/actions";
 
@@ -76,19 +76,17 @@ export function DealRevisionTimeline({ revisions }: DealRevisionTimelineProps) {
                   {/* Changes */}
                   <div className="space-y-1.5 text-sm">
                     {rev.deliverables && (
-                      <div className="flex items-start gap-1.5">
-                        <FileText className="mt-0.5 size-3 shrink-0 text-muted-foreground" />
-                        <div className="line-clamp-2 text-muted-foreground">
-                          <RichTextDisplay content={rev.deliverables} />
+                      <div>
+                        <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                          <FileText className="size-3" />
+                          {t("deal.deliverables")}
                         </div>
+                        <DeliverablesList value={rev.deliverables} />
                       </div>
                     )}
                     <div className="flex items-center gap-4">
                       {rev.budget != null && (
-                        <div className="flex items-center gap-1">
-                          <DollarSign className="size-3 text-muted-foreground" />
-                          <span className="font-medium">{formatPrice(rev.budget, rev.currency, locale)}</span>
-                        </div>
+                        <span className="font-medium">{formatPrice(rev.budget, rev.currency, locale)}</span>
                       )}
                       {rev.timeline && (
                         <div className="flex items-center gap-1">

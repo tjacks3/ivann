@@ -42,60 +42,39 @@ export default function DealsPage() {
             description={isBrand ? t("deal.emptyBrandDescription") : t("deal.emptyCreatorDescription")}
           />
         ) : (
-          <div className="space-y-10">
-            {/* Collaborations */}
-            {collaborations.length > 0 && (
-              <div>
-                <h3 className="mb-4 text-sm font-semibold text-muted-foreground">
-                  {t("collab.sectionTitle")} ({collaborations.length})
-                </h3>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {collaborations.map((collab) => (
-                    <RequestCard
-                      key={collab.id}
-                      collab={collab}
-                      viewAs={isBrand ? "brand" : "creator"}
-                      onUpdated={refetchCollabs}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Deals */}
-            {deals.length > 0 && (
-              <div>
-                <h3 className="mb-4 text-sm font-semibold text-muted-foreground">
-                  {t("deal.sectionTitle")} ({deals.length})
-                </h3>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {deals.map((deal) => (
-                    <Link key={deal.id} href={`/deals/${deal.id}`}>
-                      <Card className="transition-all hover:shadow-md hover:scale-[1.01]">
-                        <CardContent className="space-y-2 pt-4">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <p className="truncate font-semibold">{deal.title}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {deal.otherPartyName}
-                                {deal.otherPartyUsername && ` @${deal.otherPartyUsername}`}
-                              </p>
-                            </div>
-                            <DealStatusBadge status={deal.status} />
-                          </div>
-                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                            {deal.budget && (
-                              <span>{formatPrice(deal.budget, deal.currency, "en")}</span>
-                            )}
-                            {deal.timeline && <span>{deal.timeline}</span>}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {collaborations.map((collab) => (
+              <RequestCard
+                key={`collab-${collab.id}`}
+                collab={collab}
+                viewAs={isBrand ? "brand" : "creator"}
+                onUpdated={refetchCollabs}
+              />
+            ))}
+            {deals.map((deal) => (
+              <Link key={`deal-${deal.id}`} href={`/deals/${deal.id}`}>
+                <Card className="transition-all hover:shadow-md hover:scale-[1.01]">
+                  <CardContent className="space-y-2 pt-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold">{deal.title}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {deal.otherPartyName}
+                          {deal.otherPartyUsername && ` @${deal.otherPartyUsername}`}
+                        </p>
+                      </div>
+                      <DealStatusBadge status={deal.status} />
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                      {deal.budget && (
+                        <span>{formatPrice(deal.budget, deal.currency, "en")}</span>
+                      )}
+                      {deal.timeline && <span>{deal.timeline}</span>}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
           </div>
         )}
       </div>

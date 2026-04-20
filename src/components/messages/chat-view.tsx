@@ -25,8 +25,9 @@ export function ChatView({ threadId }: ChatViewProps) {
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const initials = (otherUserName || "?")
+  const initials = (otherUserName || "")
     .split(" ")
+    .filter(Boolean)
     .map((n) => n[0])
     .join("")
     .toUpperCase()
@@ -68,12 +69,16 @@ export function ChatView({ threadId }: ChatViewProps) {
       {/* Chat header */}
       <div className="shrink-0 border-b">
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <Avatar className="size-9">
-            {otherUserAvatar && (
-              <AvatarImage src={otherUserAvatar} alt={otherUserName || ""} />
-            )}
-            <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-          </Avatar>
+          {(otherUserAvatar || initials.length > 0) && (
+            <Avatar className="size-9">
+              {otherUserAvatar ? (
+                <AvatarImage src={otherUserAvatar} alt={otherUserName || ""} />
+              ) : null}
+              {initials.length > 0 && (
+                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+              )}
+            </Avatar>
+          )}
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">{otherUserName}</p>
           </div>

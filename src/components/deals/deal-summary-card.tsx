@@ -4,7 +4,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DealStatusBadge } from "./deal-status-badge";
-import { RichTextDisplay } from "@/components/ui/rich-text-display";
+import { DeliverablesList } from "@/components/packages/deliverables-list";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
 import { Pencil, DollarSign, Clock, FileText, ArrowLeftRight } from "lucide-react";
@@ -58,7 +58,7 @@ export function DealSummaryCard({
               </div>
             </div>
 
-            <span className="text-muted-foreground">×</span>
+            <div className="h-10 w-px bg-border" />
 
             {/* Creator */}
             <div className="flex items-center gap-2.5">
@@ -83,6 +83,18 @@ export function DealSummaryCard({
           <DealStatusBadge status={deal.status} />
         </div>
 
+        {/* Description */}
+        {deal.notes && (
+          <div>
+            <p className="text-xs font-medium uppercase text-muted-foreground">
+              {t("deal.description")}
+            </p>
+            <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
+              {deal.notes}
+            </p>
+          </div>
+        )}
+
         {/* Deal details */}
         <div className="rounded-lg border p-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -92,15 +104,19 @@ export function DealSummaryCard({
                 <FileText className="size-3" />
                 {t("deal.deliverables")}
               </div>
-              <div className="mt-1">
-                <RichTextDisplay content={deal.deliverables} fallback={t("deal.notSpecified")} />
+              <div className="mt-2">
+                {deal.deliverables ? (
+                  <DeliverablesList value={deal.deliverables} />
+                ) : (
+                  <p className="text-sm text-muted-foreground">{t("deal.notSpecified")}</p>
+                )}
               </div>
             </div>
 
             {/* Budget */}
             <div>
-              <div className="flex items-center gap-1.5 text-xs font-medium uppercase text-muted-foreground">
-                <DollarSign className="size-3" />
+              <div className="flex items-center gap-0.5 text-xs font-medium uppercase text-muted-foreground">
+                <DollarSign className="-ml-0.5 size-3" />
                 {t("deal.budget")}
               </div>
               <p className="mt-1 text-sm font-medium">
@@ -150,17 +166,6 @@ export function DealSummaryCard({
           </div>
         </div>
 
-        {/* Notes */}
-        {deal.notes && (
-          <div>
-            <p className="text-xs font-medium uppercase text-muted-foreground">
-              {t("deal.notes")}
-            </p>
-            <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
-              {deal.notes}
-            </p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

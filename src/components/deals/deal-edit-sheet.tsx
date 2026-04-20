@@ -11,10 +11,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { DynamicListInput } from "@/components/ui/dynamic-list-input";
 import { useTranslation } from "@/i18n";
 import { X, Loader2 } from "lucide-react";
 import type { DealWithParties } from "@/app/(app)/deals/actions";
+
+function parseDeliverables(value: string | null): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed.filter((s) => typeof s === "string" && s.trim());
+  } catch {
+    return value.split("\n").map((s) => s.trim()).filter(Boolean);
+  }
+  return [];
+}
 
 interface DealEditSheetProps {
   deal: DealWithParties;
@@ -38,7 +49,10 @@ export function DealEditSheet({
   const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState(deal.title);
-  const [deliverables, setDeliverables] = useState(deal.deliverables ?? "");
+  const [description, setDescription] = useState(deal.notes ?? "");
+  const [deliverableItems, setDeliverableItems] = useState<string[]>(
+    parseDeliverables(deal.deliverables),
+  );
   const [budgetDollars, setBudgetDollars] = useState(
     deal.budget ? (deal.budget / 100).toString() : "",
   );
@@ -52,7 +66,7 @@ export function DealEditSheet({
       : undefined;
     await onSave({
       title,
-      deliverables,
+      deliverables: deliverableItems.join("\n"),
       budget: budgetCents,
       timeline,
       notes,
@@ -78,7 +92,8 @@ export function DealEditSheet({
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <div className="space-y-2">
+          {/* Title */}
+          <div className="space-y-1.5">
             <Label htmlFor="dealTitle">{t("deal.titleLabel")}</Label>
             <Input
               id="dealTitle"
@@ -87,17 +102,33 @@ export function DealEditSheet({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>{t("deal.deliverables")}</Label>
-            <RichTextEditor
-              value={deliverables}
-              onChange={setDeliverables}
-              placeholder={t("deal.deliverablesPlaceholder")}
+          {/* Description */}
+          <div className="space-y-1.5">
+            <Label htmlFor="description">{t("collab.form.description")}</Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t("collab.form.descriptionPlaceholder")}
+              className="min-h-20"
             />
           </div>
 
+          {/* Deliverables */}
+          <div className="space-y-1.5">
+            <Label>{t("deal.deliverables")}</Label>
+            <DynamicListInput
+              items={deliverableItems}
+              onChange={setDeliverableItems}
+              placeholder={t("collab.form.deliverablePlaceholder")}
+              addLabel={t("collab.form.addDeliverable")}
+              hint={t("collab.form.deliverablesHint")}
+            />
+          </div>
+
+          {/* Budget + Timeline */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="budget">{t("deal.budget")}</Label>
               <Input
                 id="budget"
@@ -110,7 +141,7 @@ export function DealEditSheet({
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="timeline">{t("deal.timeline")}</Label>
               <Input
                 id="timeline"
@@ -121,13 +152,14 @@ export function DealEditSheet({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="notes">{t("deal.notes")}</Label>
+          {/* Notes */}
+          <div className="space-y-1.5">
+            <Label htmlFor="notes">{t("collab.form.message")}</Label>
             <Textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder={t("deal.notesPlaceholder")}
+              placeholder={t("collab.form.messagePlaceholder")}
               className="min-h-16"
             />
           </div>

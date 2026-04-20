@@ -12,6 +12,7 @@ import { dealStatusEnum } from "./enums";
 import { users } from "./users";
 import { collaborationRequests } from "./collaboration-requests";
 import { messageThreads } from "./message-threads";
+import { collaborations } from "./collaborations";
 
 export const deals = pgTable(
   "deals",
@@ -114,6 +115,10 @@ export const dealsRelations = relations(deals, ({ one, many }) => ({
   thread: one(messageThreads, {
     fields: [deals.threadId],
     references: [messageThreads.id],
+  }),
+  collaboration: one(collaborations, {
+    fields: [deals.id],
+    references: [collaborations.dealId],
   }),
 }));
 

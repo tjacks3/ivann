@@ -2,7 +2,7 @@
 
 import { getAuthUser } from "@/lib/auth/get-auth-user";
 import { db } from "@/db";
-import { users, collaborationRequests, packages, messageThreads, messageThreadMembers } from "@/db/schema";
+import { users, collaborationRequests, packages, deals, collaborations, messageThreads, messageThreadMembers } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { createAndEmail, createNotification } from "@/lib/notifications/create";
 import { collaborationRequestSchema } from "@/lib/validations/collaboration";
@@ -85,6 +85,8 @@ export interface CollabWithDetails {
   creatorUsername: string | null;
   creatorAvatar: string | null;
   packageTitle: string | null;
+  dealId: string | null;
+  collaborationWorkspaceId: string | null;
 }
 
 export async function getMyCollaborations(): Promise<CollabWithDetails[]> {
@@ -159,10 +161,44 @@ export async function getMyCollaborations(): Promise<CollabWithDetails[]> {
 
   const pkgMap = new Map(relatedPackages.map((p) => [p.id, p]));
 
-  return collabs.map((c) => {
+  // Fetch linked deals and collaboration workspaces for accepted requests
+  const collabIds = collabs.map((c) => c.id);
+  const linkedDeals = await db
+    .select({
+      id: deals.id,
+      collabRequestId: deals.collabRequestId,
+    })
+    .from(deals);
+  const dealByCollabReqId = new Map(
+    linkedDeals
+      .filter((d) => d.collabRequestId && collabIds.includes(d.collabRequestId))
+      .map((d) => [d.collabRequestId!, d.id]),
+  );
+
+  const linkedWorkspaces = await db
+    .select({
+      id: collaborations.id,
+      dealId: collaborations.dealId,
+    })
+    .from(collaborations);
+  const workspaceByDealId = new Map(
+    linkedWorkspaces.map((w) => [w.dealId, w.id]),
+  );
+
+  return collabs
+    .filter((c) => {
+      // Exclude accepted collabs that already have a linked deal — they show as deals instead
+      const dealId = dealByCollabReqId.get(c.id);
+      return !(c.status === "accepted" && dealId);
+    })
+    .map((c) => {
     const brand = userMap.get(c.brandId);
     const creator = userMap.get(c.creatorId);
     const pkg = c.packageId ? pkgMap.get(c.packageId) : null;
+    const dealId = dealByCollabReqId.get(c.id) ?? null;
+    const collaborationWorkspaceId = dealId
+      ? workspaceByDealId.get(dealId) ?? null
+      : null;
 
     return {
       id: c.id,
@@ -181,6 +217,8 @@ export async function getMyCollaborations(): Promise<CollabWithDetails[]> {
       creatorUsername: creator?.username ?? null,
       creatorAvatar: creator?.avatarUrl ?? null,
       packageTitle: pkg?.title ?? null,
+      dealId,
+      collaborationWorkspaceId,
     };
   });
 }
@@ -230,6 +268,28 @@ export async function acceptCollaboration(id: string) {
     { threadId: thread.id, userId: user.id },
   ]);
 
+  // Auto-create a deal from the accepted collaboration request
+  const [deal] = await db
+    .insert(deals)
+    .values({
+      brandId: collab.brandId,
+      creatorId: user.id,
+      collabRequestId: collab.id,
+      threadId: thread.id,
+      title: collab.title,
+      deliverables: collab.message ?? null,
+      budget: collab.budget ?? null,
+      currency: collab.currency ?? "usd",
+      timeline: collab.deadline ?? null,
+      status: "accepted",
+    })
+    .returning();
+
+  // Auto-create collaboration workspace
+  import("@/app/(app)/collaboration-workspace/actions")
+    .then(({ createCollaboration }) => createCollaboration(deal.id))
+    .catch(() => {});
+
   // Notify brand
   const [brand] = await db
     .select({ id: users.id, email: users.email })
@@ -243,7 +303,7 @@ export async function acceptCollaboration(id: string) {
       type: "collab_update",
       title: `${user.fullName ?? "A creator"} accepted your request`,
       body: collab.title,
-      actionUrl: "/deals",
+      actionUrl: `/deals/${deal.id}`,
       referenceId: collab.id,
       referenceType: "collab_request",
       email: brand.email,
@@ -307,4 +367,98 @@ export async function declineCollaboration(id: string, reason?: string) {
   }
 
   return { success: true as const };
+}
+
+// ─── Launch Collaboration Workspace (for accepted requests with no deal) ───
+
+export async function launchCollaborationWorkspace(collabRequestId: string) {
+  const user = await getUser();
+  if (!user) return { success: false as const, error: "UNAUTHORIZED" };
+
+  const [collab] = await db
+    .select()
+    .from(collaborationRequests)
+    .where(
+      and(
+        eq(collaborationRequests.id, collabRequestId),
+        eq(collaborationRequests.status, "accepted"),
+      ),
+    )
+    .limit(1);
+
+  if (!collab) return { success: false as const, error: "NOT_FOUND" };
+  if (collab.brandId !== user.id && collab.creatorId !== user.id) {
+    return { success: false as const, error: "UNAUTHORIZED" };
+  }
+
+  // Check if a deal already exists for this request
+  const [existingDeal] = await db
+    .select({ id: deals.id })
+    .from(deals)
+    .where(eq(deals.collabRequestId, collabRequestId))
+    .limit(1);
+
+  let dealId = existingDeal?.id;
+
+  if (!dealId) {
+    // Find existing message thread for this collab request
+    const [existingThread] = await db
+      .select({ id: messageThreads.id })
+      .from(messageThreads)
+      .where(eq(messageThreads.collabRequestId, collabRequestId))
+      .limit(1);
+
+    let threadId = existingThread?.id;
+
+    // Create thread if it doesn't exist
+    if (!threadId) {
+      const [thread] = await db
+        .insert(messageThreads)
+        .values({
+          collabRequestId: collab.id,
+          subject: collab.title,
+          lastMessageAt: new Date(),
+        })
+        .returning();
+
+      await db.insert(messageThreadMembers).values([
+        { threadId: thread.id, userId: collab.brandId },
+        { threadId: thread.id, userId: collab.creatorId },
+      ]);
+
+      threadId = thread.id;
+    }
+
+    // Create deal from accepted collab request
+    const [deal] = await db
+      .insert(deals)
+      .values({
+        brandId: collab.brandId,
+        creatorId: collab.creatorId,
+        collabRequestId: collab.id,
+        threadId,
+        title: collab.title,
+        deliverables: collab.message ?? null,
+        budget: collab.budget ?? null,
+        currency: collab.currency ?? "usd",
+        timeline: collab.deadline ?? null,
+        status: "accepted",
+      })
+      .returning();
+
+    dealId = deal.id;
+  }
+
+  // Create workspace if it doesn't exist
+  const { createCollaboration } = await import(
+    "@/app/(app)/collaboration-workspace/actions"
+  );
+  const result = await createCollaboration(dealId);
+
+  if (!result.success) return result;
+
+  return {
+    success: true as const,
+    collaborationWorkspaceId: result.collaborationId,
+  };
 }

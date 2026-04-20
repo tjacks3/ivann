@@ -11,8 +11,10 @@ import { LoadingState } from "@/components/shared/loading-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { DealStatusBadge } from "@/components/deals/deal-status-badge";
 import { PaymentSummaryCard } from "@/components/deals/payment-summary-card";
+import { RequestCard } from "@/components/collaborations/request-card";
 import { useBrandProfile } from "@/hooks/use-brand-profile";
 import { useMyDeals } from "@/hooks/use-deals";
+import { useCollaborations } from "@/hooks/use-collaborations";
 import { useTranslation } from "@/i18n";
 import { formatPrice } from "@/lib/currency";
 import { getPaymentSummary, type PaymentSummary } from "@/app/(app)/deals/payment-actions";
@@ -22,6 +24,7 @@ export default function BrandDashboardPage() {
   const { t } = useTranslation();
   const { profile, isLoading } = useBrandProfile();
   const { deals, isLoading: dealsLoading } = useMyDeals();
+  const { collaborations, isLoading: collabsLoading, refetch: refetchCollabs } = useCollaborations();
   const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
 
   useEffect(() => {
@@ -133,29 +136,23 @@ export default function BrandDashboardPage() {
       </div>
 
       {/* Payment Summary */}
-      {paymentSummary && (paymentSummary.totalReleased > 0 || paymentSummary.totalFunded > 0 || paymentSummary.recentTransactions.length > 0) && (
-        <div className="mt-8">
-          <PaymentSummaryCard summary={paymentSummary} isBrand />
-        </div>
-      )}
+      <div className="mt-8">
+        <PaymentSummaryCard
+          summary={paymentSummary ?? { totalReleased: 0, totalFunded: 0, currency: "usd", recentTransactions: [] }}
+          isBrand
+        />
+      </div>
 
-      {/* Deals */}
+      {/* Collaborations & Deals */}
       <div className="mt-12">
         <SectionHeader
           title={t("deal.dashboardTitle")}
           as="h2"
-          action={
-            deals.length > 0 && (
-              <span className="text-sm text-muted-foreground">
-                {deals.length} {t("deal.totalCount")}
-              </span>
-            )
-          }
         />
         <div className="mt-4">
-          {dealsLoading ? (
+          {(dealsLoading || collabsLoading) ? (
             <LoadingState variant="skeleton" count={3} />
-          ) : deals.length === 0 ? (
+          ) : (deals.length === 0 && collaborations.length === 0) ? (
             <EmptyState
               icon={<Handshake className="size-6" />}
               title={t("deal.emptyBrandTitle")}
@@ -168,8 +165,16 @@ export default function BrandDashboardPage() {
             />
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {collaborations.map((collab) => (
+                <RequestCard
+                  key={`collab-${collab.id}`}
+                  collab={collab}
+                  viewAs="brand"
+                  onUpdated={refetchCollabs}
+                />
+              ))}
               {deals.map((deal) => (
-                <Link key={deal.id} href={`/deals/${deal.id}`}>
+                <Link key={`deal-${deal.id}`} href={`/deals/${deal.id}`}>
                   <Card className="transition-all hover:shadow-md hover:scale-[1.01]">
                     <CardContent className="space-y-2 pt-4">
                       <div className="flex items-start justify-between gap-3">

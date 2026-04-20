@@ -28,6 +28,7 @@ import {
   getDealPayment,
   type DealPaymentInfo,
 } from "@/app/(app)/deals/payment-actions";
+import { getCollaborationByDealId } from "@/app/(app)/collaboration-workspace/actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "@/i18n";
 import {
@@ -38,6 +39,7 @@ import {
   ThumbsUp,
   XCircle,
   Loader2,
+  Rocket,
 } from "lucide-react";
 
 export default function DealWorkspacePage({
@@ -57,12 +59,14 @@ export default function DealWorkspacePage({
   const [statusLoading, setStatusLoading] = useState(false);
   const [revisions, setRevisions] = useState<RevisionItem[]>([]);
   const [payment, setPayment] = useState<DealPaymentInfo | null>(null);
+  const [collabId, setCollabId] = useState<string | null>(null);
 
-  // Load revisions + payment
+  // Load revisions + payment + collaboration link
   useEffect(() => {
     if (dealId) {
       getDealRevisions(dealId).then(setRevisions);
       getDealPayment(dealId).then(setPayment);
+      getCollaborationByDealId(dealId).then((c) => setCollabId(c?.id ?? null));
     }
   }, [dealId]);
 
@@ -96,7 +100,7 @@ export default function DealWorkspacePage({
   const isBrand = user?.role === "brand";
   const isCreator = user?.role === "creator";
   const isNegotiable = deal.status === "draft" || deal.status === "negotiating";
-  const showCancel = deal.status !== "completed" && deal.status !== "cancelled";
+  const showCancel = deal.status !== "completed" && deal.status !== "cancelled" && deal.status !== "delivered";
 
   const handleEditSave = async (data: {
     title: string;
@@ -149,6 +153,7 @@ export default function DealWorkspacePage({
       label: t("deal.action.accept"),
       status: "accepted",
       icon: <CheckCircle className="size-3.5" />,
+      variant: "default",
     });
   }
   if (isCreator && deal.status === "accepted") {
@@ -164,13 +169,15 @@ export default function DealWorkspacePage({
       label: t("deal.action.markDelivered"),
       status: "delivered",
       icon: <PackageCheck className="size-3.5" />,
+      variant: "default",
     });
   }
-  if (isBrand && deal.status === "delivered") {
+  if (isBrand && deal.status === "delivered" && payment?.status === "funded") {
     statusActions.push({
       label: t("deal.action.complete"),
       status: "completed",
       icon: <ThumbsUp className="size-3.5" />,
+      variant: "default",
     });
   }
 
@@ -203,8 +210,8 @@ export default function DealWorkspacePage({
         />
       </div>
 
-      {/* Status actions */}
-      {(statusActions.length > 0 || showCancel) && (
+      {/* Status actions (hidden when collaboration workspace manages transitions) */}
+      {!collabId && (statusActions.length > 0 || showCancel) && (
         <div className="mt-4 flex flex-wrap gap-2">
           {statusActions.map((action) => (
             <Button
@@ -235,6 +242,19 @@ export default function DealWorkspacePage({
               {t("deal.action.cancel")}
             </Button>
           )}
+        </div>
+      )}
+
+      {/* Collaboration workspace link */}
+      {collabId && (
+        <div className="mt-4">
+          <Link
+            href={`/collaboration-workspace/${collabId}`}
+            className={buttonVariants({ variant: "default" })}
+          >
+            <Rocket className="size-3.5" />
+            Go to Collaboration Workspace
+          </Link>
         </div>
       )}
 

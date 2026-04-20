@@ -26,8 +26,9 @@ export function ThreadList({ threads }: ThreadListProps) {
   return (
     <div className="divide-y">
       {threads.map((thread) => {
-        const initials = (thread.otherUserName || "?")
+        const initials = (thread.otherUserName || "")
           .split(" ")
+          .filter(Boolean)
           .map((n) => n[0])
           .join("")
           .toUpperCase()
@@ -40,15 +41,19 @@ export function ThreadList({ threads }: ThreadListProps) {
             className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/50 hover:text-foreground"
           >
             <div className="relative shrink-0">
-              <Avatar className="size-10">
-                {thread.otherUserAvatar && (
-                  <AvatarImage
-                    src={thread.otherUserAvatar}
-                    alt={thread.otherUserName || ""}
-                  />
-                )}
-                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-              </Avatar>
+              {(thread.otherUserAvatar || initials.length > 0) ? (
+                <Avatar className="size-10">
+                  {thread.otherUserAvatar ? (
+                    <AvatarImage
+                      src={thread.otherUserAvatar}
+                      alt={thread.otherUserName || ""}
+                    />
+                  ) : null}
+                  {initials.length > 0 && (
+                    <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                  )}
+                </Avatar>
+              ) : <div className="size-10" />}
               {thread.isUnread && (
                 <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-primary" />
               )}

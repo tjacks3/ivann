@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -13,16 +13,76 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { submitBrief } from "@/app/(app)/collaboration-workspace/actions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  submitBrief,
+  saveBriefDraft,
+} from "@/app/(app)/collaboration-workspace/actions";
 import {
   briefSchema,
   type BriefValues,
 } from "@/lib/validations/collaboration-workspace";
-import { Loader2, X } from "lucide-react";
+import { Loader2, X, Check, FileText } from "lucide-react";
+
+// ─── Brief Templates ──────────────────────────────────────────────────────
+
+const BRIEF_TEMPLATES: {
+  id: string;
+  label: string;
+  values: Partial<BriefValues>;
+}[] = [
+  {
+    id: "product_review",
+    label: "Product Review",
+    values: {
+      campaignGoal:
+        "Create an authentic product review showcasing the key features and benefits of the product. The content should feel genuine and highlight your honest experience.",
+      productOrService: "",
+    },
+  },
+  {
+    id: "brand_awareness",
+    label: "Brand Awareness",
+    values: {
+      campaignGoal:
+        "Increase brand awareness and reach by introducing the brand to your audience. Focus on the brand story, values, and what makes it unique.",
+      specialInstructions:
+        "Focus on storytelling and brand values rather than hard selling. Show how the brand fits naturally into your content style.",
+    },
+  },
+  {
+    id: "event_coverage",
+    label: "Event Coverage",
+    values: {
+      campaignGoal:
+        "Provide engaging coverage of the event, capturing key moments, the atmosphere, and highlighting the brand's presence. Create excitement and FOMO for your audience.",
+      location: "",
+      postingWindowStart: "",
+      postingWindowEnd: "",
+    },
+  },
+  {
+    id: "one_time_post",
+    label: "One-Time Post",
+    values: {
+      campaignGoal:
+        "Create a single, high-quality post featuring the product or service. The content should be visually appealing and align with your usual aesthetic.",
+    },
+  },
+];
+
+// ─── Component ────────────────────────────────────────────────────────────
 
 interface BrandBriefFormProps {
   collaborationId: string;
   existingBrief?: BriefValues | null;
+  existingDraft?: Partial<BriefValues> | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
@@ -31,31 +91,81 @@ interface BrandBriefFormProps {
 export function BrandBriefForm({
   collaborationId,
   existingBrief,
+  existingDraft,
   open,
   onOpenChange,
   onSuccess,
 }: BrandBriefFormProps) {
   const [saving, setSaving] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [draftSaved, setDraftSaved] = useState(false);
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Use draft data if no submitted brief exists
+  const initialValues = existingBrief ?? existingDraft ?? {};
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    watch,
+    reset,
+    setValue,
+    formState: { errors, isDirty },
   } = useForm<BriefValues>({
     resolver: zodResolver(briefSchema),
     defaultValues: {
-      campaignGoal: existingBrief?.campaignGoal ?? "",
-      productOrService: existingBrief?.productOrService ?? "",
-      requiredMentions: existingBrief?.requiredMentions ?? "",
-      tagsHashtags: existingBrief?.tagsHashtags ?? "",
-      location: existingBrief?.location ?? "",
-      postingWindowStart: existingBrief?.postingWindowStart ?? "",
-      postingWindowEnd: existingBrief?.postingWindowEnd ?? "",
-      specialInstructions: existingBrief?.specialInstructions ?? "",
-      restrictions: existingBrief?.restrictions ?? "",
+      campaignGoal: initialValues.campaignGoal ?? "",
+      productOrService: initialValues.productOrService ?? "",
+      requiredMentions: initialValues.requiredMentions ?? "",
+      tagsHashtags: initialValues.tagsHashtags ?? "",
+      location: initialValues.location ?? "",
+      postingWindowStart: initialValues.postingWindowStart ?? "",
+      postingWindowEnd: initialValues.postingWindowEnd ?? "",
+      specialInstructions: initialValues.specialInstructions ?? "",
+      restrictions: initialValues.restrictions ?? "",
     },
   });
+
+  const formValues = watch();
+
+  // Autosave draft every 5 seconds when form is dirty
+  const saveDraft = useCallback(async () => {
+    if (!existingBrief) {
+      // Only save drafts if brief hasn't been submitted yet
+      await saveBriefDraft(collaborationId, formValues);
+      setDraftSaved(true);
+      setTimeout(() => setDraftSaved(false), 2000);
+    }
+  }, [collaborationId, formValues, existingBrief]);
+
+  useEffect(() => {
+    if (!isDirty || !open) return;
+
+    if (draftTimerRef.current) {
+      clearTimeout(draftTimerRef.current);
+    }
+    draftTimerRef.current = setTimeout(() => {
+      saveDraft();
+    }, 5000);
+
+    return () => {
+      if (draftTimerRef.current) {
+        clearTimeout(draftTimerRef.current);
+      }
+    };
+  }, [formValues, isDirty, open, saveDraft]);
+
+  const handleTemplateSelect = (templateId: string) => {
+    const template = BRIEF_TEMPLATES.find((t) => t.id === templateId);
+    if (!template) return;
+
+    const entries = Object.entries(template.values) as [keyof BriefValues, string][];
+    for (const [key, value] of entries) {
+      if (value) {
+        setValue(key, value, { shouldDirty: true });
+      }
+    }
+  };
 
   const onSubmit = async (data: BriefValues) => {
     setSaving(true);
@@ -78,9 +188,17 @@ export function BrandBriefForm({
         showCloseButton={false}
       >
         <div className="flex h-14 shrink-0 items-center justify-between border-b px-4">
-          <SheetTitle className="text-base font-semibold">
-            Campaign Brief
-          </SheetTitle>
+          <div className="flex items-center gap-2">
+            <SheetTitle className="text-base font-semibold">
+              Campaign Brief
+            </SheetTitle>
+            {draftSaved && (
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Check className="size-3" />
+                Draft saved
+              </span>
+            )}
+          </div>
           <SheetClose>
             <X className="size-5" />
           </SheetClose>
@@ -88,6 +206,28 @@ export function BrandBriefForm({
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Template selector */}
+            {!existingBrief && (
+              <div className="space-y-1.5">
+                <Label className="flex items-center gap-1.5">
+                  <FileText className="size-3.5" />
+                  Start from a template
+                </Label>
+                <Select onValueChange={(val: string | null) => val && handleTemplateSelect(val)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a template (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BRIEF_TEMPLATES.map((template) => (
+                      <SelectItem key={template.id} value={template.id}>
+                        {template.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             {/* Campaign Goal */}
             <div className="space-y-1.5">
               <Label htmlFor="campaignGoal">Campaign Goal *</Label>

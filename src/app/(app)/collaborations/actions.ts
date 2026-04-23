@@ -2,7 +2,7 @@
 
 import { getAuthUser } from "@/lib/auth/get-auth-user";
 import { db } from "@/db";
-import { users, collaborationRequests, packages, deals, collaborations, messageThreads, messageThreadMembers } from "@/db/schema";
+import { users, collaborationRequests, packages, deals, collaborations, messageThreads, messageThreadMembers, messages } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { createAndEmail, createNotification } from "@/lib/notifications/create";
 import { collaborationRequestSchema } from "@/lib/validations/collaboration";
@@ -56,8 +56,8 @@ export async function createCollaborationRequest(data: CollaborationRequestValue
       userId: creator.id,
       type: "collab_request",
       title: `New collaboration request from ${user.fullName ?? "a brand"}`,
-      body: parsed.data.title,
-      actionUrl: "/deals",
+      body: `${user.fullName ?? "A brand"} wants to collaborate with you: "${parsed.data.title}". Review and accept or decline on your dashboard.`,
+      actionUrl: "/creator/dashboard",
       referenceId: created.id,
       referenceType: "collab_request",
       email: creator.email,
@@ -268,6 +268,24 @@ export async function acceptCollaboration(id: string) {
     { threadId: thread.id, userId: user.id },
   ]);
 
+  // Seed initial message from the brand's outreach
+  const brandName = await db
+    .select({ fullName: users.fullName, brandName: users.brandName })
+    .from(users)
+    .where(eq(users.id, collab.brandId))
+    .limit(1)
+    .then((rows) => rows[0]?.brandName ?? rows[0]?.fullName ?? "Brand");
+
+  const outreachBody = collab.message
+    ? collab.message
+    : `Hi! I'd like to collaborate with you on "${collab.title}".`;
+
+  await db.insert(messages).values({
+    threadId: thread.id,
+    senderId: collab.brandId,
+    body: outreachBody,
+  });
+
   // Auto-create a deal from the accepted collaboration request
   const [deal] = await db
     .insert(deals)
@@ -285,10 +303,11 @@ export async function acceptCollaboration(id: string) {
     })
     .returning();
 
-  // Auto-create collaboration workspace
-  import("@/app/(app)/collaboration-workspace/actions")
-    .then(({ createCollaboration }) => createCollaboration(deal.id))
-    .catch(() => {});
+  // Auto-create collaboration workspace (awaited so it exists before UI fetches)
+  const { createCollaboration } = await import(
+    "@/app/(app)/collaboration-workspace/actions"
+  );
+  const collabResult = await createCollaboration(deal.id);
 
   // Notify brand
   const [brand] = await db
@@ -297,13 +316,17 @@ export async function acceptCollaboration(id: string) {
     .where(eq(users.id, collab.brandId))
     .limit(1);
 
+  const workspaceUrl = collabResult.success && collabResult.collaborationId
+    ? `/collaboration-workspace/${collabResult.collaborationId}`
+    : `/deals/${deal.id}`;
+
   if (brand) {
     createAndEmail({
       userId: brand.id,
       type: "collab_update",
       title: `${user.fullName ?? "A creator"} accepted your request`,
       body: collab.title,
-      actionUrl: `/deals/${deal.id}`,
+      actionUrl: workspaceUrl,
       referenceId: collab.id,
       referenceType: "collab_request",
       email: brand.email,
@@ -311,7 +334,10 @@ export async function acceptCollaboration(id: string) {
     }).catch(() => {});
   }
 
-  return { success: true as const };
+  return {
+    success: true as const,
+    collaborationWorkspaceId: collabResult.success ? collabResult.collaborationId : null,
+  };
 }
 
 export async function declineCollaboration(id: string, reason?: string) {
@@ -425,6 +451,17 @@ export async function launchCollaborationWorkspace(collabRequestId: string) {
         { threadId: thread.id, userId: collab.brandId },
         { threadId: thread.id, userId: collab.creatorId },
       ]);
+
+      // Seed initial message from the brand's outreach
+      const outreachBody = collab.message
+        ? collab.message
+        : `Hi! I'd like to collaborate with you on "${collab.title}".`;
+
+      await db.insert(messages).values({
+        threadId: thread.id,
+        senderId: collab.brandId,
+        body: outreachBody,
+      });
 
       threadId = thread.id;
     }

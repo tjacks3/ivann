@@ -2,7 +2,6 @@
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { DeliverablesList } from "@/components/packages/deliverables-list";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
@@ -135,7 +134,7 @@ export function CollaborationSummary({
               </div>
               <div className="mt-2">
                 {collaboration.dealDeliverables ? (
-                  <DeliverablesList value={collaboration.dealDeliverables} />
+                  <p className="whitespace-pre-wrap text-sm text-foreground">{collaboration.dealDeliverables}</p>
                 ) : (
                   <p className="text-sm text-muted-foreground">{t("deal.notSpecified")}</p>
                 )}

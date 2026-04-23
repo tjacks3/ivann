@@ -2,21 +2,40 @@
 
 import { use, useState, useCallback } from "react";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import { PageContainer } from "@/components/shared/page-container";
 import { LoadingState } from "@/components/shared/loading-state";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { ProgressTracker } from "@/components/collaboration-workspace/progress-tracker";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CollaborationSummary } from "@/components/collaboration-workspace/collaboration-summary";
 import { NextStepCard } from "@/components/collaboration-workspace/next-step-card";
 import { BrandBriefForm } from "@/components/collaboration-workspace/brand-brief-form";
 import { BriefReview } from "@/components/collaboration-workspace/brief-review";
 import { DeliverableSubmission } from "@/components/collaboration-workspace/deliverable-submission";
 import { BrandReviewActions } from "@/components/collaboration-workspace/brand-review-actions";
-import { CollabMessages } from "@/components/collaboration-workspace/collab-messages";
+import {
+  ActivityLog,
+  CollabMessages,
+} from "@/components/collaboration-workspace/collab-messages";
+import { CollaborationPaymentCard } from "@/components/collaboration-workspace/collaboration-payment-card";
+
+import { WaitingOnBadge } from "@/components/collaboration-workspace/waiting-on-badge";
+import { StaleNudgeBanner } from "@/components/collaboration-workspace/stale-nudge-banner";
+import { CompletionActions } from "@/components/collaboration-workspace/completion-actions";
 import { useCollaborationWorkspace } from "@/hooks/use-collaboration-workspace";
 import { useUser } from "@/hooks/use-user";
+import {
+  getCollaborationPayment,
+  type CollabPaymentData,
+} from "@/app/(app)/collaboration-workspace/actions";
+import {
+  initFunding,
+  confirmFunding,
+} from "@/app/(app)/deals/payment-actions";
 import type { BriefValues } from "@/lib/validations/collaboration-workspace";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil, Rocket, Lock, PanelRight } from "lucide-react";
 
 export default function CollaborationWorkspacePage({
   params,
@@ -29,10 +48,19 @@ export default function CollaborationWorkspacePage({
     useCollaborationWorkspace(collaborationId);
 
   const [briefSheetOpen, setBriefSheetOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Fetch payment data
+  const { data: payment, refetch: refetchPayment } = useQuery({
+    queryKey: ["collaboration-payment", collaborationId],
+    queryFn: () => getCollaborationPayment(collaborationId),
+    staleTime: 30_000,
+  });
 
   const handleRefresh = useCallback(() => {
     refetch();
-  }, [refetch]);
+    refetchPayment();
+  }, [refetch, refetchPayment]);
 
   if (isLoading) {
     return <LoadingState variant="page" />;
@@ -61,6 +89,7 @@ export default function CollaborationWorkspacePage({
 
   const isBrand = user?.role === "brand";
   const isCreator = user?.role === "creator";
+  const userRole = isBrand ? "brand" : "creator";
   const currentUserId = isBrand
     ? collaboration.brandUserId
     : collaboration.creatorId;
@@ -77,20 +106,16 @@ export default function CollaborationWorkspacePage({
     collaboration.briefData;
 
   const showDeliverableSubmission =
-    isCreator &&
-    collaboration.state === "in_progress";
+    isCreator && collaboration.state === "in_progress";
 
   const showBrandReview =
-    isBrand &&
-    collaboration.state === "submitted";
+    isBrand && collaboration.state === "submitted";
 
-  // Read-only brief display for brand when waiting for creator confirmation
   const showBriefReadOnly =
     isBrand &&
     collaboration.state === "awaiting_creator_confirmation" &&
     collaboration.briefData;
 
-  // Read-only brief for in_progress / submitted / completed states
   const showBriefSummary =
     collaboration.briefData &&
     !canAddBrief &&
@@ -104,10 +129,33 @@ export default function CollaborationWorkspacePage({
     }
   };
 
+  const handleFundDeal = async () => {
+    if (!payment?.dealId) return;
+    const result = await initFunding(payment.dealId);
+    if (result.success) {
+      await confirmFunding(result.paymentId);
+      handleRefresh();
+    }
+  };
+
+  const handleActivityAction = (actionType: string) => {
+    if (actionType === "review_brief" || actionType === "update_brief") {
+      setBriefSheetOpen(true);
+    }
+  };
+
+  // Build secondary action for NextStepCard
+  const secondaryAction =
+    isBrand && payment?.status === "unpaid" && collaboration.state !== "completed"
+      ? { label: "Fund Deal", onClick: handleFundDeal }
+      : undefined;
+
   return (
     <PageContainer>
+      {/* ─── Top Section ─────────────────────────────────────────────── */}
+
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between">
         <Link
           href={dashboardHref}
           className={buttonVariants({ variant: "ghost", size: "sm" })}
@@ -115,105 +163,189 @@ export default function CollaborationWorkspacePage({
           <ArrowLeft className="size-3.5" />
           Back to Dashboard
         </Link>
+
+        {/* Mobile sidebar toggle */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="lg:hidden"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          <PanelRight className="size-3.5" />
+          Details
+        </Button>
       </div>
 
-      <h1 className="text-xl font-semibold">{collaboration.dealTitle}</h1>
-
-      {/* Progress Tracker */}
-      <div className="mt-4">
-        <ProgressTracker state={collaboration.state} />
-      </div>
-
-      {/* Summary Card */}
-      <div className="mt-4">
-        <CollaborationSummary collaboration={collaboration} />
+      {/* Title + WaitingOnBadge */}
+      <div className="flex items-center gap-3">
+        <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
+          <Rocket className="size-4 text-primary" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Collaboration Workspace
+          </p>
+          <h1 className="text-xl font-semibold">{collaboration.dealTitle}</h1>
+        </div>
+        <WaitingOnBadge state={collaboration.state} userRole={userRole} />
       </div>
 
       {/* Next Step Card */}
-      {collaboration.state !== "completed" && (
-        <div className="mt-4">
-          <NextStepCard
-            state={collaboration.state}
-            isBrand={!!isBrand}
-            onAction={handleNextStepAction}
-          />
-        </div>
-      )}
-
-      {/* Completed state */}
-      {collaboration.state === "completed" && (
-        <div className="mt-4">
-          <NextStepCard state="completed" isBrand={!!isBrand} />
-        </div>
-      )}
-
-      {/* Brand Brief Sheet */}
-      {canAddBrief && (
-        <BrandBriefForm
-          collaborationId={collaborationId}
-          existingBrief={collaboration.briefData as BriefValues | null}
-          open={briefSheetOpen}
-          onOpenChange={setBriefSheetOpen}
-          onSuccess={handleRefresh}
+      <div className="mt-3">
+        <NextStepCard
+          state={collaboration.state}
+          isBrand={!!isBrand}
+          onAction={handleNextStepAction}
+          secondaryAction={secondaryAction}
+          paymentStatus={payment?.status ?? null}
         />
-      )}
-
-      {/* Action sections */}
-      <div className="mt-6 space-y-4">
-        {/* Creator Brief Review */}
-        {showBriefReview && (
-          <BriefReview
-            collaborationId={collaborationId}
-            briefData={collaboration.briefData as BriefValues}
-            onSuccess={handleRefresh}
-          />
-        )}
-
-        {/* Brand read-only brief (waiting for creator) */}
-        {showBriefReadOnly && (
-          <BriefReadOnly briefData={collaboration.briefData as BriefValues} />
-        )}
-
-        {/* Brief summary for later stages */}
-        {showBriefSummary && (
-          <BriefReadOnly briefData={collaboration.briefData as BriefValues} />
-        )}
-
-        {/* Deliverable Submission */}
-        {showDeliverableSubmission && (
-          <DeliverableSubmission
-            collaborationId={collaborationId}
-            onSuccess={handleRefresh}
-          />
-        )}
-
-        {/* Brand Review */}
-        {showBrandReview && (
-          <BrandReviewActions
-            collaborationId={collaborationId}
-            submittedUrl={collaboration.submittedUrl}
-            submittedNote={collaboration.submittedNote}
-            onSuccess={handleRefresh}
-          />
-        )}
-
-        {/* Submitted deliverable read-only (for creator when waiting for review) */}
-        {isCreator && collaboration.state === "submitted" && collaboration.submittedUrl && (
-          <SubmittedReadOnly
-            url={collaboration.submittedUrl}
-            note={collaboration.submittedNote}
-          />
-        )}
       </div>
 
-      {/* Messages */}
-      <div className="mt-6">
-        <CollabMessages
-          collaborationId={collaborationId}
-          messages={messages}
-          currentUserId={currentUserId}
-          onMessageSent={refetch}
+      {/* Stale Nudge Banner */}
+      <div className="mt-3">
+        <StaleNudgeBanner
+          state={collaboration.state}
+          updatedAt={collaboration.updatedAt}
+          isBrand={!!isBrand}
         />
+      </div>
+
+      {/* ─── Main Content ────────────────────────────────────────────── */}
+
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
+        {/* Left column — primary operating surface */}
+        <div className="space-y-4">
+          {/* Collaboration Summary — parties, deliverables, budget */}
+          <CollaborationSummary collaboration={collaboration} />
+
+          {/* Brand Brief Sheet */}
+          {isBrand && collaboration.state !== "completed" && (
+            <BrandBriefForm
+              collaborationId={collaborationId}
+              existingBrief={collaboration.briefData as BriefValues | null}
+              existingDraft={collaboration.briefDraft}
+              open={briefSheetOpen}
+              onOpenChange={setBriefSheetOpen}
+              onSuccess={handleRefresh}
+            />
+          )}
+
+          {/* Creator Brief Review */}
+          {showBriefReview && (
+            <BriefReview
+              collaborationId={collaborationId}
+              briefData={collaboration.briefData as BriefValues}
+              onSuccess={handleRefresh}
+              paymentStatus={payment?.status ?? null}
+            />
+          )}
+
+          {/* Brand read-only brief (waiting for creator) */}
+          {showBriefReadOnly && (
+            <BriefReadOnly
+              briefData={collaboration.briefData as BriefValues}
+              onEdit={() => setBriefSheetOpen(true)}
+            />
+          )}
+
+          {/* Brief summary for later stages */}
+          {showBriefSummary && (
+            <BriefReadOnly
+              briefData={collaboration.briefData as BriefValues}
+              onEdit={
+                isBrand && collaboration.state !== "completed"
+                  ? () => setBriefSheetOpen(true)
+                  : undefined
+              }
+            />
+          )}
+
+          {/* Deliverable Submission */}
+          {showDeliverableSubmission && (
+            <DeliverableSubmission
+              collaborationId={collaborationId}
+              dueDate={collaboration.dueDate}
+              onSuccess={handleRefresh}
+            />
+          )}
+
+          {/* Brand Review */}
+          {showBrandReview && (
+            <BrandReviewActions
+              collaborationId={collaborationId}
+              submittedUrl={collaboration.submittedUrl}
+              submittedNote={collaboration.submittedNote}
+              onSuccess={handleRefresh}
+            />
+          )}
+
+          {/* Submitted deliverable read-only (for creator when waiting for review) */}
+          {isCreator &&
+            collaboration.state === "submitted" &&
+            collaboration.submittedUrl && (
+              <SubmittedReadOnly
+                url={collaboration.submittedUrl}
+                note={collaboration.submittedNote}
+              />
+            )}
+
+          {/* Completion Actions */}
+          {collaboration.state === "completed" && (
+            <CompletionActions
+              isBrand={!!isBrand}
+              creatorName={collaboration.creatorName}
+            />
+          )}
+
+          {/* Messages & Activity — tabbed layout */}
+          <Tabs defaultValue="messages" className="w-full">
+            <TabsList className="w-full">
+              <TabsTrigger value="messages" className="flex-1">
+                Messages
+              </TabsTrigger>
+              <TabsTrigger value="activity" className="flex-1">
+                Activity
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="messages" className="mt-3">
+              <CollabMessages
+                collaborationId={collaborationId}
+                messages={messages}
+                currentUserId={currentUserId}
+                onMessageSent={refetch}
+              />
+            </TabsContent>
+            <TabsContent value="activity" className="mt-3">
+              <ActivityLog
+                messages={messages}
+                onActionClick={handleActivityAction}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Right column — sidebar (desktop persistent, mobile collapsible) */}
+        <div className={`space-y-4 ${sidebarOpen ? "" : "hidden lg:block"}`}>
+          {/* Payment Card */}
+          <CollaborationPaymentCard
+            payment={payment ?? null}
+            dealBudget={collaboration.budgetAmount}
+            dealCurrency={collaboration.dealCurrency}
+            isBrand={!!isBrand}
+            collaborationState={collaboration.state}
+            onPaymentAction={handleRefresh}
+          />
+
+          {/* Trust messaging */}
+          <Card>
+            <CardContent className="flex items-center gap-2 p-4">
+              <Lock className="size-4 shrink-0 text-primary" />
+              <p className="text-xs text-muted-foreground">
+                Communication and payments are protected on-platform
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </PageContainer>
   );
@@ -221,7 +353,13 @@ export default function CollaborationWorkspacePage({
 
 // ─── Read-only brief display ───────────────────────────────────────────────
 
-function BriefReadOnly({ briefData }: { briefData: BriefValues }) {
+function BriefReadOnly({
+  briefData,
+  onEdit,
+}: {
+  briefData: BriefValues;
+  onEdit?: () => void;
+}) {
   const fields: { key: keyof BriefValues; label: string }[] = [
     { key: "campaignGoal", label: "Campaign Goal" },
     { key: "productOrService", label: "Product / Service" },
@@ -234,22 +372,35 @@ function BriefReadOnly({ briefData }: { briefData: BriefValues }) {
     { key: "restrictions", label: "Restrictions" },
   ];
 
+  const activeFields = fields.filter(({ key }) => briefData[key]);
+
   return (
-    <div className="rounded-xl border p-5">
-      <h3 className="mb-3 text-sm font-semibold">Campaign Brief</h3>
-      <div className="space-y-3">
-        {fields.map(({ key, label }) => {
-          const value = briefData[key];
-          if (!value) return null;
-          return (
-            <div key={key} className="rounded-lg border p-3">
-              <p className="text-xs font-medium uppercase text-muted-foreground">
-                {label}
-              </p>
-              <p className="mt-1 whitespace-pre-wrap text-sm">{value}</p>
-            </div>
-          );
-        })}
+    <div className="rounded-xl bg-muted/30 p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-sm font-semibold">Campaign Brief</h3>
+        {onEdit && (
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={onEdit}
+            className="cursor-pointer"
+          >
+            <Pencil className="size-3" />
+            Edit Brief
+          </Button>
+        )}
+      </div>
+      <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+        {activeFields.map(({ key, label }) => (
+          <div key={key} className="space-y-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {label}
+            </p>
+            <p className="whitespace-pre-wrap text-sm text-foreground">
+              {briefData[key]}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );

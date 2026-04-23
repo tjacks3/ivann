@@ -110,7 +110,7 @@ export function CreatorMatchCard({
             {displayCategories.map((cat) => (
               <span
                 key={cat}
-                className="rounded-full border border-primary bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                className="rounded-full border border-primary bg-white px-2 py-0.5 text-xs font-medium text-primary"
               >
                 {t(`onboarding.category.${cat}`)}
               </span>

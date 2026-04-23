@@ -44,8 +44,12 @@ export function RequestCard({ collab, viewAs, onUpdated }: RequestCardProps) {
 
   const handleAccept = async () => {
     setLoading(true);
-    await acceptCollaboration(collab.id);
-    onUpdated();
+    const result = await acceptCollaboration(collab.id);
+    if (result.success && result.collaborationWorkspaceId) {
+      router.push(`/collaboration-workspace/${result.collaborationWorkspaceId}`);
+    } else {
+      onUpdated();
+    }
   };
 
   const handleDecline = async () => {

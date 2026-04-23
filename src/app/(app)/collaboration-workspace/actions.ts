@@ -8,8 +8,9 @@ import {
   collaborations,
   collaborationMessages,
   collaborationStateHistory,
+  dealPayments,
 } from "@/db/schema";
-import { eq, asc, or } from "drizzle-orm";
+import { eq, asc, or, inArray } from "drizzle-orm";
 import { createAndEmail } from "@/lib/notifications/create";
 import {
   briefSchema,
@@ -99,11 +100,23 @@ async function transitionState(
     completed: "Completed",
   };
 
+  const STATE_ACTIONS: Record<string, { actionType: string; actionLabel: string }> = {
+    awaiting_creator_confirmation: { actionType: "review_brief", actionLabel: "Review Brief" },
+    revision_requested: { actionType: "update_brief", actionLabel: "Update Brief" },
+    in_progress: { actionType: "start_work", actionLabel: "View Workspace" },
+    submitted: { actionType: "review_deliverable", actionLabel: "Review Submission" },
+    completed: { actionType: "view_completion", actionLabel: "View Details" },
+  };
+
+  const action = STATE_ACTIONS[toState];
+
   await db.insert(collaborationMessages).values({
     collaborationId,
     senderId: null,
     body: STATE_LABELS[toState] ?? `Status changed to ${toState}`,
     isSystemEvent: true,
+    actionType: action?.actionType ?? null,
+    actionLabel: action?.actionLabel ?? null,
   });
 
   return { success: true as const, collab };
@@ -138,7 +151,7 @@ export async function createCollaboration(dealId: string) {
       dealId: deal.id,
       brandUserId: deal.brandId,
       creatorId: deal.creatorId,
-      deliverableType: deal.deliverables ?? null,
+      deliverableType: deal.deliverables?.slice(0, 100) ?? null,
       budgetAmount: deal.budget ?? null,
       dueDate: deal.timeline ? new Date(deal.timeline) : null,
     })
@@ -206,28 +219,39 @@ export async function submitBrief(
   if (collab.brandUserId !== user.id)
     return { success: false as const, error: "UNAUTHORIZED" };
 
-  // Allow brief submission from awaiting_brand_brief or revision_requested
-  if (
-    collab.state !== "awaiting_brand_brief" &&
-    collab.state !== "revision_requested"
-  ) {
+  // Cannot edit brief after completion
+  if (collab.state === "completed") {
     return { success: false as const, error: "INVALID_TRANSITION" };
   }
 
   await db
     .update(collaborations)
-    .set({ briefData: parsed.data, updatedAt: new Date() })
+    .set({ briefData: parsed.data, briefDraft: null, updatedAt: new Date() })
     .where(eq(collaborations.id, collaborationId));
 
-  const result = await transitionState(
-    collaborationId,
-    collab.state,
-    "awaiting_creator_confirmation",
-    user.id,
-    "Brand submitted campaign brief",
-  );
+  // Only transition state if in brief-submission states
+  if (
+    collab.state === "awaiting_brand_brief" ||
+    collab.state === "revision_requested"
+  ) {
+    const result = await transitionState(
+      collaborationId,
+      collab.state,
+      "awaiting_creator_confirmation",
+      user.id,
+      "Brand submitted campaign brief",
+    );
 
-  if (!result.success) return result;
+    if (!result.success) return result;
+  } else {
+    // Just log the edit as a system message
+    await db.insert(collaborationMessages).values({
+      collaborationId,
+      senderId: null,
+      body: "Brand updated the campaign brief",
+      isSystemEvent: true,
+    });
+  }
 
   // Notify creator
   const [creator] = await db
@@ -484,6 +508,16 @@ export async function approveDeliverable(collaborationId: string) {
   const { releasePayment } = await import("@/app/(app)/deals/payment-actions");
   releasePayment(collab.dealId).catch(() => {});
 
+  // Payment released system message
+  await db.insert(collaborationMessages).values({
+    collaborationId,
+    senderId: null,
+    body: "Payment has been released to the creator",
+    isSystemEvent: true,
+    actionType: "payment_released",
+    actionLabel: "View Payment",
+  });
+
   // Notify creator
   const [creator] = await db
     .select({ id: users.id, email: users.email })
@@ -628,6 +662,7 @@ export interface CollaborationData {
   dueDate: Date | null;
   budgetAmount: number | null;
   briefData: BriefValues | null;
+  briefDraft: Partial<BriefValues> | null;
   submittedUrl: string | null;
   submittedNote: string | null;
   approvedAt: Date | null;
@@ -696,6 +731,7 @@ export async function getCollaboration(
     dueDate: collab.dueDate,
     budgetAmount: collab.budgetAmount,
     briefData: collab.briefData as BriefValues | null,
+    briefDraft: collab.briefDraft as Partial<BriefValues> | null,
     submittedUrl: collab.submittedUrl,
     submittedNote: collab.submittedNote,
     approvedAt: collab.approvedAt,
@@ -725,6 +761,8 @@ export interface CollabMessageItem {
   senderAvatar: string | null;
   body: string;
   isSystemEvent: boolean;
+  actionType: string | null;
+  actionLabel: string | null;
   createdAt: Date;
 }
 
@@ -749,6 +787,8 @@ export async function getCollaborationMessages(
       senderId: collaborationMessages.senderId,
       body: collaborationMessages.body,
       isSystemEvent: collaborationMessages.isSystemEvent,
+      actionType: collaborationMessages.actionType,
+      actionLabel: collaborationMessages.actionLabel,
       createdAt: collaborationMessages.createdAt,
     })
     .from(collaborationMessages)
@@ -781,6 +821,8 @@ export async function getCollaborationMessages(
       senderAvatar: sender?.avatarUrl ?? null,
       body: m.body,
       isSystemEvent: m.isSystemEvent,
+      actionType: m.actionType ?? null,
+      actionLabel: m.actionLabel ?? null,
       createdAt: m.createdAt,
     };
   });
@@ -810,4 +852,162 @@ export async function getCollaborationByDealId(
     return null;
 
   return { id: collab.id, state: collab.state };
+}
+
+// ─── Get Collaboration Payment ────────────────────────────────────────────
+
+export interface CollabPaymentData {
+  dealId: string;
+  amountInCents: number;
+  currency: string;
+  status: string;
+  fundedAt: Date | null;
+  releasedAt: Date | null;
+  refundedAt: Date | null;
+}
+
+export async function getCollaborationPayment(
+  collaborationId: string,
+): Promise<CollabPaymentData | null> {
+  const user = await getUser();
+  if (!user) return null;
+
+  const [collab] = await db
+    .select({
+      dealId: collaborations.dealId,
+      brandUserId: collaborations.brandUserId,
+      creatorId: collaborations.creatorId,
+    })
+    .from(collaborations)
+    .where(eq(collaborations.id, collaborationId))
+    .limit(1);
+
+  if (!collab) return null;
+  if (collab.brandUserId !== user.id && collab.creatorId !== user.id)
+    return null;
+
+  const [payment] = await db
+    .select({
+      amountInCents: dealPayments.amountInCents,
+      currency: dealPayments.currency,
+      status: dealPayments.status,
+      fundedAt: dealPayments.fundedAt,
+      releasedAt: dealPayments.releasedAt,
+      refundedAt: dealPayments.refundedAt,
+    })
+    .from(dealPayments)
+    .where(eq(dealPayments.dealId, collab.dealId))
+    .limit(1);
+
+  if (!payment) return null;
+
+  return {
+    dealId: collab.dealId,
+    amountInCents: payment.amountInCents,
+    currency: payment.currency,
+    status: payment.status,
+    fundedAt: payment.fundedAt,
+    releasedAt: payment.releasedAt,
+    refundedAt: payment.refundedAt,
+  };
+}
+
+// ─── Save Brief Draft (Autosave) ──────────────────────────────────────────
+
+export async function saveBriefDraft(
+  collaborationId: string,
+  draftData: Partial<BriefValues>,
+) {
+  const user = await getUser();
+  if (!user) return { success: false as const, error: "UNAUTHORIZED" };
+
+  const [collab] = await db
+    .select({
+      brandUserId: collaborations.brandUserId,
+      state: collaborations.state,
+    })
+    .from(collaborations)
+    .where(eq(collaborations.id, collaborationId))
+    .limit(1);
+
+  if (!collab) return { success: false as const, error: "NOT_FOUND" };
+  if (collab.brandUserId !== user.id)
+    return { success: false as const, error: "UNAUTHORIZED" };
+
+  if (collab.state === "completed")
+    return { success: false as const, error: "INVALID_TRANSITION" };
+
+  await db
+    .update(collaborations)
+    .set({ briefDraft: draftData, updatedAt: new Date() })
+    .where(eq(collaborations.id, collaborationId));
+
+  return { success: true as const };
+}
+
+// ─── Get Collaboration State History ──────────────────────────────────────
+
+export interface StateHistoryItem {
+  id: string;
+  fromState: string | null;
+  toState: string;
+  changedByName: string | null;
+  note: string | null;
+  createdAt: Date;
+}
+
+export async function getCollaborationStateHistory(
+  collaborationId: string,
+): Promise<StateHistoryItem[]> {
+  const user = await getUser();
+  if (!user) return [];
+
+  const [collab] = await db
+    .select({
+      brandUserId: collaborations.brandUserId,
+      creatorId: collaborations.creatorId,
+    })
+    .from(collaborations)
+    .where(eq(collaborations.id, collaborationId))
+    .limit(1);
+
+  if (!collab) return [];
+  if (collab.brandUserId !== user.id && collab.creatorId !== user.id) return [];
+
+  const history = await db
+    .select({
+      id: collaborationStateHistory.id,
+      fromState: collaborationStateHistory.fromState,
+      toState: collaborationStateHistory.toState,
+      changedBy: collaborationStateHistory.changedBy,
+      note: collaborationStateHistory.note,
+      createdAt: collaborationStateHistory.createdAt,
+    })
+    .from(collaborationStateHistory)
+    .where(eq(collaborationStateHistory.collaborationId, collaborationId))
+    .orderBy(asc(collaborationStateHistory.createdAt));
+
+  if (history.length === 0) return [];
+
+  const changerIds = [...new Set(history.map((h) => h.changedBy).filter(Boolean))] as string[];
+  const changers =
+    changerIds.length > 0
+      ? await db
+          .select({ id: users.id, fullName: users.fullName, brandName: users.brandName })
+          .from(users)
+          .where(inArray(users.id, changerIds))
+      : [];
+  const changerMap = new Map(changers.map((c) => [c.id, c]));
+
+  return history.map((h) => {
+    const changer = h.changedBy ? changerMap.get(h.changedBy) : null;
+    return {
+      id: h.id,
+      fromState: h.fromState,
+      toState: h.toState,
+      changedByName: changer?.brandName ?? changer?.fullName ?? null,
+      note: h.note,
+      createdAt: h.createdAt,
+    };
+  });
 }

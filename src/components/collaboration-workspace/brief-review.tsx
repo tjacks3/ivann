@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import {
   confirmDeliverable,
   requestBriefChanges,
@@ -14,22 +16,25 @@ import {
   FileText,
   CheckCircle2,
   MessageSquare,
+  ShieldCheck,
+  AlertTriangle,
 } from "lucide-react";
 
 interface BriefReviewProps {
   collaborationId: string;
   briefData: BriefValues;
   onSuccess: () => void;
+  paymentStatus?: string | null;
 }
 
-const BRIEF_FIELDS: { key: keyof BriefValues; label: string }[] = [
-  { key: "campaignGoal", label: "Campaign Goal" },
-  { key: "productOrService", label: "Product / Service" },
+const BRIEF_FIELDS: { key: keyof BriefValues; label: string; highlight?: boolean }[] = [
+  { key: "campaignGoal", label: "Campaign Goal", highlight: true },
+  { key: "productOrService", label: "Product / Service", highlight: true },
   { key: "requiredMentions", label: "Required Mentions" },
   { key: "tagsHashtags", label: "Tags / Hashtags" },
   { key: "location", label: "Location" },
-  { key: "postingWindowStart", label: "Posting Window Start" },
-  { key: "postingWindowEnd", label: "Posting Window End" },
+  { key: "postingWindowStart", label: "Posting Window Start", highlight: true },
+  { key: "postingWindowEnd", label: "Posting Window End", highlight: true },
   { key: "specialInstructions", label: "Special Instructions" },
   { key: "restrictions", label: "Restrictions" },
 ];
@@ -38,10 +43,13 @@ export function BriefReview({
   collaborationId,
   briefData,
   onSuccess,
+  paymentStatus,
 }: BriefReviewProps) {
   const [saving, setSaving] = useState(false);
   const [showChangeRequest, setShowChangeRequest] = useState(false);
+  const [showConfirmNote, setShowConfirmNote] = useState(false);
   const [changeMessage, setChangeMessage] = useState("");
+  const [confirmNote, setConfirmNote] = useState("");
   const [serverError, setServerError] = useState("");
 
   const handleConfirm = async () => {
@@ -81,20 +89,81 @@ export function BriefReview({
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Brief fields */}
-        <div className="space-y-3">
-          {BRIEF_FIELDS.map(({ key, label }) => {
-            const value = briefData[key];
-            if (!value) return null;
-            return (
-              <div key={key} className="rounded-lg border p-3">
-                <p className="text-xs font-medium uppercase text-muted-foreground">
-                  {label}
-                </p>
-                <p className="mt-1 whitespace-pre-wrap text-sm">{value}</p>
-              </div>
-            );
-          })}
+        <div className="rounded-xl bg-muted/30 p-4">
+          <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+            {BRIEF_FIELDS.map(({ key, label, highlight }) => {
+              const value = briefData[key];
+              if (!value) return null;
+              return (
+                <div
+                  key={key}
+                  className={cn(
+                    "space-y-1 rounded-lg p-2",
+                    highlight && "bg-primary/5",
+                  )}
+                >
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    {label}
+                  </p>
+                  <p className="whitespace-pre-wrap text-sm text-foreground">
+                    {value}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </div>
+
+        {/* Payment status indicator */}
+        {paymentStatus && (
+          <div className="flex items-center gap-2">
+            {paymentStatus === "funded" ? (
+              <Badge variant="outline" className="border-primary/30 text-primary">
+                <ShieldCheck className="mr-1 size-3" />
+                Payment secured
+              </Badge>
+            ) : paymentStatus === "unpaid" ? (
+              <Badge variant="outline" className="border-amber-500/30 text-amber-600">
+                <AlertTriangle className="mr-1 size-3" />
+                Payment not yet funded
+              </Badge>
+            ) : null}
+          </div>
+        )}
+
+        {/* Confirm with optional note */}
+        {showConfirmNote && (
+          <div className="space-y-2 rounded-lg border border-dashed p-3">
+            <Textarea
+              value={confirmNote}
+              onChange={(e) => setConfirmNote(e.target.value)}
+              placeholder="Add a note for the brand (optional)..."
+              className="min-h-16"
+            />
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setShowConfirmNote(false);
+                  setConfirmNote("");
+                }}
+                className="cursor-pointer"
+              >
+                Skip Note
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleConfirm}
+                disabled={saving}
+                className="cursor-pointer"
+              >
+                {saving && <Loader2 className="size-3 animate-spin" />}
+                Confirm & Start
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Change request section */}
         {showChangeRequest && (
@@ -136,10 +205,10 @@ export function BriefReview({
         )}
 
         {/* Action buttons */}
-        {!showChangeRequest && (
+        {!showChangeRequest && !showConfirmNote && (
           <div className="flex gap-2">
             <Button
-              onClick={handleConfirm}
+              onClick={() => setShowConfirmNote(true)}
               disabled={saving}
               className="cursor-pointer"
             >

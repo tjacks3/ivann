@@ -13,15 +13,35 @@ import {
   deliverableSubmissionSchema,
   type DeliverableSubmissionValues,
 } from "@/lib/validations/collaboration-workspace";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, ExternalLink, Clock } from "lucide-react";
+
+function getDaysUntil(date: Date | null): string | null {
+  if (!date) return null;
+  const diff = new Date(date).getTime() - Date.now();
+  if (diff < 0) return "Overdue";
+  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  if (days === 0) return "Due today";
+  if (days === 1) return "Due tomorrow";
+  return `${days} days left`;
+}
+
+function getDomainFromUrl(url: string): string | null {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+}
 
 interface DeliverableSubmissionProps {
   collaborationId: string;
+  dueDate?: Date | null;
   onSuccess: () => void;
 }
 
 export function DeliverableSubmission({
   collaborationId,
+  dueDate,
   onSuccess,
 }: DeliverableSubmissionProps) {
   const [saving, setSaving] = useState(false);
@@ -30,6 +50,7 @@ export function DeliverableSubmission({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<DeliverableSubmissionValues>({
     resolver: zodResolver(deliverableSubmissionSchema),
@@ -38,6 +59,10 @@ export function DeliverableSubmission({
       note: "",
     },
   });
+
+  const contentUrl = watch("contentUrl");
+  const urlDomain = contentUrl ? getDomainFromUrl(contentUrl) : null;
+  const dueDateLabel = getDaysUntil(dueDate ?? null);
 
   const onSubmit = async (data: DeliverableSubmissionValues) => {
     setSaving(true);
@@ -54,10 +79,18 @@ export function DeliverableSubmission({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Upload className="size-4" />
-          Submit Deliverable
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Upload className="size-4" />
+            Submit Deliverable
+          </CardTitle>
+          {dueDateLabel && (
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="size-3" />
+              {dueDateLabel}
+            </span>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -73,6 +106,13 @@ export function DeliverableSubmission({
               <p className="text-xs text-destructive">
                 {errors.contentUrl.message}
               </p>
+            )}
+            {/* URL preview */}
+            {urlDomain && (
+              <div className="flex items-center gap-2 rounded-lg bg-muted/50 px-3 py-2">
+                <ExternalLink className="size-3.5 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">{urlDomain}</span>
+              </div>
             )}
           </div>
 

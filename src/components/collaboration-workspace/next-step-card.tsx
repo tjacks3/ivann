@@ -17,6 +17,8 @@ interface NextStepCardProps {
   state: string;
   isBrand: boolean;
   onAction?: () => void;
+  secondaryAction?: { label: string; onClick: () => void };
+  paymentStatus?: string | null;
 }
 
 interface StepConfig {
@@ -167,9 +169,20 @@ function getStepConfig(
   }
 }
 
-export function NextStepCard({ state, isBrand, onAction }: NextStepCardProps) {
+export function NextStepCard({
+  state,
+  isBrand,
+  onAction,
+  secondaryAction,
+  paymentStatus,
+}: NextStepCardProps) {
   const config = getStepConfig(state, isBrand);
   const Icon = config.icon;
+
+  const showPaymentWarning =
+    isBrand &&
+    paymentStatus === "unpaid" &&
+    (state === "in_progress" || state === "awaiting_creator_confirmation");
 
   return (
     <Card className={cn("border-l-4", config.borderColor)}>
@@ -187,12 +200,28 @@ export function NextStepCard({ state, isBrand, onAction }: NextStepCardProps) {
           <p className="mt-0.5 text-sm text-muted-foreground">
             {config.description}
           </p>
+          {showPaymentWarning && (
+            <p className="mt-1 text-xs text-amber-600">
+              Payment has not been funded yet. Fund the deal to secure payment for the creator.
+            </p>
+          )}
         </div>
-        {config.actionLabel && onAction && (
-          <Button onClick={onAction} className="shrink-0 cursor-pointer">
-            {config.actionLabel}
-          </Button>
-        )}
+        <div className="flex shrink-0 gap-2">
+          {secondaryAction && (
+            <Button
+              variant="outline"
+              onClick={secondaryAction.onClick}
+              className="cursor-pointer"
+            >
+              {secondaryAction.label}
+            </Button>
+          )}
+          {config.actionLabel && onAction && (
+            <Button onClick={onAction} className="cursor-pointer">
+              {config.actionLabel}
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

@@ -8,6 +8,8 @@ import {
   dealRevisions,
   messageThreads,
   messageThreadMembers,
+  messages,
+  collaborations,
 } from "@/db/schema";
 import { eq, or, desc, asc } from "drizzle-orm";
 import { createAndEmail } from "@/lib/notifications/create";
@@ -59,6 +61,17 @@ export async function createDeal(data: CreateDealValues) {
     { threadId: thread.id, userId: parsed.data.creatorId },
   ]);
 
+  // Seed initial message from the brand
+  const initialMessage = parsed.data.notes
+    ? parsed.data.notes
+    : `Hi! I'd like to propose a deal: "${parsed.data.title}".`;
+
+  await db.insert(messages).values({
+    threadId: thread.id,
+    senderId: user.id,
+    body: initialMessage,
+  });
+
   // Create the deal
   const [deal] = await db
     .insert(deals)
@@ -107,6 +120,7 @@ export interface DealWithParties {
   brandId: string;
   creatorId: string;
   threadId: string | null;
+  collabRequestId: string | null;
   title: string;
   deliverables: string | null;
   budget: number | null;
@@ -160,6 +174,7 @@ export async function getDeal(dealId: string): Promise<DealWithParties | null> {
     brandId: deal.brandId,
     creatorId: deal.creatorId,
     threadId: deal.threadId,
+    collabRequestId: deal.collabRequestId,
     title: deal.title,
     deliverables: deal.deliverables,
     budget: deal.budget,
@@ -191,6 +206,9 @@ export interface DealListItem {
   otherPartyName: string | null;
   otherPartyAvatar: string | null;
   otherPartyUsername: string | null;
+  collaborationId: string | null;
+  collaborationState: string | null;
+  collabRequestId: string | null;
 }
 
 export async function getMyDeals(): Promise<DealListItem[]> {
@@ -200,8 +218,22 @@ export async function getMyDeals(): Promise<DealListItem[]> {
   const isBrand = user.role === "brand";
 
   const allDeals = await db
-    .select()
+    .select({
+      id: deals.id,
+      title: deals.title,
+      status: deals.status,
+      budget: deals.budget,
+      currency: deals.currency,
+      timeline: deals.timeline,
+      updatedAt: deals.updatedAt,
+      brandId: deals.brandId,
+      creatorId: deals.creatorId,
+      collabRequestId: deals.collabRequestId,
+      collaborationId: collaborations.id,
+      collaborationState: collaborations.state,
+    })
     .from(deals)
+    .leftJoin(collaborations, eq(collaborations.dealId, deals.id))
     .where(
       isBrand
         ? eq(deals.brandId, user.id)
@@ -239,6 +271,9 @@ export async function getMyDeals(): Promise<DealListItem[]> {
         : other?.brandName ?? other?.fullName ?? null,
       otherPartyAvatar: other?.avatarUrl ?? null,
       otherPartyUsername: other?.username ?? null,
+      collaborationId: d.collaborationId ?? null,
+      collaborationState: d.collaborationState ?? null,
+      collabRequestId: d.collabRequestId ?? null,
     };
   });
 }
@@ -519,11 +554,12 @@ export async function updateDealStatus(dealId: string, newStatus: string) {
     refundPayment(dealId).catch(() => {});
   }
 
-  // Auto-create collaboration workspace on acceptance
+  // Auto-create collaboration workspace on acceptance (awaited to avoid race conditions)
   if (newStatus === "accepted") {
-    import("@/app/(app)/collaboration-workspace/actions")
-      .then(({ createCollaboration }) => createCollaboration(dealId))
-      .catch(() => {});
+    const { createCollaboration } = await import(
+      "@/app/(app)/collaboration-workspace/actions"
+    );
+    await createCollaboration(dealId);
   }
 
   // Notify the other party

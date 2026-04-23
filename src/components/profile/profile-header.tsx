@@ -67,7 +67,7 @@ export function ProfileHeader({
           {categories.map((category) => (
             <span
               key={category}
-              className="rounded-full border border-primary bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary"
+              className="rounded-full border border-primary bg-white px-3 py-1.5 text-sm font-medium text-primary"
             >
               {t(`onboarding.category.${category}`)}
             </span>

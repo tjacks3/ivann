@@ -38,7 +38,7 @@ export function CategorySelect({ selected, onChange, error }: CategorySelectProp
               className={cn(
                 "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
                 isSelected
-                  ? "border-primary bg-primary/10 text-primary"
+                  ? "border-primary bg-white text-primary"
                   : "border-input bg-background text-muted-foreground hover:border-primary/50 hover:text-foreground",
               )}
             >

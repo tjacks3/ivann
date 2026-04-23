@@ -1,7 +1,8 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PageContainer } from "@/components/shared/page-container";
 import { LoadingState } from "@/components/shared/loading-state";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,8 @@ export default function DealWorkspacePage({
   const { user } = useUser();
   const { deal, isLoading, refetch } = useDeal(dealId);
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const redirectedRef = useRef(false);
 
   const [editOpen, setEditOpen] = useState(false);
   const [counterOpen, setCounterOpen] = useState(false);
@@ -69,6 +72,14 @@ export default function DealWorkspacePage({
       getCollaborationByDealId(dealId).then((c) => setCollabId(c?.id ?? null));
     }
   }, [dealId]);
+
+  // Auto-redirect QuickCollab deals to collaboration workspace
+  useEffect(() => {
+    if (deal?.collabRequestId && collabId && !redirectedRef.current) {
+      redirectedRef.current = true;
+      router.replace(`/collaboration-workspace/${collabId}`);
+    }
+  }, [deal?.collabRequestId, collabId, router]);
 
   const refreshAll = () => {
     refetch();

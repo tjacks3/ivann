@@ -12,6 +12,7 @@ import { LoadingState } from "@/components/shared/loading-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ProfileStatusBadge } from "@/components/profile/profile-status-badge";
 import { DealStatusBadge } from "@/components/deals/deal-status-badge";
+import { WaitingOnBadge } from "@/components/collaboration-workspace/waiting-on-badge";
 import { RequestCard } from "@/components/collaborations/request-card";
 import { PaymentSummaryCard } from "@/components/deals/payment-summary-card";
 import { useCreatorProfile } from "@/hooks/use-creator-profile";
@@ -195,7 +196,14 @@ export default function CreatorDashboardPage() {
                 />
               ))}
               {deals.map((deal) => (
-                <Link key={`deal-${deal.id}`} href={`/deals/${deal.id}`}>
+                <Link
+                  key={`deal-${deal.id}`}
+                  href={
+                    deal.collaborationId
+                      ? `/collaboration-workspace/${deal.collaborationId}`
+                      : `/deals/${deal.id}`
+                  }
+                >
                   <Card className="transition-all hover:shadow-md hover:scale-[1.01]">
                     <CardContent className="space-y-2 pt-4">
                       <div className="flex items-start justify-between gap-3">
@@ -205,7 +213,15 @@ export default function CreatorDashboardPage() {
                             {deal.otherPartyName}
                           </p>
                         </div>
-                        <DealStatusBadge status={deal.status} />
+                        <div className="flex shrink-0 items-center gap-2">
+                          {deal.collaborationState && (
+                            <WaitingOnBadge
+                              state={deal.collaborationState}
+                              userRole="creator"
+                            />
+                          )}
+                          <DealStatusBadge status={deal.status} />
+                        </div>
                       </div>
                       <div className="flex items-center gap-3 text-sm text-muted-foreground">
                         {deal.budget && (

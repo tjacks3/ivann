@@ -37,6 +37,7 @@ export const collaborations = pgTable(
     dueDate: timestamp("due_date", { withTimezone: true }),
     budgetAmount: integer("budget_amount"),
     briefData: jsonb("brief_data"),
+    briefDraft: jsonb("brief_draft"),
     submittedUrl: text("submitted_url"),
     submittedNote: text("submitted_note"),
     approvedAt: timestamp("approved_at", { withTimezone: true }),
@@ -98,6 +99,8 @@ export const collaborationMessages = pgTable(
     }),
     body: text("body").notNull(),
     isSystemEvent: boolean("is_system_event").notNull().default(false),
+    actionType: varchar("action_type", { length: 50 }),
+    actionLabel: varchar("action_label", { length: 100 }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

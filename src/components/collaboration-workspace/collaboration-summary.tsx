@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
-import { DollarSign, Clock, FileText, Calendar } from "lucide-react";
+import { DollarSign, FileText, Calendar } from "lucide-react";
 import type { CollaborationData } from "@/app/(app)/collaboration-workspace/actions";
 
 function getInitials(name: string | null): string {
@@ -47,6 +47,20 @@ export function CollaborationSummary({
   return (
     <Card>
       <CardContent className="space-y-5 p-5">
+        {/* Title */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">{collaboration.dealTitle}</h2>
+          {/* State badge */}
+          <span
+            className={cn(
+              "rounded-full px-2.5 py-0.5 text-xs font-medium",
+              STATE_STYLES[collaboration.state] ?? STATE_STYLES.in_progress,
+            )}
+          >
+            {STATE_LABELS[collaboration.state] ?? collaboration.state}
+          </span>
+        </div>
+
         {/* Parties */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
@@ -100,15 +114,6 @@ export function CollaborationSummary({
             </div>
           </div>
 
-          {/* State badge */}
-          <span
-            className={cn(
-              "rounded-full px-2.5 py-0.5 text-xs font-medium",
-              STATE_STYLES[collaboration.state] ?? STATE_STYLES.in_progress,
-            )}
-          >
-            {STATE_LABELS[collaboration.state] ?? collaboration.state}
-          </span>
         </div>
 
         {/* Description */}
@@ -175,16 +180,6 @@ export function CollaborationSummary({
               </p>
             </div>
 
-            {/* Deal link */}
-            <div>
-              <div className="flex items-center gap-1.5 text-xs font-medium uppercase text-muted-foreground">
-                <Clock className="size-3" />
-                Deal
-              </div>
-              <p className="mt-1 text-sm font-medium">
-                {collaboration.dealTitle}
-              </p>
-            </div>
           </div>
         </div>
       </CardContent>

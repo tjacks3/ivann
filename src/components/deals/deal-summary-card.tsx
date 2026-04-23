@@ -23,6 +23,7 @@ interface DealSummaryCardProps {
   deal: DealWithParties;
   isBrand: boolean;
   isNegotiable: boolean;
+  hasRevisions?: boolean;
   onEdit: () => void;
   onCounter: () => void;
 }
@@ -31,6 +32,7 @@ export function DealSummaryCard({
   deal,
   isBrand,
   isNegotiable,
+  hasRevisions,
   onEdit,
   onCounter,
 }: DealSummaryCardProps) {
@@ -39,9 +41,14 @@ export function DealSummaryCard({
   return (
     <Card>
       <CardContent className="space-y-5 p-5">
-        {/* Parties */}
+        {/* Title + Status */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
+          <h2 className="text-lg font-semibold">{deal.title}</h2>
+          <DealStatusBadge status={deal.status} />
+        </div>
+
+        {/* Parties */}
+        <div className="flex items-center gap-6">
             {/* Brand */}
             <div className="flex items-center gap-2.5">
               <Avatar className="size-10">
@@ -78,9 +85,6 @@ export function DealSummaryCard({
                 )}
               </div>
             </div>
-          </div>
-
-          <DealStatusBadge status={deal.status} />
         </div>
 
         {/* Description */}
@@ -137,8 +141,8 @@ export function DealSummaryCard({
               </p>
             </div>
 
-            {/* Action button */}
-            {isNegotiable && (
+            {/* Action button — hidden when revisions exist (moves to revision timeline) */}
+            {isNegotiable && !hasRevisions && (
               <div className="flex items-end sm:justify-end">
                 {isBrand ? (
                   <Button

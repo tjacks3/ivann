@@ -207,15 +207,13 @@ export default function DealWorkspacePage({
         </Link>
       </div>
 
-      {/* Deal title */}
-      <h1 className="text-xl font-semibold">{deal.title}</h1>
-
       {/* Summary card */}
       <div className="mt-4">
         <DealSummaryCard
           deal={deal}
           isBrand={!!isBrand}
           isNegotiable={isNegotiable}
+          hasRevisions={revisions.length > 0}
           onEdit={() => setEditOpen(true)}
           onCounter={() => setCounterOpen(true)}
         />
@@ -284,7 +282,13 @@ export default function DealWorkspacePage({
       {/* Revision timeline */}
       {revisions.length > 0 && (
         <div className="mt-6">
-          <DealRevisionTimeline revisions={revisions} />
+          <DealRevisionTimeline
+            revisions={revisions}
+            isBrand={!!isBrand}
+            isNegotiable={isNegotiable}
+            onEdit={() => setEditOpen(true)}
+            onCounter={() => setCounterOpen(true)}
+          />
         </div>
       )}
 

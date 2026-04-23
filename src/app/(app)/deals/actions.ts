@@ -397,14 +397,10 @@ export async function submitCounterProposal(dealId: string, data: UpdateDealValu
     notes: parsed.data.notes ?? deal.notes,
   });
 
-  // Update deal with counter-proposal values
+  // Update deal status to negotiating (do NOT overwrite original proposal fields)
   await db
     .update(deals)
     .set({
-      deliverables: parsed.data.deliverables ?? deal.deliverables,
-      budget: parsed.data.budget ?? deal.budget,
-      timeline: parsed.data.timeline ?? deal.timeline,
-      notes: parsed.data.notes ?? deal.notes,
       status: "negotiating",
       updatedAt: new Date(),
     })

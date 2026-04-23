@@ -11,8 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { RichTextDisplay } from "@/components/ui/rich-text-display";
+import { DynamicListInput } from "@/components/ui/dynamic-list-input";
+import { DeliverablesList } from "@/components/packages/deliverables-list";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
 import { X, Loader2, DollarSign, Clock, FileText } from "lucide-react";
@@ -38,7 +38,16 @@ export function DealCounterSheet({
 }: DealCounterSheetProps) {
   const { t, locale } = useTranslation();
   const [saving, setSaving] = useState(false);
-  const [deliverables, setDeliverables] = useState(deal.deliverables ?? "");
+  const [deliverableItems, setDeliverableItems] = useState<string[]>(() => {
+    if (!deal.deliverables) return [];
+    try {
+      const parsed = JSON.parse(deal.deliverables);
+      if (Array.isArray(parsed)) return parsed.filter((s: unknown) => typeof s === "string" && (s as string).trim());
+    } catch {
+      return deal.deliverables.split("\n").map((s) => s.trim()).filter(Boolean);
+    }
+    return [];
+  });
   const [budgetDollars, setBudgetDollars] = useState(
     deal.budget ? (deal.budget / 100).toString() : "",
   );
@@ -51,7 +60,7 @@ export function DealCounterSheet({
       ? Math.round(parseFloat(budgetDollars) * 100)
       : undefined;
     await onSubmit({
-      deliverables,
+      deliverables: JSON.stringify(deliverableItems),
       budget: budgetCents,
       timeline,
       notes,
@@ -88,8 +97,12 @@ export function DealCounterSheet({
                   <FileText className="size-3" />
                   {t("deal.deliverables")}
                 </div>
-                <div className="mt-0.5">
-                  <RichTextDisplay content={deal.deliverables} fallback={t("deal.notSpecified")} />
+                <div className="mt-1">
+                  {deal.deliverables ? (
+                    <DeliverablesList value={deal.deliverables} />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">{t("deal.notSpecified")}</p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -121,10 +134,11 @@ export function DealCounterSheet({
 
             <div className="space-y-2">
               <Label>{t("deal.deliverables")}</Label>
-              <RichTextEditor
-                value={deliverables}
-                onChange={setDeliverables}
+              <DynamicListInput
+                items={deliverableItems}
+                onChange={setDeliverableItems}
                 placeholder={t("deal.counter.deliverablesPlaceholder")}
+                addLabel="Add"
               />
             </div>
 

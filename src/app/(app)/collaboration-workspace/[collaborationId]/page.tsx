@@ -181,12 +181,9 @@ export default function CollaborationWorkspacePage({
         <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
           <Rocket className="size-4 text-primary" />
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Collaboration Workspace
-          </p>
-          <h1 className="text-xl font-semibold">{collaboration.dealTitle}</h1>
-        </div>
+        <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+          Collaboration Workspace
+        </p>
         <WaitingOnBadge state={collaboration.state} userRole={userRole} />
       </div>
 

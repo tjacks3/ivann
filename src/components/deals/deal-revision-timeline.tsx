@@ -1,18 +1,29 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { DeliverablesList } from "@/components/packages/deliverables-list";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
-import { FileText, DollarSign, Clock } from "lucide-react";
+import { FileText, DollarSign, Clock, Pencil, ArrowLeftRight } from "lucide-react";
 import type { RevisionItem } from "@/app/(app)/deals/actions";
 
 interface DealRevisionTimelineProps {
   revisions: RevisionItem[];
+  isBrand?: boolean;
+  isNegotiable?: boolean;
+  onEdit?: () => void;
+  onCounter?: () => void;
 }
 
-export function DealRevisionTimeline({ revisions }: DealRevisionTimelineProps) {
+export function DealRevisionTimeline({
+  revisions,
+  isBrand,
+  isNegotiable,
+  onEdit,
+  onCounter,
+}: DealRevisionTimelineProps) {
   const { t, locale } = useTranslation();
 
   if (revisions.length === 0) return null;
@@ -63,14 +74,38 @@ export function DealRevisionTimeline({ revisions }: DealRevisionTimelineProps) {
                         {rev.authorName}
                       </span>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(rev.createdAt).toLocaleDateString(locale, {
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </span>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(rev.createdAt).toLocaleDateString(locale, {
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      {isLatest && isNegotiable && isBrand && onEdit && (
+                        <Button
+                          variant="outline"
+                          size="xs"
+                          onClick={onEdit}
+                          className="cursor-pointer"
+                        >
+                          <Pencil className="size-3" />
+                          {t("deal.editProposal")}
+                        </Button>
+                      )}
+                      {isLatest && isNegotiable && !isBrand && onCounter && (
+                        <Button
+                          variant="outline"
+                          size="xs"
+                          onClick={onCounter}
+                          className="cursor-pointer"
+                        >
+                          <ArrowLeftRight className="size-3" />
+                          {t("deal.counterProposal")}
+                        </Button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Changes */}

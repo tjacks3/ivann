@@ -38,8 +38,6 @@ export function Header({ variant = "marketing" }: HeaderProps) {
 
   const creatorLinks = [
     { href: "/creator/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
-    { href: "/creator/profile", label: t("nav.myProfile"), icon: User },
-    { href: "/deals", label: t("nav.deals"), icon: Handshake },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
   ];
 
@@ -47,7 +45,6 @@ export function Header({ variant = "marketing" }: HeaderProps) {
     { href: "/brand/dashboard", label: t("nav.brandDashboard"), icon: LayoutDashboard },
     { href: "/brand/quick-collab", label: t("nav.quickCollab"), icon: Zap },
     { href: "/discover", label: t("nav.discover"), icon: Compass },
-    { href: "/deals", label: t("nav.deals"), icon: Handshake },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
   ];
 

@@ -16,11 +16,9 @@ import {
   DollarSign,
   Clock,
   Lock,
+  Info,
 } from "lucide-react";
-import {
-  initFunding,
-  confirmFunding,
-} from "@/app/(app)/deals/payment-actions";
+import { initFunding, confirmFunding } from "@/app/(app)/deals/payment-actions";
 import type { CollabPaymentData } from "@/app/(app)/collaboration-workspace/actions";
 
 const STATUS_CONFIG: Record<
@@ -93,7 +91,10 @@ export function CollaborationPaymentCard({
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.unpaid;
 
   const showFundButton =
-    isBrand && status === "unpaid" && amount > 0 && collaborationState !== "completed";
+    isBrand &&
+    status === "unpaid" &&
+    amount > 0 &&
+    collaborationState !== "completed";
 
   const showPaymentWarning =
     status === "unpaid" &&
@@ -115,84 +116,90 @@ export function CollaborationPaymentCard({
   };
 
   return (
-    <Card>
-      <CardContent className="space-y-3 p-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Payment
-          </h3>
-          <Badge
-            variant="outline"
-            className={cn("text-xs", config.color)}
-          >
-            {config.label}
-          </Badge>
-        </div>
+    <div className="relative pb-12">
+      {/* Footer card — layered underneath */}
+      <div className="absolute inset-x-0 bottom-0 h-20 rounded-2xl bg-primary" />
 
-        {/* Amount */}
-        <div className={cn("flex items-center gap-3 rounded-lg p-3", config.bgColor)}>
-          <div className="flex size-8 items-center justify-center rounded-full bg-background">
-            {STATUS_ICONS[status]}
+      {/* Primary card — elevated above footer */}
+      <Card className="relative z-10 rounded-2xl ring-0 shadow-lg">
+        <CardContent className="space-y-1.5 p-5">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold">Payment</h3>
+            <Badge variant="outline" className={cn("text-xs", config.color)}>
+              {config.label}
+            </Badge>
           </div>
-          <div>
-            <p className={cn("text-lg font-bold", config.textColor)}>
-              {formatPrice(amount, currency, locale)}
-            </p>
-            <p className="text-xs text-muted-foreground">Deal value</p>
-          </div>
-        </div>
 
-        {/* Payment warning */}
-        {showPaymentWarning && isBrand && (
-          <p className="text-xs text-amber-600">
-            Fund the deal to secure payment for the creator before work begins.
-          </p>
-        )}
-        {showPaymentWarning && !isBrand && (
-          <p className="text-xs text-amber-600">
-            Payment has not been funded yet. Work will be protected once the brand secures payment.
-          </p>
-        )}
-
-        {/* Fund button */}
-        {showFundButton && (
-          <Button
-            onClick={handleFund}
-            disabled={funding}
-            className="w-full cursor-pointer"
-            size="sm"
-          >
-            {funding ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Shield className="size-3.5" />
-            )}
-            Fund Deal
-          </Button>
-        )}
-
-        {/* Trust messaging for creator */}
-        {!isBrand && status === "funded" && (
-          <div className="flex items-center gap-2 rounded-lg bg-primary/5 px-3 py-2">
-            <Lock className="size-3.5 text-primary" />
-            <p className="text-xs text-primary">
-              Payment is protected on-platform
+          {/* Amount */}
+          <div className="flex items-center justify-center gap-2 pt-8 pb-4">
+            <div className="flex size-11 items-center justify-center rounded-full bg-primary">
+              <DollarSign className="size-6 text-[#FFF]" />
+            </div>
+            <p className="text-3xl font-bold text-foreground">
+              {formatPrice(amount, currency, locale, false)}
             </p>
           </div>
-        )}
 
-        {/* Release info */}
-        {status === "released" && payment?.releasedAt && (
-          <p className="text-xs text-muted-foreground">
-            Released on{" "}
-            {new Date(payment.releasedAt).toLocaleDateString(locale, {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
-          </p>
-        )}
-      </CardContent>
-    </Card>
+          {/* Fund button */}
+          {showFundButton && (
+            <div className="flex justify-center">
+              <Button
+                onClick={handleFund}
+                disabled={funding}
+                className="cursor-pointer"
+              >
+                {funding ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Shield className="size-4" />
+                )}
+                Fund Deal
+              </Button>
+            </div>
+          )}
+
+          {/* Payment warning */}
+          {showPaymentWarning && isBrand && (
+            <div className="flex items-center gap-1.5 rounded-lg bg-muted px-3 py-2">
+              <Info className="size-3 shrink-0" />
+              <p className="text-[10px]">
+                Fund the deal to secure payment for the creator before work
+                begins.
+              </p>
+            </div>
+          )}
+          {showPaymentWarning && !isBrand && (
+            <div className="flex items-center gap-1.5 rounded-lg bg-muted px-3 py-2">
+              <Info className="size-3 shrink-0" />
+              <p className="text-[10px]">
+                Payment has not been funded yet. Work will be protected once the
+                brand secures payment.
+              </p>
+            </div>
+          )}
+
+          {/* Release info */}
+          {status === "released" && payment?.releasedAt && (
+            <p className="text-xs text-muted-foreground">
+              Released on{" "}
+              {new Date(payment.releasedAt).toLocaleDateString(locale, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Footer label — sits on the green footer card */}
+      <div className="absolute inset-x-0 bottom-0 z-20 flex h-12 items-center justify-center gap-1 px-4 py-3">
+        <Lock className="size-3.5 text-[#FFF]" />
+        <p className="text-[11px] font-medium tracking-wide text-[#FFF]">
+          Payments are protected on-platform
+        </p>
+      </div>
+    </div>
   );
 }

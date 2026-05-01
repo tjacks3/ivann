@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { DynamicListInput } from "@/components/ui/dynamic-list-input";
 import { useTranslation } from "@/i18n";
 import { X, Loader2 } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 import type { DealWithParties } from "@/app/(app)/deals/actions";
 
 function parseDeliverables(value: string | null): string[] {
@@ -79,7 +80,7 @@ export function DealEditSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="flex w-full flex-col overflow-hidden p-0 sm:max-w-md"
+        className="flex w-full flex-col overflow-hidden p-0 sm:max-w-lg"
         showCloseButton={false}
       >
         <div className="flex h-14 shrink-0 items-center justify-between border-b px-4">
@@ -91,9 +92,9 @@ export function DealEditSheet({
           </SheetClose>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Title */}
-          <div className="space-y-1.5">
+          <div className="space-y-2.5">
             <Label htmlFor="dealTitle">{t("deal.titleLabel")}</Label>
             <Input
               id="dealTitle"
@@ -103,7 +104,7 @@ export function DealEditSheet({
           </div>
 
           {/* Description */}
-          <div className="space-y-1.5">
+          <div className="space-y-2.5">
             <Label htmlFor="description">{t("collab.form.description")}</Label>
             <Textarea
               id="description"
@@ -115,7 +116,7 @@ export function DealEditSheet({
           </div>
 
           {/* Deliverables */}
-          <div className="space-y-1.5">
+          <div className="space-y-2.5">
             <Label>{t("deal.deliverables")}</Label>
             <DynamicListInput
               items={deliverableItems}
@@ -126,34 +127,32 @@ export function DealEditSheet({
             />
           </div>
 
-          {/* Budget + Timeline */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="budget">{t("deal.budget")}</Label>
-              <Input
-                id="budget"
-                type="number"
-                min={0}
-                step={0.01}
-                value={budgetDollars}
-                onChange={(e) => setBudgetDollars(e.target.value)}
-                placeholder="0.00"
-              />
-            </div>
+          {/* Budget */}
+          <div className="space-y-2.5">
+            <Label htmlFor="budget">{t("deal.budget")}</Label>
+            <Input
+              id="budget"
+              type="number"
+              min={0}
+              step={0.01}
+              value={budgetDollars}
+              onChange={(e) => setBudgetDollars(e.target.value)}
+              placeholder="0.00"
+            />
+          </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="timeline">{t("deal.timeline")}</Label>
-              <Input
-                id="timeline"
-                value={timeline}
-                onChange={(e) => setTimeline(e.target.value)}
-                placeholder={t("deal.timelinePlaceholder")}
-              />
-            </div>
+          {/* Timeline */}
+          <div className="space-y-2.5">
+            <Label>{t("deal.timeline")}</Label>
+            <DatePicker
+              value={timeline}
+              onChange={(val) => setTimeline(val)}
+              placeholder={t("deal.timelinePlaceholder")}
+            />
           </div>
 
           {/* Notes */}
-          <div className="space-y-1.5">
+          <div className="space-y-2.5">
             <Label htmlFor="notes">{t("collab.form.message")}</Label>
             <Textarea
               id="notes"
@@ -165,7 +164,7 @@ export function DealEditSheet({
           </div>
         </div>
 
-        <div className="shrink-0 border-t p-4">
+        <div className="shrink-0 border-t p-6">
           <Button
             className="w-full cursor-pointer"
             onClick={handleSave}

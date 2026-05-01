@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CollabStatusBadge } from "./status-badge";
-import { Calendar, DollarSign, Package, Loader2, ChevronDown, ChevronUp, Rocket } from "lucide-react";
+import { Loader2, ChevronDown, ChevronUp, Rocket, Info } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import {
   acceptCollaboration,
@@ -70,35 +70,31 @@ export function RequestCard({ collab, viewAs, onUpdated }: RequestCardProps) {
             </Avatar>
             <div className="min-w-0">
               <p className="font-semibold truncate">{collab.title}</p>
-              <p className="text-sm text-muted-foreground truncate">
-                {viewAs === "creator"
-                  ? t("collab.from", { name: otherName || "" })
-                  : t("collab.to", { name: otherName || "" })}
-              </p>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                {collab.budget != null && (
+                  <span>
+                    <span className="font-medium text-foreground">Budget:</span>{" "}
+                    {formatPrice(collab.budget, collab.currency, locale)}
+                  </span>
+                )}
+                {collab.deadline && (
+                  <span>
+                    <span className="font-medium text-foreground">Timeline:</span>{" "}
+                    {new Date(collab.deadline).toLocaleDateString(locale, {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </span>
+                )}
+                {collab.packageTitle && (
+                  <span>{collab.packageTitle}</span>
+                )}
+              </div>
             </div>
           </div>
-          <CollabStatusBadge status={collab.status} />
-        </div>
-
-        {/* Meta */}
-        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-          {collab.budget != null && (
-            <span className="flex items-center gap-1">
-              <DollarSign className="size-3.5" />
-              {formatPrice(collab.budget, collab.currency, locale)}
-            </span>
-          )}
-          {collab.deadline && (
-            <span className="flex items-center gap-1">
-              <Calendar className="size-3.5" />
-              {new Date(collab.deadline).toLocaleDateString(locale)}
-            </span>
-          )}
-          {collab.packageTitle && (
-            <span className="flex items-center gap-1">
-              <Package className="size-3.5" />
-              {collab.packageTitle}
-            </span>
+          {!(viewAs === "brand" && collab.status === "pending") && (
+            <CollabStatusBadge status={collab.status} />
           )}
         </div>
 
@@ -108,7 +104,7 @@ export function RequestCard({ collab, viewAs, onUpdated }: RequestCardProps) {
             <button
               type="button"
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+              className="flex cursor-pointer items-center gap-1 text-xs font-medium text-primary hover:underline"
             >
               {expanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
               {expanded ? t("collab.hideMessage") : t("collab.viewMessage")}
@@ -199,24 +195,30 @@ export function RequestCard({ collab, viewAs, onUpdated }: RequestCardProps) {
                 </div>
               </div>
             ) : (
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  disabled={loading}
-                  onClick={handleAccept}
-                  className="flex-1"
-                >
-                  {loading && <Loader2 className="size-3 animate-spin" />}
-                  {t("collab.accept")}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setDeclining(true)}
-                  className="flex-1"
-                >
-                  {t("collab.decline")}
-                </Button>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    disabled={loading}
+                    onClick={handleAccept}
+                    className="flex-1 cursor-pointer"
+                  >
+                    {loading && <Loader2 className="size-3 animate-spin" />}
+                    {t("collab.accept")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setDeclining(true)}
+                    className="flex-1 cursor-pointer"
+                  >
+                    {t("collab.decline")}
+                  </Button>
+                </div>
+                <p className="mt-4 flex items-start gap-1.5 text-xs text-muted-foreground">
+                  <Info className="mt-0.5 size-3.5 shrink-0" />
+                  If you are interested you'll enter the collaboration workspace to review details and confirm before finalizing.
+                </p>
               </div>
             )}
           </div>

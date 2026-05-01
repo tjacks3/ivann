@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useCallback } from "react";
+import { use, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { PageContainer } from "@/components/shared/page-container";
@@ -30,10 +30,7 @@ import {
   getCollaborationPayment,
   type CollabPaymentData,
 } from "@/app/(app)/collaboration-workspace/actions";
-import {
-  initFunding,
-  confirmFunding,
-} from "@/app/(app)/deals/payment-actions";
+import { initFunding, confirmFunding } from "@/app/(app)/deals/payment-actions";
 import type { BriefValues } from "@/lib/validations/collaboration-workspace";
 import { ArrowLeft, Pencil, Rocket, Lock, PanelRight } from "lucide-react";
 
@@ -44,11 +41,16 @@ export default function CollaborationWorkspacePage({
 }) {
   const { collaborationId } = use(params);
   const { user } = useUser();
-  const { collaboration, messages, isLoading, refetch } =
-    useCollaborationWorkspace(collaborationId);
 
   const [briefSheetOpen, setBriefSheetOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
+
+  const isMessagesActive = activeTab === "messages";
+
+  const { collaboration, messages, isLoading, refetch } =
+    useCollaborationWorkspace(collaborationId, { isMessagesActive });
 
   // Fetch payment data
   const { data: payment, refetch: refetchPayment } = useQuery({
@@ -108,8 +110,7 @@ export default function CollaborationWorkspacePage({
   const showDeliverableSubmission =
     isCreator && collaboration.state === "in_progress";
 
-  const showBrandReview =
-    isBrand && collaboration.state === "submitted";
+  const showBrandReview = isBrand && collaboration.state === "submitted";
 
   const showBriefReadOnly =
     isBrand &&
@@ -123,9 +124,22 @@ export default function CollaborationWorkspacePage({
     !showBriefReadOnly &&
     ["in_progress", "submitted", "completed"].includes(collaboration.state);
 
+  const scrollToTab = (tab: string) => {
+    setActiveTab(tab);
+    setTimeout(() => {
+      tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  };
+
   const handleNextStepAction = () => {
     if (canAddBrief) {
       setBriefSheetOpen(true);
+    } else if (showBriefReview) {
+      scrollToTab("brief");
+    } else if (showDeliverableSubmission) {
+      scrollToTab("details");
+    } else if (showBrandReview) {
+      scrollToTab("details");
     }
   };
 
@@ -139,14 +153,23 @@ export default function CollaborationWorkspacePage({
   };
 
   const handleActivityAction = (actionType: string) => {
-    if (actionType === "review_brief" || actionType === "update_brief") {
+    if (actionType === "update_brief") {
       setBriefSheetOpen(true);
+    } else if (actionType === "review_brief") {
+      scrollToTab("brief");
+    } else if (
+      actionType === "review_deliverable" ||
+      actionType === "start_work"
+    ) {
+      scrollToTab("details");
     }
   };
 
   // Build secondary action for NextStepCard
   const secondaryAction =
-    isBrand && payment?.status === "unpaid" && collaboration.state !== "completed"
+    isBrand &&
+    payment?.status === "unpaid" &&
+    collaboration.state !== "completed"
       ? { label: "Fund Deal", onClick: handleFundDeal }
       : undefined;
 
@@ -212,10 +235,10 @@ export default function CollaborationWorkspacePage({
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
         {/* Left column — primary operating surface */}
         <div className="space-y-4">
-          {/* Collaboration Summary — parties, deliverables, budget */}
+          {/* Collaboration Summary — parties, budget, timeline */}
           <CollaborationSummary collaboration={collaboration} />
 
-          {/* Brand Brief Sheet */}
+          {/* Brand Brief Sheet (modal) */}
           {isBrand && collaboration.state !== "completed" && (
             <BrandBriefForm
               collaborationId={collaborationId}
@@ -227,65 +250,6 @@ export default function CollaborationWorkspacePage({
             />
           )}
 
-          {/* Creator Brief Review */}
-          {showBriefReview && (
-            <BriefReview
-              collaborationId={collaborationId}
-              briefData={collaboration.briefData as BriefValues}
-              onSuccess={handleRefresh}
-              paymentStatus={payment?.status ?? null}
-            />
-          )}
-
-          {/* Brand read-only brief (waiting for creator) */}
-          {showBriefReadOnly && (
-            <BriefReadOnly
-              briefData={collaboration.briefData as BriefValues}
-              onEdit={() => setBriefSheetOpen(true)}
-            />
-          )}
-
-          {/* Brief summary for later stages */}
-          {showBriefSummary && (
-            <BriefReadOnly
-              briefData={collaboration.briefData as BriefValues}
-              onEdit={
-                isBrand && collaboration.state !== "completed"
-                  ? () => setBriefSheetOpen(true)
-                  : undefined
-              }
-            />
-          )}
-
-          {/* Deliverable Submission */}
-          {showDeliverableSubmission && (
-            <DeliverableSubmission
-              collaborationId={collaborationId}
-              dueDate={collaboration.dueDate}
-              onSuccess={handleRefresh}
-            />
-          )}
-
-          {/* Brand Review */}
-          {showBrandReview && (
-            <BrandReviewActions
-              collaborationId={collaborationId}
-              submittedUrl={collaboration.submittedUrl}
-              submittedNote={collaboration.submittedNote}
-              onSuccess={handleRefresh}
-            />
-          )}
-
-          {/* Submitted deliverable read-only (for creator when waiting for review) */}
-          {isCreator &&
-            collaboration.state === "submitted" &&
-            collaboration.submittedUrl && (
-              <SubmittedReadOnly
-                url={collaboration.submittedUrl}
-                note={collaboration.submittedNote}
-              />
-            )}
-
           {/* Completion Actions */}
           {collaboration.state === "completed" && (
             <CompletionActions
@@ -294,28 +258,136 @@ export default function CollaborationWorkspacePage({
             />
           )}
 
-          {/* Messages & Activity — tabbed layout */}
-          <Tabs defaultValue="messages" className="w-full">
+          {/* Tabbed content: Campaign Brief / Collaboration Details / Messages */}
+          <Tabs
+            ref={tabsRef}
+            value={activeTab ?? (collaboration.briefData ? "brief" : "details")}
+            onValueChange={(val) => setActiveTab(val)}
+            className="w-full"
+          >
             <TabsList className="w-full">
+              <TabsTrigger value="brief" className="flex-1">
+                Campaign Brief
+              </TabsTrigger>
+              <TabsTrigger value="details" className="flex-1">
+                Collaboration Details
+              </TabsTrigger>
               <TabsTrigger value="messages" className="flex-1">
                 Messages
               </TabsTrigger>
-              <TabsTrigger value="activity" className="flex-1">
-                Activity
-              </TabsTrigger>
             </TabsList>
+
+            {/* Campaign Brief tab */}
+            <TabsContent value="brief" className="mt-3 space-y-4">
+              {/* Creator Brief Review (awaiting confirmation) */}
+              {showBriefReview && (
+                <BriefReview
+                  collaborationId={collaborationId}
+                  briefData={collaboration.briefData as BriefValues}
+                  onSuccess={handleRefresh}
+                  paymentStatus={payment?.status ?? null}
+                />
+              )}
+
+              {/* Brand read-only brief (waiting for creator) */}
+              {showBriefReadOnly && (
+                <BriefReadOnly
+                  briefData={collaboration.briefData as BriefValues}
+                  onEdit={() => setBriefSheetOpen(true)}
+                />
+              )}
+
+              {/* Brief summary for later stages */}
+              {showBriefSummary && (
+                <BriefReadOnly
+                  briefData={collaboration.briefData as BriefValues}
+                  onEdit={
+                    isBrand && collaboration.state !== "completed"
+                      ? () => setBriefSheetOpen(true)
+                      : undefined
+                  }
+                />
+              )}
+
+              {/* No brief yet */}
+              {!collaboration.briefData && (
+                <div className="rounded-xl bg-muted/30 p-8 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    {isBrand
+                      ? "No campaign brief yet. Add one to get started."
+                      : "The brand hasn't submitted a campaign brief yet."}
+                  </p>
+                  {canAddBrief && (
+                    <Button
+                      className="mt-3 cursor-pointer"
+                      size="sm"
+                      onClick={() => setBriefSheetOpen(true)}
+                    >
+                      Add Brief
+                    </Button>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Collaboration Details tab */}
+            <TabsContent value="details" className="mt-3 space-y-4">
+              {/* Deliverable Submission (creator, in_progress) */}
+              {showDeliverableSubmission && (
+                <DeliverableSubmission
+                  collaborationId={collaborationId}
+                  dueDate={collaboration.dueDate}
+                  onSuccess={handleRefresh}
+                />
+              )}
+
+              {/* Brand Review (brand, submitted) */}
+              {showBrandReview && (
+                <BrandReviewActions
+                  collaborationId={collaborationId}
+                  submittedUrl={collaboration.submittedUrl}
+                  submittedNote={collaboration.submittedNote}
+                  onSuccess={handleRefresh}
+                />
+              )}
+
+              {/* Submitted deliverable read-only (creator waiting for review) */}
+              {isCreator &&
+                collaboration.state === "submitted" &&
+                collaboration.submittedUrl && (
+                  <SubmittedReadOnly
+                    url={collaboration.submittedUrl}
+                    note={collaboration.submittedNote}
+                  />
+                )}
+
+              {/* Activity log */}
+              <ActivityLog
+                messages={messages}
+                onActionClick={handleActivityAction}
+              />
+
+              {/* Empty state when nothing to show yet */}
+              {!showDeliverableSubmission &&
+                !showBrandReview &&
+                !(isCreator && collaboration.state === "submitted") &&
+                messages.filter((m) => m.isSystemEvent).length === 0 && (
+                  <div className="rounded-xl bg-muted/30 p-8 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      No collaboration activity yet. Details will appear here as
+                      the collaboration progresses.
+                    </p>
+                  </div>
+                )}
+            </TabsContent>
+
+            {/* Messages tab */}
             <TabsContent value="messages" className="mt-3">
               <CollabMessages
                 collaborationId={collaborationId}
                 messages={messages}
                 currentUserId={currentUserId}
                 onMessageSent={refetch}
-              />
-            </TabsContent>
-            <TabsContent value="activity" className="mt-3">
-              <ActivityLog
-                messages={messages}
-                onActionClick={handleActivityAction}
               />
             </TabsContent>
           </Tabs>
@@ -332,16 +404,6 @@ export default function CollaborationWorkspacePage({
             collaborationState={collaboration.state}
             onPaymentAction={handleRefresh}
           />
-
-          {/* Trust messaging */}
-          <Card>
-            <CardContent className="flex items-center gap-2 p-4">
-              <Lock className="size-4 shrink-0 text-primary" />
-              <p className="text-xs text-muted-foreground">
-                Communication and payments are protected on-platform
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </PageContainer>

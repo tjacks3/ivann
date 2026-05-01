@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
-import { DollarSign, FileText, Calendar } from "lucide-react";
 import type { CollaborationData } from "@/app/(app)/collaboration-workspace/actions";
 
 function getInitials(name: string | null): string {
@@ -42,15 +41,14 @@ interface CollaborationSummaryProps {
 export function CollaborationSummary({
   collaboration,
 }: CollaborationSummaryProps) {
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
 
   return (
     <Card>
-      <CardContent className="space-y-5 p-5">
-        {/* Title */}
+      <CardContent className="space-y-4 p-5">
+        {/* Title + Status */}
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">{collaboration.dealTitle}</h2>
-          {/* State badge */}
           <span
             className={cn(
               "rounded-full px-2.5 py-0.5 text-xs font-medium",
@@ -61,8 +59,9 @@ export function CollaborationSummary({
           </span>
         </div>
 
-        {/* Parties */}
+        {/* Parties + Budget/Timeline bar */}
         <div className="flex items-center justify-between">
+          {/* Parties */}
           <div className="flex items-center gap-6">
             {/* Brand */}
             <div className="flex items-center gap-2.5">
@@ -114,72 +113,36 @@ export function CollaborationSummary({
             </div>
           </div>
 
-        </div>
-
-        {/* Description */}
-        {collaboration.dealDescription && (
-          <div>
-            <p className="text-xs font-medium uppercase text-muted-foreground">
-              {t("deal.description")}
-            </p>
-            <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
-              {collaboration.dealDescription}
-            </p>
-          </div>
-        )}
-
-        {/* Details grid */}
-        <div className="rounded-lg border p-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {/* Deliverables */}
-            <div className="sm:col-span-3">
-              <div className="flex items-center gap-1.5 text-xs font-medium uppercase text-muted-foreground">
-                <FileText className="size-3" />
-                {t("deal.deliverables")}
+          {/* Budget + Timeline — right-aligned */}
+          <div className="flex items-center gap-6">
+            {collaboration.budgetAmount && (
+              <div className="text-right">
+                <p className="text-xs font-medium uppercase text-muted-foreground">
+                  Budget
+                </p>
+                <p className="text-sm font-semibold">
+                  {formatPrice(
+                    collaboration.budgetAmount,
+                    collaboration.dealCurrency,
+                    locale,
+                  )}
+                </p>
               </div>
-              <div className="mt-2">
-                {collaboration.dealDeliverables ? (
-                  <p className="whitespace-pre-wrap text-sm text-foreground">{collaboration.dealDeliverables}</p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">{t("deal.notSpecified")}</p>
-                )}
+            )}
+            {collaboration.dueDate && (
+              <div className="text-right">
+                <p className="text-xs font-medium uppercase text-muted-foreground">
+                  Timeline
+                </p>
+                <p className="text-sm font-semibold">
+                  {new Date(collaboration.dueDate).toLocaleDateString(locale, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </p>
               </div>
-            </div>
-
-            {/* Budget */}
-            <div>
-              <div className="flex items-center gap-0.5 text-xs font-medium uppercase text-muted-foreground">
-                <DollarSign className="-ml-0.5 size-3" />
-                {t("deal.budget")}
-              </div>
-              <p className="mt-1 text-sm font-medium">
-                {collaboration.budgetAmount
-                  ? formatPrice(
-                      collaboration.budgetAmount,
-                      collaboration.dealCurrency,
-                      locale,
-                    )
-                  : t("deal.notSpecified")}
-              </p>
-            </div>
-
-            {/* Due date */}
-            <div>
-              <div className="flex items-center gap-1.5 text-xs font-medium uppercase text-muted-foreground">
-                <Calendar className="size-3" />
-                {t("deal.timeline")}
-              </div>
-              <p className="mt-1 text-sm">
-                {collaboration.dueDate
-                  ? new Date(collaboration.dueDate).toLocaleDateString(locale, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })
-                  : t("deal.notSpecified")}
-              </p>
-            </div>
-
+            )}
           </div>
         </div>
       </CardContent>

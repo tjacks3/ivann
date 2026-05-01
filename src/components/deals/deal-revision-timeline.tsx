@@ -6,23 +6,40 @@ import { DeliverablesList } from "@/components/packages/deliverables-list";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
-import { FileText, DollarSign, Clock, Pencil, ArrowLeftRight } from "lucide-react";
+import {
+  FileText,
+  DollarSign,
+  Clock,
+  CheckCircle,
+  ArrowLeftRight,
+  XCircle,
+  Loader2,
+} from "lucide-react";
 import type { RevisionItem } from "@/app/(app)/deals/actions";
 
 interface DealRevisionTimelineProps {
   revisions: RevisionItem[];
   isBrand?: boolean;
   isNegotiable?: boolean;
-  onEdit?: () => void;
+  /** The role of the user viewing (to determine who can accept) */
+  userRole?: "brand" | "creator";
+  onAccept?: () => void;
   onCounter?: () => void;
+  onEdit?: () => void;
+  onCancel?: () => void;
+  actionLoading?: boolean;
 }
 
 export function DealRevisionTimeline({
   revisions,
   isBrand,
   isNegotiable,
-  onEdit,
+  userRole,
+  onAccept,
   onCounter,
+  onEdit,
+  onCancel,
+  actionLoading,
 }: DealRevisionTimelineProps) {
   const { t, locale } = useTranslation();
 
@@ -37,8 +54,18 @@ export function DealRevisionTimeline({
         <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
 
         {revisions.map((rev, i) => {
-          const isBrand = rev.authorRole === "brand";
+          const revIsBrand = rev.authorRole === "brand";
           const isLatest = i === revisions.length - 1;
+
+          // The receiver (not the sender) can accept/counter on the latest revision
+          const isReceiver = isLatest && userRole && rev.authorRole !== userRole;
+          const isSender = isLatest && userRole && rev.authorRole === userRole;
+
+          const hasDeliverables = !!rev.deliverables;
+          const hasBudget = rev.budget != null;
+          const hasTimeline = !!rev.timeline;
+          const hasNotes = !!rev.notes;
+          const hasChanges = hasDeliverables || hasBudget || hasTimeline || hasNotes;
 
           return (
             <div key={rev.id} className="relative flex gap-4 pb-4">
@@ -58,82 +85,135 @@ export function DealRevisionTimeline({
               <Card className={cn("flex-1", isLatest && "ring-1 ring-primary/20")}>
                 <CardContent className="space-y-2 p-3">
                   {/* Header */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={cn(
-                          "rounded-full px-2 py-0.5 text-xs font-medium",
-                          isBrand
-                            ? "bg-blue-500/10 text-blue-600"
-                            : "bg-purple-500/10 text-purple-600",
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn(
+                        "rounded-full px-2 py-0.5 text-xs font-medium",
+                        revIsBrand
+                          ? "bg-blue-500/10 text-blue-600"
+                          : "bg-purple-500/10 text-purple-600",
+                      )}
+                    >
+                      {revIsBrand ? t("deal.revisions.brandEdit") : t("deal.revisions.counterProposal")}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      by: {rev.authorName} on{" "}
+                      {new Date(rev.createdAt).toLocaleDateString(locale, {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+
+                  {/* Changed fields only */}
+                  {hasChanges && (
+                    <div className="space-y-1.5 text-sm">
+                      {hasDeliverables && (
+                        <div className="mb-3">
+                          <div className="mb-1 flex items-center gap-1.5 text-xs font-medium uppercase text-muted-foreground">
+                            <FileText className="size-3" />
+                            {t("deal.deliverables")}
+                          </div>
+                          <DeliverablesList value={rev.deliverables!} />
+                        </div>
+                      )}
+                      <div className="grid grid-cols-2 gap-3">
+                        {hasBudget && (
+                          <div>
+                            <div className="flex items-center gap-0.5 text-xs font-medium uppercase text-muted-foreground">
+                              <DollarSign className="-ml-0.5 size-3" />
+                              {t("deal.budget")}
+                            </div>
+                            <p className="mt-1 text-sm font-medium">
+                              {formatPrice(rev.budget!, rev.currency, locale)}
+                            </p>
+                          </div>
                         )}
-                      >
-                        {isBrand ? t("deal.revisions.brandEdit") : t("deal.revisions.counterProposal")}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {rev.authorName}
-                      </span>
+                        {hasTimeline && (
+                          <div>
+                            <div className="flex items-center gap-1.5 text-xs font-medium uppercase text-muted-foreground">
+                              <Clock className="size-3" />
+                              {t("deal.timeline")}
+                            </div>
+                            <p className="mt-1 text-sm">{rev.timeline}</p>
+                          </div>
+                        )}
+                      </div>
+                      {hasNotes && (
+                        <p className="text-xs italic text-muted-foreground">"{rev.notes}"</p>
+                      )}
                     </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(rev.createdAt).toLocaleDateString(locale, {
-                          month: "short",
-                          day: "numeric",
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                      {isLatest && isNegotiable && isBrand && onEdit && (
+                  )}
+
+                  {!hasChanges && (
+                    <p className="text-xs text-muted-foreground">No changes from original proposal.</p>
+                  )}
+
+                  {/* Actions on the latest revision — only for the receiver */}
+                  {isLatest && isNegotiable && isReceiver && (
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      {onAccept && (
                         <Button
-                          variant="outline"
-                          size="xs"
-                          onClick={onEdit}
+                          size="sm"
+                          onClick={onAccept}
+                          disabled={actionLoading}
                           className="cursor-pointer"
                         >
-                          <Pencil className="size-3" />
-                          {t("deal.editProposal")}
+                          {actionLoading ? (
+                            <Loader2 className="size-3.5 animate-spin" />
+                          ) : (
+                            <CheckCircle className="size-3.5" />
+                          )}
+                          {t("deal.action.accept")}
                         </Button>
                       )}
-                      {isLatest && isNegotiable && !isBrand && onCounter && (
+                      {userRole === "creator" && onCounter && (
                         <Button
                           variant="outline"
-                          size="xs"
+                          size="sm"
                           onClick={onCounter}
+                          disabled={actionLoading}
                           className="cursor-pointer"
                         >
-                          <ArrowLeftRight className="size-3" />
+                          <ArrowLeftRight className="size-3.5" />
                           {t("deal.counterProposal")}
                         </Button>
                       )}
+                      {userRole === "brand" && onEdit && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={onEdit}
+                          disabled={actionLoading}
+                          className="cursor-pointer"
+                        >
+                          <ArrowLeftRight className="size-3.5" />
+                          {t("deal.editProposal")}
+                        </Button>
+                      )}
+                      {onCancel && (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={onCancel}
+                          disabled={actionLoading}
+                          className="cursor-pointer"
+                        >
+                          <XCircle className="size-3.5" />
+                          {t("deal.action.cancel")}
+                        </Button>
+                      )}
                     </div>
-                  </div>
+                  )}
 
-                  {/* Changes */}
-                  <div className="space-y-1.5 text-sm">
-                    {rev.deliverables && (
-                      <div>
-                        <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                          <FileText className="size-3" />
-                          {t("deal.deliverables")}
-                        </div>
-                        <DeliverablesList value={rev.deliverables} />
-                      </div>
-                    )}
-                    <div className="flex items-center gap-4">
-                      {rev.budget != null && (
-                        <span className="font-medium">{formatPrice(rev.budget, rev.currency, locale)}</span>
-                      )}
-                      {rev.timeline && (
-                        <div className="flex items-center gap-1">
-                          <Clock className="size-3 text-muted-foreground" />
-                          <span>{rev.timeline}</span>
-                        </div>
-                      )}
-                    </div>
-                    {rev.notes && (
-                      <p className="text-xs italic text-muted-foreground">"{rev.notes}"</p>
-                    )}
-                  </div>
+                  {/* Sender sees a waiting message */}
+                  {isLatest && isNegotiable && isSender && (
+                    <p className="pt-1 text-xs text-muted-foreground">
+                      Waiting for the other party to respond...
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             </div>

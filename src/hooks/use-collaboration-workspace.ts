@@ -8,9 +8,18 @@ import {
   getCollaborationMessages,
 } from "@/app/(app)/collaboration-workspace/actions";
 
-export function useCollaborationWorkspace(collaborationId: string) {
+interface UseCollaborationWorkspaceOptions {
+  /** When true, messages poll more aggressively (every 3s). */
+  isMessagesActive?: boolean;
+}
+
+export function useCollaborationWorkspace(
+  collaborationId: string,
+  options?: UseCollaborationWorkspaceOptions,
+) {
   const queryClient = useQueryClient();
   const supabase = useSupabase();
+  const isMessagesActive = options?.isMessagesActive ?? false;
 
   const {
     data: collaboration,
@@ -29,7 +38,8 @@ export function useCollaborationWorkspace(collaborationId: string) {
   } = useQuery({
     queryKey: ["collaboration-messages", collaborationId],
     queryFn: () => getCollaborationMessages(collaborationId),
-    staleTime: 30 * 1000,
+    staleTime: isMessagesActive ? 0 : 30 * 1000,
+    refetchInterval: isMessagesActive ? 10_000 : false,
   });
 
   // Realtime subscription for new collaboration messages

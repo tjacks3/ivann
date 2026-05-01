@@ -85,7 +85,7 @@ export function DealCounterSheet({
           </SheetClose>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 space-y-8">
           {/* Original proposal (read-only) */}
           <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -127,12 +127,12 @@ export function DealCounterSheet({
           </div>
 
           {/* Counter-proposal fields */}
-          <div className="space-y-4">
+          <div className="space-y-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {t("deal.counter.yourChanges")}
             </p>
 
-            <div className="space-y-2">
+            <div className="space-y-2.5.5">
               <Label>{t("deal.deliverables")}</Label>
               <DynamicListInput
                 items={deliverableItems}
@@ -143,7 +143,7 @@ export function DealCounterSheet({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <Label htmlFor="counterBudget">{t("deal.budget")}</Label>
                 <Input
                   id="counterBudget"
@@ -155,7 +155,7 @@ export function DealCounterSheet({
                   placeholder="0.00"
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <Label htmlFor="counterTimeline">{t("deal.timeline")}</Label>
                 <Input
                   id="counterTimeline"
@@ -166,7 +166,7 @@ export function DealCounterSheet({
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               <Label htmlFor="counterNotes">{t("deal.counter.notesLabel")}</Label>
               <Textarea
                 id="counterNotes"

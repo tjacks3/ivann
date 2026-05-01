@@ -28,6 +28,7 @@ export function formatPrice(
   amountInCents: number,
   currency: string,
   locale: string = "en",
+  showCurrency: boolean = true,
 ): string {
   const isZeroDecimal = ZERO_DECIMAL_CURRENCIES.includes(currency.toLowerCase());
   const amount = isZeroDecimal ? amountInCents : amountInCents / 100;
@@ -35,8 +36,8 @@ export function formatPrice(
   const intlLocale = locale === "zh-CN" ? "zh-Hans-CN" : locale;
 
   return new Intl.NumberFormat(intlLocale, {
-    style: "currency",
-    currency: currency.toUpperCase(),
+    style: showCurrency ? "currency" : "decimal",
+    ...(showCurrency && { currency: currency.toUpperCase() }),
     minimumFractionDigits: isZeroDecimal ? 0 : 0,
     maximumFractionDigits: isZeroDecimal ? 0 : 2,
   }).format(amount);

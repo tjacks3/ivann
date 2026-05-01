@@ -306,27 +306,23 @@ export async function editProposal(dealId: string, data: UpdateDealValues) {
     .where(eq(dealRevisions.dealId, dealId));
   const revisionNumber = existingRevisions.length + 1;
 
-  // Save current state as a revision before updating
+  // Save as a revision (do NOT overwrite original proposal fields)
   await db.insert(dealRevisions).values({
     dealId,
     authorId: user.id,
     authorRole: "brand",
     revisionNumber,
-    deliverables: parsed.data.deliverables ?? deal.deliverables,
-    budget: parsed.data.budget ?? deal.budget,
+    deliverables: parsed.data.deliverables ?? null,
+    budget: parsed.data.budget ?? null,
     currency: parsed.data.currency ?? deal.currency,
-    timeline: parsed.data.timeline ?? deal.timeline,
-    notes: parsed.data.notes ?? deal.notes,
+    timeline: parsed.data.timeline ?? null,
+    notes: parsed.data.notes ?? null,
   });
 
-  // Update the deal with new values
+  // Update deal status only
   await db
     .update(deals)
     .set({
-      deliverables: parsed.data.deliverables ?? deal.deliverables,
-      budget: parsed.data.budget ?? deal.budget,
-      timeline: parsed.data.timeline ?? deal.timeline,
-      notes: parsed.data.notes ?? deal.notes,
       status: deal.status === "draft" ? "draft" : "negotiating",
       updatedAt: new Date(),
     })
@@ -384,17 +380,17 @@ export async function submitCounterProposal(dealId: string, data: UpdateDealValu
     .where(eq(dealRevisions.dealId, dealId));
   const revisionNumber = existingRevisions.length + 1;
 
-  // Save counter-proposal as a revision
+  // Save counter-proposal as a revision (only changed fields)
   await db.insert(dealRevisions).values({
     dealId,
     authorId: user.id,
     authorRole: "creator",
     revisionNumber,
-    deliverables: parsed.data.deliverables ?? deal.deliverables,
-    budget: parsed.data.budget ?? deal.budget,
+    deliverables: parsed.data.deliverables ?? null,
+    budget: parsed.data.budget ?? null,
     currency: parsed.data.currency ?? deal.currency,
-    timeline: parsed.data.timeline ?? deal.timeline,
-    notes: parsed.data.notes ?? deal.notes,
+    timeline: parsed.data.timeline ?? null,
+    notes: parsed.data.notes ?? null,
   });
 
   // Update deal status to negotiating (do NOT overwrite original proposal fields)

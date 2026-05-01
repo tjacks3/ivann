@@ -3,14 +3,20 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { buttonVariants } from "@/components/ui/button-variants";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet";
 import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { LoadingState } from "@/components/shared/loading-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ProfileStatusBadge } from "@/components/profile/profile-status-badge";
+import { ProfileEditForm } from "@/components/profile/profile-edit-form";
 import { DealStatusBadge } from "@/components/deals/deal-status-badge";
 import { WaitingOnBadge } from "@/components/collaboration-workspace/waiting-on-badge";
 import { RequestCard } from "@/components/collaborations/request-card";
@@ -21,7 +27,7 @@ import { useCollaborations } from "@/hooks/use-collaborations";
 import { useTranslation } from "@/i18n";
 import { formatPrice } from "@/lib/currency";
 import { getPaymentSummary, type PaymentSummary } from "@/app/(app)/deals/payment-actions";
-import { Pencil, Eye, Package, Handshake } from "lucide-react";
+import { Pencil, Package, Handshake, X } from "lucide-react";
 import type { ProfileStatus } from "@/types";
 
 function getProfileCompletion(profile: {
@@ -47,10 +53,11 @@ function getProfileCompletion(profile: {
 
 export default function CreatorDashboardPage() {
   const { t } = useTranslation();
-  const { profile, isLoading } = useCreatorProfile();
+  const { profile, isLoading, refetch: refetchProfile } = useCreatorProfile();
   const { deals, isLoading: dealsLoading } = useMyDeals();
   const { collaborations, isLoading: collabsLoading, refetch: refetchCollabs } = useCollaborations();
   const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
 
   useEffect(() => {
     getPaymentSummary().then(setPaymentSummary);
@@ -99,16 +106,6 @@ export default function CreatorDashboardPage() {
                   <p className="mt-2 line-clamp-2 max-w-md text-sm text-muted-foreground">{profile.bio}</p>
                 )}
 
-                <div className="mt-4 flex flex-wrap justify-center gap-3 sm:justify-start">
-                  <Link href="/creator/profile/edit" className={buttonVariants({ size: "sm" })}>
-                    <Pencil className="size-3.5" />
-                    {t("creatorDashboard.editProfile")}
-                  </Link>
-                  <Link href="/creator/profile" className={buttonVariants({ variant: "outline", size: "sm" })}>
-                    <Eye className="size-3.5" />
-                    {t("creatorDashboard.viewProfile")}
-                  </Link>
-                </div>
               </div>
             </div>
 
@@ -132,9 +129,12 @@ export default function CreatorDashboardPage() {
         <div className="space-y-4">
           <h3 className="text-sm font-semibold text-muted-foreground">{t("creatorDashboard.quickActions")}</h3>
 
-          <Card className="transition-colors hover:border-primary/30">
+          <Card
+            className="cursor-pointer transition-colors hover:border-primary/30"
+            onClick={() => setEditProfileOpen(true)}
+          >
             <CardContent className="pt-4">
-              <Link href="/creator/profile/edit" className="flex items-center gap-3">
+              <div className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Pencil className="size-4" />
                 </div>
@@ -142,7 +142,7 @@ export default function CreatorDashboardPage() {
                   <p className="text-sm font-medium">{t("creatorDashboard.editProfile")}</p>
                   <p className="text-xs text-muted-foreground">{t("profile.edit.subtitle")}</p>
                 </div>
-              </Link>
+              </div>
             </CardContent>
           </Card>
 
@@ -237,6 +237,31 @@ export default function CreatorDashboardPage() {
           )}
         </div>
       </div>
+      {/* Edit Profile Sheet */}
+      <Sheet open={editProfileOpen} onOpenChange={setEditProfileOpen}>
+        <SheetContent
+          side="right"
+          className="flex w-full flex-col overflow-hidden p-0 sm:max-w-lg"
+          showCloseButton={false}
+        >
+          <div className="flex h-14 shrink-0 items-center justify-between border-b px-6">
+            <SheetTitle className="text-base font-semibold">
+              {t("profile.edit.title")}
+            </SheetTitle>
+            <SheetClose>
+              <X className="size-5" />
+            </SheetClose>
+          </div>
+          <ProfileEditForm
+            profile={profile}
+            onSaved={() => {
+              setEditProfileOpen(false);
+              refetchProfile();
+            }}
+            onCancel={() => setEditProfileOpen(false)}
+          />
+        </SheetContent>
+      </Sheet>
     </PageContainer>
   );
 }

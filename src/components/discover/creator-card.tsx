@@ -72,17 +72,17 @@ export function CreatorCard({ creator, isFavorited = false, showFavorite = false
 
         {/* Categories */}
         {displayCategories.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1">
             {displayCategories.map((cat) => (
               <span
                 key={cat}
-                className="rounded-full border border-primary bg-white px-2.5 py-1 text-xs font-medium text-primary"
+                className="rounded-full border border-primary bg-white px-2 py-0.5 text-[10px] font-medium text-primary"
               >
                 {t(`onboarding.category.${cat}`)}
               </span>
             ))}
             {extraCount > 0 && (
-              <span className="rounded-full border border-input bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground">
+              <span className="rounded-full border border-input bg-background px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                 +{extraCount}
               </span>
             )}

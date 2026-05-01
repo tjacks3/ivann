@@ -19,11 +19,12 @@ import { OutreachEditor } from "@/components/quick-collab/outreach-editor";
 import { useQuickCollab } from "@/hooks/use-quick-collab";
 import { useBrandProfile } from "@/hooks/use-brand-profile";
 import { useTranslation } from "@/i18n";
-import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle, Zap, Search, MessageSquare, Shield, Sparkles } from "lucide-react";
 import type { MatchedCreator, OutreachDraft } from "@/app/(app)/brand/quick-collab/actions";
 import type { QuickCollabCampaign } from "@/db/schema/quick-collab";
 
 type WizardStep =
+  | "intro"
   | "collab_type"
   | "campaign_intent"
   | "local_preference"
@@ -43,6 +44,7 @@ const INTAKE_STEPS: WizardStep[] = [
 ];
 
 const ALL_STEPS: WizardStep[] = [
+  "intro",
   ...INTAKE_STEPS,
   "matching",
   "campaign",
@@ -65,7 +67,7 @@ export default function QuickCollabPage() {
   } = useQuickCollab();
 
   // Wizard state
-  const [step, setStep] = useState<WizardStep>("collab_type");
+  const [step, setStep] = useState<WizardStep>("intro");
   const [loading, setLoading] = useState(false);
 
   // Intake form data
@@ -99,6 +101,7 @@ export default function QuickCollabPage() {
   const stepIndex = ALL_STEPS.indexOf(step);
 
   const STEP_LABELS: Record<WizardStep, string> = {
+    intro: "Welcome",
     collab_type: t("quickCollab.stepLabel.collabType"),
     campaign_intent: t("quickCollab.stepLabel.intent"),
     local_preference: t("quickCollab.stepLabel.localPreference"),
@@ -113,6 +116,8 @@ export default function QuickCollabPage() {
   // Validation per step
   const canProceed = useCallback((): boolean => {
     switch (step) {
+      case "intro":
+        return true;
       case "collab_type":
         if (collabType === "other") return collabTypeOther.trim() !== "";
         return collabType !== "";
@@ -331,16 +336,71 @@ export default function QuickCollabPage() {
         </Link>
       </div>
 
-      {/* Stepper */}
-      <IntakeStepper
-        currentStep={stepIndex}
-        totalSteps={ALL_STEPS.length - 1}
-        stepLabel={STEP_LABELS[step]}
-      />
+      {/* Stepper — hidden on intro */}
+      {step !== "intro" && (
+        <IntakeStepper
+          currentStep={stepIndex - 1}
+          totalSteps={ALL_STEPS.length - 2}
+          stepLabel={STEP_LABELS[step]}
+        />
+      )}
 
       {/* Step content */}
       <div className="mt-8">
         {loading && <LoadingState variant="spinner" />}
+
+        {/* Intro */}
+        {!loading && step === "intro" && (
+          <div className="mx-auto max-w-lg space-y-8">
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-primary/10">
+                <Zap className="size-7 text-primary" />
+              </div>
+              <h1 className="text-2xl font-bold">Find Creators That Fit Your Brand</h1>
+              <p className="mt-3 text-muted-foreground">
+                QuickCollab makes it easy to discover, connect with, and collaborate with creators who align with your brand&nbsp;&mdash;&nbsp;in&nbsp;just&nbsp;a&nbsp;few&nbsp;steps.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-start gap-2.5">
+                <Search className="mt-0.5 size-4 shrink-0 text-primary" />
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">Smart Matching</span> — creators matched by niche, location & budget
+                </p>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <MessageSquare className="mt-0.5 size-4 shrink-0 text-primary" />
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">Personalized Outreach</span> — no cold DMs, no guesswork
+                </p>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Shield className="mt-0.5 size-4 shrink-0 text-primary" />
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">Secure Workflow</span> — managed on-platform with payment protection
+                </p>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Sparkles className="mt-0.5 size-4 shrink-0 text-primary" />
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">Fast & Easy</span> — idea to outreach in minutes
+                </p>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <Button
+                size="lg"
+                onClick={() => setStep("collab_type")}
+                className="cursor-pointer px-8"
+              >
+                Get Started
+                <ArrowRight className="size-4" />
+              </Button>
+            </div>
+          </div>
+        )}
 
         {!loading && step === "collab_type" && (
           <StepCollabType
@@ -417,8 +477,8 @@ export default function QuickCollabPage() {
         )}
       </div>
 
-      {/* Navigation buttons */}
-      {!loading && step !== "outreach" && (
+      {/* Navigation buttons — hidden on intro and outreach */}
+      {!loading && step !== "intro" && step !== "outreach" && (
         <div className="mt-8 flex items-center justify-between">
           <Button
             variant="outline"

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
 const statusStyles: Record<string, string> = {
-  pending: "border-yellow-500 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
+  pending: "border-primary bg-primary/10 text-primary dark:text-primary",
   accepted: "border-green-500 bg-green-500/10 text-green-700 dark:text-green-400",
   declined: "border-red-500 bg-red-500/10 text-red-700 dark:text-red-400",
   expired: "border-gray-500 bg-gray-500/10 text-gray-600 dark:text-gray-400",

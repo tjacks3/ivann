@@ -115,7 +115,7 @@ export default function PublicCreatorProfilePage({
               <Handshake className="size-3.5" />
               {t("profile.sendOffer")}
             </SheetTrigger>
-            <SheetContent side="right" className="flex w-full flex-col overflow-hidden p-0 sm:max-w-md" showCloseButton={false}>
+            <SheetContent side="right" className="flex w-full flex-col overflow-hidden p-0 sm:max-w-lg" showCloseButton={false}>
               <div className="flex h-14 shrink-0 items-center justify-between border-b px-4">
                 <SheetTitle className="text-base font-bold">
                   {t("collab.form.title", { name: profile.fullName || "" })}

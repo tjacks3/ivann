@@ -151,7 +151,7 @@ export default function DealWorkspacePage({
     }
   };
 
-  // Status actions based on role + current status
+  // Status actions for non-negotiable states (negotiable actions are now in cards)
   const statusActions: {
     label: string;
     status: string;
@@ -159,14 +159,6 @@ export default function DealWorkspacePage({
     variant?: "default" | "outline" | "destructive";
   }[] = [];
 
-  if (isCreator && isNegotiable) {
-    statusActions.push({
-      label: t("deal.action.accept"),
-      status: "accepted",
-      icon: <CheckCircle className="size-3.5" />,
-      variant: "default",
-    });
-  }
   if (isCreator && deal.status === "accepted") {
     statusActions.push({
       label: t("deal.action.startWork"),
@@ -216,11 +208,14 @@ export default function DealWorkspacePage({
           hasRevisions={revisions.length > 0}
           onEdit={() => setEditOpen(true)}
           onCounter={() => setCounterOpen(true)}
+          onAccept={() => handleStatusChange("accepted")}
+          onCancel={() => setCancelConfirmOpen(true)}
+          actionLoading={statusLoading}
         />
       </div>
 
-      {/* Status actions (hidden when collaboration workspace manages transitions) */}
-      {!collabId && (statusActions.length > 0 || showCancel) && (
+      {/* Status actions for non-negotiable states (negotiable actions are in cards) */}
+      {!collabId && !isNegotiable && (statusActions.length > 0 || showCancel) && (
         <div className="mt-4 flex flex-wrap gap-2">
           {statusActions.map((action) => (
             <Button
@@ -286,8 +281,12 @@ export default function DealWorkspacePage({
             revisions={revisions}
             isBrand={!!isBrand}
             isNegotiable={isNegotiable}
+            userRole={isBrand ? "brand" : "creator"}
+            onAccept={() => handleStatusChange("accepted")}
             onEdit={() => setEditOpen(true)}
             onCounter={() => setCounterOpen(true)}
+            onCancel={() => setCancelConfirmOpen(true)}
+            actionLoading={statusLoading}
           />
         </div>
       )}

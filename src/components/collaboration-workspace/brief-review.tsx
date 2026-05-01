@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import {
   confirmDeliverable,
   requestBriefChanges,
@@ -27,14 +26,14 @@ interface BriefReviewProps {
   paymentStatus?: string | null;
 }
 
-const BRIEF_FIELDS: { key: keyof BriefValues; label: string; highlight?: boolean }[] = [
-  { key: "campaignGoal", label: "Campaign Goal", highlight: true },
-  { key: "productOrService", label: "Product / Service", highlight: true },
+const BRIEF_FIELDS: { key: keyof BriefValues; label: string }[] = [
+  { key: "campaignGoal", label: "Campaign Goal" },
+  { key: "productOrService", label: "Product / Service" },
   { key: "requiredMentions", label: "Required Mentions" },
   { key: "tagsHashtags", label: "Tags / Hashtags" },
   { key: "location", label: "Location" },
-  { key: "postingWindowStart", label: "Posting Window Start", highlight: true },
-  { key: "postingWindowEnd", label: "Posting Window End", highlight: true },
+  { key: "postingWindowStart", label: "Posting Window Start" },
+  { key: "postingWindowEnd", label: "Posting Window End" },
   { key: "specialInstructions", label: "Special Instructions" },
   { key: "restrictions", label: "Restrictions" },
 ];
@@ -91,16 +90,13 @@ export function BriefReview({
         {/* Brief fields */}
         <div className="rounded-xl bg-muted/30 p-4">
           <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
-            {BRIEF_FIELDS.map(({ key, label, highlight }) => {
+            {BRIEF_FIELDS.map(({ key, label }) => {
               const value = briefData[key];
               if (!value) return null;
               return (
                 <div
                   key={key}
-                  className={cn(
-                    "space-y-1 rounded-lg p-2",
-                    highlight && "bg-primary/5",
-                  )}
+                  className="space-y-1 p-2"
                 >
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     {label}

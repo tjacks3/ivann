@@ -94,11 +94,11 @@ export function DynamicListInput({
         />
         <Button
           type="button"
-          variant="outline"
+          variant="default"
           size="sm"
           onClick={handleAdd}
           disabled={!newItem.trim()}
-          className="cursor-pointer shrink-0"
+          className="cursor-pointer shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
         >
           <Plus className="size-3.5" />
           {addLabel}

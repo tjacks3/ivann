@@ -63,11 +63,11 @@ export function ProfileHeader({
 
       {/* Categories */}
       {categories.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {categories.map((category) => (
             <span
               key={category}
-              className="rounded-full border border-primary bg-white px-3 py-1.5 text-sm font-medium text-primary"
+              className="rounded-full border border-primary bg-white px-2.5 py-1 text-xs font-medium text-primary"
             >
               {t(`onboarding.category.${category}`)}
             </span>

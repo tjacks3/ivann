@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 import { useTranslation } from "@/i18n";
 import { collaborationRequestSchema } from "@/lib/validations/collaboration";
 import type { CollaborationRequestValues } from "@/lib/validations/collaboration";
@@ -143,10 +144,10 @@ export function RequestForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-1 flex-col overflow-hidden">
       {/* Scrollable fields */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {/* Package select */}
         {availablePackages && availablePackages.length > 0 && (
-          <div className="space-y-1.5">
+          <div className="space-y-2.5">
             <Label>{t("collab.form.package")}</Label>
             <Select
               value={selectedPackageId ?? "custom"}
@@ -168,14 +169,14 @@ export function RequestForm({
         )}
 
         {/* Title */}
-        <div className="space-y-1.5">
+        <div className="space-y-2.5">
           <Label htmlFor="title">{t("collab.form.requestTitle")}</Label>
           <Input id="title" {...register("title")} placeholder={t("collab.form.titlePlaceholder")} />
           {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
         </div>
 
         {/* Type */}
-        <div className="space-y-1.5">
+        <div className="space-y-2.5">
           <Label>{t("collab.form.type")}</Label>
           <Select
             value={watch("type") ?? "custom"}
@@ -195,7 +196,7 @@ export function RequestForm({
         </div>
 
         {/* Description */}
-        <div className="space-y-1.5">
+        <div className="space-y-2.5">
           <Label htmlFor="description">{t("collab.form.description")}</Label>
           <Textarea
             id="description"
@@ -206,7 +207,7 @@ export function RequestForm({
         </div>
 
         {/* Deliverables */}
-        <div className="space-y-1.5">
+        <div className="space-y-2.5">
           <Label>{t("collab.form.deliverables")}</Label>
           <DynamicListInput
             items={deliverableItems}
@@ -221,8 +222,8 @@ export function RequestForm({
         </div>
 
         {/* Budget + Deadline */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2.5">
             <Label htmlFor="budget">{t("collab.form.budget")}</Label>
             <div className="flex">
               <span className="flex items-center rounded-l-lg border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground uppercase">
@@ -240,19 +241,19 @@ export function RequestForm({
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="deadline">{t("collab.form.deadline")}</Label>
-            <Input
-              id="deadline"
-              type="date"
-              min={new Date().toISOString().split("T")[0]}
-              {...register("deadline")}
+          <div className="space-y-2.5">
+            <Label>{t("collab.form.deadline")}</Label>
+            <DatePicker
+              value={watch("deadline") ?? ""}
+              onChange={(val) => setValue("deadline", val, { shouldDirty: true })}
+              placeholder="Pick a deadline"
+              className="min-w-0"
             />
           </div>
         </div>
 
         {/* Message / Notes */}
-        <div className="space-y-1.5">
+        <div className="space-y-2.5">
           <Label htmlFor="message">{t("collab.form.message")}</Label>
           <Textarea
             id="message"
@@ -269,7 +270,7 @@ export function RequestForm({
       </div>
 
       {/* Fixed footer */}
-      <div className="shrink-0 border-t bg-background p-4">
+      <div className="shrink-0 border-t bg-background p-6">
         <div className="flex gap-2">
           <Button type="button" variant="outline" onClick={onClose} className="flex-1">
             {t("collab.form.cancel")}

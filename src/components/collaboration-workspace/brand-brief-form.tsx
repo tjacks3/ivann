@@ -28,7 +28,8 @@ import {
   briefSchema,
   type BriefValues,
 } from "@/lib/validations/collaboration-workspace";
-import { Loader2, X, Check, FileText } from "lucide-react";
+import { Loader2, X, Check, FileText, Info } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 
 // ─── Brief Templates ──────────────────────────────────────────────────────
 
@@ -205,10 +206,10 @@ export function BrandBriefForm({
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Template selector */}
             {!existingBrief && (
-              <div className="space-y-1.5">
+              <div className="space-y-2.5">
                 <Label className="flex items-center gap-1.5">
                   <FileText className="size-3.5" />
                   Start from a template
@@ -225,11 +226,15 @@ export function BrandBriefForm({
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  <Info className="size-3 shrink-0" />
+                  Templates pre-fill common fields so you can launch campaigns faster and maintain consistency.
+                </p>
               </div>
             )}
 
             {/* Campaign Goal */}
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <Label htmlFor="campaignGoal">Campaign Goal *</Label>
               <Textarea
                 id="campaignGoal"
@@ -244,7 +249,7 @@ export function BrandBriefForm({
             </div>
 
             {/* Product/Service */}
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <Label htmlFor="productOrService">Product / Service *</Label>
               <Input
                 id="productOrService"
@@ -258,70 +263,72 @@ export function BrandBriefForm({
               )}
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {/* Required Mentions */}
-              <div className="space-y-1.5">
-                <Label htmlFor="requiredMentions">Required Mentions</Label>
-                <Textarea
-                  id="requiredMentions"
-                  placeholder="Specific phrases, handles, or links to include"
-                  {...register("requiredMentions")}
-                />
-                {errors.requiredMentions && (
-                  <p className="text-xs text-destructive">
-                    {errors.requiredMentions.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Tags/Hashtags */}
-              <div className="space-y-1.5">
-                <Label htmlFor="tagsHashtags">Tags / Hashtags</Label>
-                <Input
-                  id="tagsHashtags"
-                  placeholder="#brand #campaign"
-                  {...register("tagsHashtags")}
-                />
-                {errors.tagsHashtags && (
-                  <p className="text-xs text-destructive">
-                    {errors.tagsHashtags.message}
-                  </p>
-                )}
-              </div>
+            {/* Mentions */}
+            <div className="space-y-2.5">
+              <Label htmlFor="requiredMentions">Mentions</Label>
+              <Textarea
+                id="requiredMentions"
+                placeholder="Specific phrases, handles, or links to include"
+                {...register("requiredMentions")}
+              />
+              {errors.requiredMentions && (
+                <p className="text-xs text-destructive">
+                  {errors.requiredMentions.message}
+                </p>
+              )}
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {/* Location */}
-              <div className="space-y-1.5">
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  placeholder="Specific location or setting"
-                  {...register("location")}
-                />
-              </div>
+            {/* Tags/Hashtags */}
+            <div className="space-y-2.5">
+              <Label htmlFor="tagsHashtags">Tags / Hashtags</Label>
+              <Input
+                id="tagsHashtags"
+                placeholder="#brand #campaign"
+                {...register("tagsHashtags")}
+              />
+              {errors.tagsHashtags && (
+                <p className="text-xs text-destructive">
+                  {errors.tagsHashtags.message}
+                </p>
+              )}
+            </div>
 
-              {/* Posting Window */}
-              <div className="space-y-1.5">
-                <Label>Posting Window</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="date"
-                    placeholder="Start"
-                    {...register("postingWindowStart")}
-                  />
-                  <span className="text-xs text-muted-foreground">to</span>
-                  <Input
-                    type="date"
-                    placeholder="End"
-                    {...register("postingWindowEnd")}
-                  />
-                </div>
+            {/* Location */}
+            <div className="space-y-2.5">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                placeholder="Specific location or setting"
+                {...register("location")}
+              />
+            </div>
+
+            {/* Posting Window */}
+            <div className="space-y-2.5">
+              <Label>Posting Window</Label>
+              <div className="flex min-w-0 items-center gap-2">
+                <DatePicker
+                  value={formValues.postingWindowStart}
+                  onChange={(val) =>
+                    setValue("postingWindowStart", val, { shouldDirty: true })
+                  }
+                  placeholder="Start"
+                  className="min-w-0 flex-1"
+                />
+                <span className="shrink-0 text-xs text-muted-foreground">to</span>
+                <DatePicker
+                  value={formValues.postingWindowEnd}
+                  onChange={(val) =>
+                    setValue("postingWindowEnd", val, { shouldDirty: true })
+                  }
+                  placeholder="End"
+                  className="min-w-0 flex-1"
+                />
               </div>
             </div>
 
             {/* Special Instructions */}
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <Label htmlFor="specialInstructions">Special Instructions</Label>
               <Textarea
                 id="specialInstructions"
@@ -336,7 +343,7 @@ export function BrandBriefForm({
             </div>
 
             {/* Restrictions */}
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <Label htmlFor="restrictions">Restrictions</Label>
               <Textarea
                 id="restrictions"

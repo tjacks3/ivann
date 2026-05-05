@@ -12,8 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { DynamicListInput } from "@/components/ui/dynamic-list-input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { DeliverablesList } from "@/components/packages/deliverables-list";
-import { formatPrice } from "@/lib/currency";
+import { formatPrice, getCurrencyForLocale } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
 import { X, Loader2, DollarSign, Clock, FileText } from "lucide-react";
 import type { DealWithParties } from "@/app/(app)/deals/actions";
@@ -132,7 +133,7 @@ export function DealCounterSheet({
               {t("deal.counter.yourChanges")}
             </p>
 
-            <div className="space-y-2.5.5">
+            <div className="space-y-2.5">
               <Label>{t("deal.deliverables")}</Label>
               <DynamicListInput
                 items={deliverableItems}
@@ -145,23 +146,29 @@ export function DealCounterSheet({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2.5">
                 <Label htmlFor="counterBudget">{t("deal.budget")}</Label>
-                <Input
-                  id="counterBudget"
-                  type="number"
-                  min={0}
-                  step={0.01}
-                  value={budgetDollars}
-                  onChange={(e) => setBudgetDollars(e.target.value)}
-                  placeholder="0.00"
-                />
+                <div className="flex">
+                  <span className="flex items-center rounded-l-lg border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground uppercase">
+                    {deal.currency || getCurrencyForLocale(locale)}
+                  </span>
+                  <Input
+                    id="counterBudget"
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    className="rounded-l-none"
+                    value={budgetDollars}
+                    onChange={(e) => setBudgetDollars(e.target.value)}
+                    placeholder="0.00"
+                  />
+                </div>
               </div>
               <div className="space-y-2.5">
-                <Label htmlFor="counterTimeline">{t("deal.timeline")}</Label>
-                <Input
-                  id="counterTimeline"
+                <Label>{t("deal.timeline")}</Label>
+                <DatePicker
                   value={timeline}
-                  onChange={(e) => setTimeline(e.target.value)}
-                  placeholder={t("deal.timelinePlaceholder")}
+                  onChange={(val) => setTimeline(val)}
+                  placeholder="Pick a deadline"
+                  className="min-w-0"
                 />
               </div>
             </div>

@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
+  pending: "bg-yellow-500/10 text-yellow-600",
   negotiating: "bg-amber-500/10 text-amber-600",
   accepted: "bg-primary/10 text-primary",
   in_progress: "bg-blue-500/10 text-blue-600",

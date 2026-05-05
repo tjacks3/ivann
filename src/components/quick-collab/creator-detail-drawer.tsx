@@ -12,7 +12,7 @@ import { MapPin, Users, X, Check } from "lucide-react";
 import { getPlatformMeta } from "@/lib/social/platforms";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
-import type { MatchedCreator } from "@/app/(app)/brand/quick-collab/actions";
+import type { MatchedCreator } from "@/app/(app)/brand/quick-deal/actions";
 
 const FIT_LABEL_COLORS: Record<string, string> = {
   "Strong niche match": "bg-purple-500/10 text-purple-600 border-purple-500/30",

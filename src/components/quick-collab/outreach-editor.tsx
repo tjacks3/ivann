@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/i18n";
 import { Pencil, Check, Send, Loader2 } from "lucide-react";
-import type { OutreachDraft } from "@/app/(app)/brand/quick-collab/actions";
+import type { OutreachDraft } from "@/app/(app)/brand/quick-deal/actions";
 
 interface OutreachEditorProps {
   outreaches: OutreachDraft[];

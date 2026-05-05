@@ -43,7 +43,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
 
   const brandLinks = [
     { href: "/brand/dashboard", label: t("nav.brandDashboard"), icon: LayoutDashboard },
-    { href: "/brand/quick-collab", label: t("nav.quickCollab"), icon: Zap },
+    { href: "/brand/quick-deal", label: t("nav.quickCollab"), icon: Zap },
     { href: "/discover", label: t("nav.discover"), icon: Compass },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
   ];

@@ -31,7 +31,7 @@ export function CompletionActions({
         <div className="flex flex-wrap gap-2">
           {isBrand && (
             <>
-              <Link href="/brand/quick-collab">
+              <Link href="/brand/quick-deal">
                 <Button variant="outline" size="sm" className="cursor-pointer">
                   <Zap className="size-3.5" />
                   Start New Collaboration

@@ -19,7 +19,7 @@ import {
   Info,
 } from "lucide-react";
 import { initFunding, confirmFunding } from "@/app/(app)/deals/payment-actions";
-import type { CollabPaymentData } from "@/app/(app)/collaboration-workspace/actions";
+import type { CollabPaymentData } from "@/app/(app)/deal-workspace/actions";
 
 const STATUS_CONFIG: Record<
   string,

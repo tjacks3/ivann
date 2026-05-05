@@ -46,7 +46,7 @@ export function RequestCard({ collab, viewAs, onUpdated }: RequestCardProps) {
     setLoading(true);
     const result = await acceptCollaboration(collab.id);
     if (result.success && result.collaborationWorkspaceId) {
-      router.push(`/collaboration-workspace/${result.collaborationWorkspaceId}`);
+      router.push(`/deal-workspace/${result.collaborationWorkspaceId}`);
     } else {
       onUpdated();
     }
@@ -128,7 +128,7 @@ export function RequestCard({ collab, viewAs, onUpdated }: RequestCardProps) {
         {collab.status === "accepted" && (
           <div className="pt-1">
             {collab.collaborationWorkspaceId ? (
-              <Link href={`/collaboration-workspace/${collab.collaborationWorkspaceId}`}>
+              <Link href={`/deal-workspace/${collab.collaborationWorkspaceId}`}>
                 <Button size="sm" className="w-full cursor-pointer">
                   <Rocket className="size-3.5" />
                   {t("collab.launchWorkspace")}
@@ -144,7 +144,7 @@ export function RequestCard({ collab, viewAs, onUpdated }: RequestCardProps) {
                   const result = await launchCollaborationWorkspace(collab.id);
                   if (result.success && result.collaborationWorkspaceId) {
                     router.push(
-                      `/collaboration-workspace/${result.collaborationWorkspaceId}`,
+                      `/deal-workspace/${result.collaborationWorkspaceId}`,
                     );
                   } else {
                     onUpdated();
@@ -217,7 +217,7 @@ export function RequestCard({ collab, viewAs, onUpdated }: RequestCardProps) {
                 </div>
                 <p className="mt-4 flex items-start gap-1.5 text-xs text-muted-foreground">
                   <Info className="mt-0.5 size-3.5 shrink-0" />
-                  If you are interested you'll enter the collaboration workspace to review details and confirm before finalizing.
+                  Accepting will take you to the deal workspace to review details before finalizing.
                 </p>
               </div>
             )}

@@ -1,8 +1,8 @@
 "use client";
 
-import { use, useState, useEffect, useRef } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+
 import { PageContainer } from "@/components/shared/page-container";
 import { LoadingState } from "@/components/shared/loading-state";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ import {
   getDealPayment,
   type DealPaymentInfo,
 } from "@/app/(app)/deals/payment-actions";
-import { getCollaborationByDealId } from "@/app/(app)/collaboration-workspace/actions";
+import { getCollaborationByDealId } from "@/app/(app)/deal-workspace/actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "@/i18n";
 import {
@@ -53,8 +53,6 @@ export default function DealWorkspacePage({
   const { user } = useUser();
   const { deal, isLoading, refetch } = useDeal(dealId);
   const queryClient = useQueryClient();
-  const router = useRouter();
-  const redirectedRef = useRef(false);
 
   const [editOpen, setEditOpen] = useState(false);
   const [counterOpen, setCounterOpen] = useState(false);
@@ -73,13 +71,8 @@ export default function DealWorkspacePage({
     }
   }, [dealId]);
 
-  // Auto-redirect QuickCollab deals to collaboration workspace
-  useEffect(() => {
-    if (deal?.collabRequestId && collabId && !redirectedRef.current) {
-      redirectedRef.current = true;
-      router.replace(`/collaboration-workspace/${collabId}`);
-    }
-  }, [deal?.collabRequestId, collabId, router]);
+  // Quick Deals redirect to workspace from the dashboard directly.
+  // Regular Deals stay on this detail page — workspace link shown in UI.
 
   const refreshAll = () => {
     refetch();
@@ -110,7 +103,7 @@ export default function DealWorkspacePage({
 
   const isBrand = user?.role === "brand";
   const isCreator = user?.role === "creator";
-  const isNegotiable = deal.status === "draft" || deal.status === "negotiating";
+  const isNegotiable = deal.status === "draft" || deal.status === "pending" || deal.status === "negotiating";
   const showCancel = deal.status !== "completed" && deal.status !== "cancelled" && deal.status !== "delivered";
 
   const handleEditSave = async (data: {
@@ -187,7 +180,7 @@ export default function DealWorkspacePage({
   const dashboardHref = isBrand ? "/brand/dashboard" : "/creator/dashboard";
 
   return (
-    <PageContainer>
+    <PageContainer size="narrow">
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <Link
@@ -197,6 +190,18 @@ export default function DealWorkspacePage({
           <ArrowLeft className="size-3.5" />
           {t("deal.backToDashboard")}
         </Link>
+      </div>
+
+      {/* Payment section — above summary */}
+      <div className="mt-4">
+        <DealPaymentSection
+          payment={payment}
+          dealBudget={deal.budget}
+          dealCurrency={deal.currency}
+          isBrand={!!isBrand}
+          dealStatus={deal.status}
+          onFund={handleFundDeal}
+        />
       </div>
 
       {/* Summary card */}
@@ -211,67 +216,51 @@ export default function DealWorkspacePage({
           onAccept={() => handleStatusChange("accepted")}
           onCancel={() => setCancelConfirmOpen(true)}
           actionLoading={statusLoading}
-        />
-      </div>
-
-      {/* Status actions for non-negotiable states (negotiable actions are in cards) */}
-      {!collabId && !isNegotiable && (statusActions.length > 0 || showCancel) && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {statusActions.map((action) => (
-            <Button
-              key={action.status}
-              variant={action.variant ?? "outline"}
-              size="sm"
-              onClick={() => handleStatusChange(action.status)}
-              disabled={statusLoading}
-              className="cursor-pointer"
-            >
-              {statusLoading ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                action.icon
+        >
+          {/* Status actions + collab link — inside the summary card */}
+          {((!collabId && !isNegotiable && (statusActions.length > 0 || showCancel)) || collabId) && (
+            <div className="flex flex-wrap gap-2">
+              {!collabId && !isNegotiable && statusActions.map((action) => (
+                <Button
+                  key={action.status}
+                  variant={action.variant ?? "outline"}
+                  size="sm"
+                  onClick={() => handleStatusChange(action.status)}
+                  disabled={statusLoading}
+                  className="cursor-pointer"
+                >
+                  {statusLoading ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    action.icon
+                  )}
+                  {action.label}
+                </Button>
+              ))}
+              {!collabId && !isNegotiable && showCancel && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setCancelConfirmOpen(true)}
+                  disabled={statusLoading}
+                  className="cursor-pointer"
+                >
+                  <XCircle className="size-3.5" />
+                  {t("deal.action.cancel")}
+                </Button>
               )}
-              {action.label}
-            </Button>
-          ))}
-          {showCancel && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setCancelConfirmOpen(true)}
-              disabled={statusLoading}
-              className="cursor-pointer"
-            >
-              <XCircle className="size-3.5" />
-              {t("deal.action.cancel")}
-            </Button>
+              {collabId && (
+                <Link
+                  href={`/deal-workspace/${collabId}`}
+                  className={buttonVariants({ variant: "default", size: "sm" })}
+                >
+                  <Rocket className="size-3.5" />
+                  Go to Deal Workspace
+                </Link>
+              )}
+            </div>
           )}
-        </div>
-      )}
-
-      {/* Collaboration workspace link */}
-      {collabId && (
-        <div className="mt-4">
-          <Link
-            href={`/collaboration-workspace/${collabId}`}
-            className={buttonVariants({ variant: "default" })}
-          >
-            <Rocket className="size-3.5" />
-            Go to Collaboration Workspace
-          </Link>
-        </div>
-      )}
-
-      {/* Payment section */}
-      <div className="mt-4">
-        <DealPaymentSection
-          payment={payment}
-          dealBudget={deal.budget}
-          dealCurrency={deal.currency}
-          isBrand={!!isBrand}
-          dealStatus={deal.status}
-          onFund={handleFundDeal}
-        />
+        </DealSummaryCard>
       </div>
 
       {/* Revision timeline */}
@@ -334,12 +323,12 @@ export default function DealWorkspacePage({
                   <XCircle className="size-6 text-destructive" />
                 </div>
                 <h3 className="text-lg font-semibold">
-                  {t("deal.cancel.title")}
+                  {isCreator ? t("deal.decline.title") : t("deal.cancel.title")}
                 </h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {isBrand
                     ? t("deal.cancel.brandMessage")
-                    : t("deal.cancel.creatorMessage")}
+                    : t("deal.decline.creatorMessage")}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -360,7 +349,7 @@ export default function DealWorkspacePage({
                   }}
                 >
                   {statusLoading && <Loader2 className="size-3.5 animate-spin" />}
-                  {t("deal.cancel.confirm")}
+                  {isCreator ? t("deal.decline.confirm") : t("deal.cancel.confirm")}
                 </Button>
               </div>
             </CardContent>

@@ -22,7 +22,7 @@ const COLLAB_TYPE_LABELS: Record<string, string> = {
   youtube_promo: "YouTube Promo",
   tiktok_post: "TikTok Post",
   podcast_mention: "Podcast Mention",
-  other: "Custom Collaboration",
+  other: "Custom Deal",
 };
 
 const COLLAB_TYPE_DELIVERABLES: Record<string, string> = {
@@ -35,7 +35,7 @@ const COLLAB_TYPE_DELIVERABLES: Record<string, string> = {
   tiktok_post: "1 TikTok Post promoting the business to local audience",
   podcast_mention:
     "1 Podcast Mention with business name and brief description",
-  other: "1 Custom collaboration deliverable as discussed",
+  other: "1 Custom deal deliverable as discussed",
 };
 
 const BUDGET_RANGE_LABELS: Record<string, string> = {
@@ -143,7 +143,7 @@ export function generateOutreachMessage(
     BUSINESS_CATEGORY_LABELS[request.businessCategory] ?? "business";
   const deliverableLabel =
     COLLAB_TYPE_LABELS[request.collabType]?.toLowerCase() ??
-    "a collaboration";
+    "a deal";
   const budgetLabel =
     BUDGET_RANGE_LABELS[request.budgetRange] ?? request.budgetRange;
   const timingSentence =
@@ -172,9 +172,9 @@ export function generateOutreachMessage(
     "",
     `I came across your profile and think you'd be a great fit — ${topFitReason}.`,
     "",
-    `I'm looking for ${deliverableLabel === "a collaboration" ? "a collaboration" : `a ${deliverableLabel}`} and my budget is ${budgetLabel}. ${timingSentence}`,
+    `I'm looking for ${deliverableLabel === "a deal" ? "a deal" : `a ${deliverableLabel}`} and my budget is ${budgetLabel}. ${timingSentence}`,
     "",
-    "Would you be interested in collaborating? I'd love to discuss the details!",
+    "Would you be interested in working together? I'd love to discuss the details!",
     "",
     `Best,`,
     brandContactName,

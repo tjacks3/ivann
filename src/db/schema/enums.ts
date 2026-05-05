@@ -76,6 +76,7 @@ export const collaborationStateEnum = pgEnum("collaboration_state", [
 // Deal statuses
 export const dealStatusEnum = pgEnum("deal_status", [
   "draft",
+  "pending",
   "negotiating",
   "accepted",
   "in_progress",

@@ -18,7 +18,7 @@ import {
   collabMessageSchema,
   type BriefValues,
   type DeliverableSubmissionValues,
-} from "@/lib/validations/collaboration-workspace";
+} from "@/lib/validations/deal-workspace";
 
 // ─── Auth Helper ────────────────────────────────────────────────────────────
 
@@ -153,7 +153,9 @@ export async function createCollaboration(dealId: string) {
       creatorId: deal.creatorId,
       deliverableType: deal.deliverables?.slice(0, 100) ?? null,
       budgetAmount: deal.budget ?? null,
-      dueDate: deal.timeline ? new Date(deal.timeline) : null,
+      dueDate: deal.timeline && !isNaN(new Date(deal.timeline).getTime())
+        ? new Date(deal.timeline)
+        : null,
     })
     .returning();
 
@@ -185,7 +187,7 @@ export async function createCollaboration(dealId: string) {
       type: "collab_update",
       title: `Collaboration workspace created for "${deal.title}"`,
       body: "Your collaboration workspace is ready. Next step: brand provides the campaign brief.",
-      actionUrl: `/collaboration-workspace/${collab.id}`,
+      actionUrl: `/deal-workspace/${collab.id}`,
       referenceId: collab.id,
       referenceType: "collaboration",
       email: party.email,
@@ -266,7 +268,7 @@ export async function submitBrief(
       type: "collab_update",
       title: "Campaign brief submitted",
       body: "The brand has submitted the campaign brief. Please review and confirm.",
-      actionUrl: `/collaboration-workspace/${collaborationId}`,
+      actionUrl: `/deal-workspace/${collaborationId}`,
       referenceId: collaborationId,
       referenceType: "collaboration",
       email: creator.email,
@@ -322,7 +324,7 @@ export async function confirmDeliverable(collaborationId: string) {
       type: "collab_update",
       title: "Creator confirmed the deliverable",
       body: "The creator has reviewed the brief and confirmed. Work is now in progress.",
-      actionUrl: `/collaboration-workspace/${collaborationId}`,
+      actionUrl: `/deal-workspace/${collaborationId}`,
       referenceId: collaborationId,
       referenceType: "collaboration",
       email: brand.email,
@@ -383,7 +385,7 @@ export async function requestBriefChanges(
       type: "collab_update",
       title: "Creator requested brief changes",
       body: message,
-      actionUrl: `/collaboration-workspace/${collaborationId}`,
+      actionUrl: `/deal-workspace/${collaborationId}`,
       referenceId: collaborationId,
       referenceType: "collaboration",
       email: brand.email,
@@ -455,7 +457,7 @@ export async function submitDeliverable(
       type: "collab_update",
       title: "Deliverable submitted for review",
       body: "The creator has submitted their deliverable. Please review and approve.",
-      actionUrl: `/collaboration-workspace/${collaborationId}`,
+      actionUrl: `/deal-workspace/${collaborationId}`,
       referenceId: collaborationId,
       referenceType: "collaboration",
       email: brand.email,
@@ -531,7 +533,7 @@ export async function approveDeliverable(collaborationId: string) {
       type: "collab_update",
       title: "Deliverable approved!",
       body: "The brand has approved your deliverable. Collaboration complete!",
-      actionUrl: `/collaboration-workspace/${collaborationId}`,
+      actionUrl: `/deal-workspace/${collaborationId}`,
       referenceId: collaborationId,
       referenceType: "collaboration",
       email: creator.email,
@@ -605,7 +607,7 @@ export async function requestRevision(
       type: "collab_update",
       title: "Revision requested",
       body: message,
-      actionUrl: `/collaboration-workspace/${collaborationId}`,
+      actionUrl: `/deal-workspace/${collaborationId}`,
       referenceId: collaborationId,
       referenceType: "collaboration",
       email: creator.email,

@@ -14,7 +14,7 @@ import {
   Upload,
   Trophy,
 } from "lucide-react";
-import type { StateHistoryItem } from "@/app/(app)/collaboration-workspace/actions";
+import type { StateHistoryItem } from "@/app/(app)/deal-workspace/actions";
 
 const STEPS = [
   { key: "awaiting_brand_brief", label: "Accepted", icon: CheckCircle2 },

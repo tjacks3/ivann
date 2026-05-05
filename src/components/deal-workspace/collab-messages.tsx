@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { sendCollabMessage } from "@/app/(app)/collaboration-workspace/actions";
-import type { CollabMessageItem } from "@/app/(app)/collaboration-workspace/actions";
+import { sendCollabMessage } from "@/app/(app)/deal-workspace/actions";
+import type { CollabMessageItem } from "@/app/(app)/deal-workspace/actions";
 import { Send, Loader2, MessageCircle, Activity, Info } from "lucide-react";
 
 function formatTime(date: Date): string {

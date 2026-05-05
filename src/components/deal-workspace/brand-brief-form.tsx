@@ -23,11 +23,11 @@ import {
 import {
   submitBrief,
   saveBriefDraft,
-} from "@/app/(app)/collaboration-workspace/actions";
+} from "@/app/(app)/deal-workspace/actions";
 import {
   briefSchema,
   type BriefValues,
-} from "@/lib/validations/collaboration-workspace";
+} from "@/lib/validations/deal-workspace";
 import { Loader2, X, Check, FileText, Info } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 

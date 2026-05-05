@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { submitDeliverable } from "@/app/(app)/collaboration-workspace/actions";
+import { submitDeliverable } from "@/app/(app)/deal-workspace/actions";
 import {
   deliverableSubmissionSchema,
   type DeliverableSubmissionValues,
-} from "@/lib/validations/collaboration-workspace";
+} from "@/lib/validations/deal-workspace";
 import { Loader2, Upload, ExternalLink, Clock } from "lucide-react";
 
 function getDaysUntil(date: Date | null): string | null {

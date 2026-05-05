@@ -9,6 +9,7 @@ import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
 import { DollarSign, Clock, FileText, ArrowLeftRight, CheckCircle, XCircle, Pencil } from "lucide-react";
 import type { DealWithParties } from "@/app/(app)/deals/actions";
+import type { ReactNode } from "react";
 
 function getInitials(name: string | null): string {
   return (name || "?")
@@ -29,6 +30,7 @@ interface DealSummaryCardProps {
   onAccept?: () => void;
   onCancel?: () => void;
   actionLoading?: boolean;
+  children?: ReactNode;
 }
 
 export function DealSummaryCard({
@@ -41,6 +43,7 @@ export function DealSummaryCard({
   onAccept,
   onCancel,
   actionLoading,
+  children,
 }: DealSummaryCardProps) {
   const { t, locale } = useTranslation();
 
@@ -93,8 +96,8 @@ export function DealSummaryCard({
             </div>
         </div>
 
-        {/* Description */}
-        {deal.notes && (
+        {/* Description — creator only */}
+        {!isBrand && deal.notes && (
           <div>
             <p className="text-xs font-medium uppercase text-muted-foreground">
               {t("deal.description")}
@@ -147,62 +150,77 @@ export function DealSummaryCard({
               </p>
             </div>
 
-            {/* Actions — only shown when no revisions exist (otherwise actions move to revision timeline) */}
-            {isNegotiable && !hasRevisions && (
-              <div className="flex flex-wrap items-end gap-2 sm:col-span-3">
-                {/* Creator can accept, counter, or cancel the original proposal */}
-                {!isBrand && onAccept && (
-                  <Button
-                    size="sm"
-                    onClick={onAccept}
-                    disabled={actionLoading}
-                    className="cursor-pointer"
-                  >
-                    <CheckCircle className="size-3.5" />
-                    {t("deal.action.accept")}
-                  </Button>
-                )}
-                {!isBrand && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onCounter}
-                    disabled={actionLoading}
-                    className="cursor-pointer"
-                  >
-                    <ArrowLeftRight className="size-3.5" />
-                    {t("deal.counterProposal")}
-                  </Button>
-                )}
-                {/* Brand can edit or cancel */}
-                {isBrand && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onEdit}
-                    disabled={actionLoading}
-                    className="cursor-pointer"
-                  >
-                    <Pencil className="size-3.5" />
-                    {t("deal.editProposal")}
-                  </Button>
-                )}
-                {onCancel && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={onCancel}
-                    disabled={actionLoading}
-                    className="cursor-pointer"
-                  >
-                    <XCircle className="size-3.5" />
-                    {t("deal.action.cancel")}
-                  </Button>
-                )}
-              </div>
-            )}
           </div>
         </div>
+
+        {/* Actions — only shown when no revisions exist (otherwise actions move to revision timeline) */}
+        {isNegotiable && !hasRevisions && (
+          <div className="flex flex-wrap gap-2">
+            {/* Creator: Request Changes → Decline → Accept */}
+            {!isBrand && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onCounter}
+                disabled={actionLoading}
+                className="cursor-pointer"
+              >
+                <ArrowLeftRight className="size-3.5" />
+                {t("deal.counterProposal")}
+              </Button>
+            )}
+            {!isBrand && onCancel && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={onCancel}
+                disabled={actionLoading}
+                className="cursor-pointer"
+              >
+                <XCircle className="size-3.5" />
+                {t("deal.action.decline")}
+              </Button>
+            )}
+            {!isBrand && onAccept && (
+              <Button
+                size="sm"
+                onClick={onAccept}
+                disabled={actionLoading}
+                className="cursor-pointer"
+              >
+                <CheckCircle className="size-3.5" />
+                {t("deal.action.accept")}
+              </Button>
+            )}
+            {/* Brand: Edit → Cancel */}
+            {isBrand && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onEdit}
+                disabled={actionLoading}
+                className="cursor-pointer"
+              >
+                <Pencil className="size-3.5" />
+                {t("deal.editProposal")}
+              </Button>
+            )}
+            {isBrand && onCancel && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={onCancel}
+                disabled={actionLoading}
+                className="cursor-pointer"
+              >
+                <XCircle className="size-3.5" />
+                {t("deal.action.cancel")}
+              </Button>
+            )}
+          </div>
+        )}
+
+        {children}
 
       </CardContent>
     </Card>

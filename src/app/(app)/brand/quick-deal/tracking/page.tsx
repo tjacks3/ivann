@@ -37,7 +37,7 @@ export default function QuickCollabTrackingPage() {
         description={t("quickCollab.tracking.subtitle")}
         action={
           <Link
-            href="/brand/quick-collab"
+            href="/brand/quick-deal"
             className={buttonVariants({ size: "sm" })}
           >
             <Zap className="size-3.5" />

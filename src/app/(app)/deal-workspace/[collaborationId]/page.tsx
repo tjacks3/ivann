@@ -9,29 +9,29 @@ import { buttonVariants } from "@/components/ui/button-variants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CollaborationSummary } from "@/components/collaboration-workspace/collaboration-summary";
-import { NextStepCard } from "@/components/collaboration-workspace/next-step-card";
-import { BrandBriefForm } from "@/components/collaboration-workspace/brand-brief-form";
-import { BriefReview } from "@/components/collaboration-workspace/brief-review";
-import { DeliverableSubmission } from "@/components/collaboration-workspace/deliverable-submission";
-import { BrandReviewActions } from "@/components/collaboration-workspace/brand-review-actions";
+import { CollaborationSummary } from "@/components/deal-workspace/collaboration-summary";
+import { NextStepCard } from "@/components/deal-workspace/next-step-card";
+import { BrandBriefForm } from "@/components/deal-workspace/brand-brief-form";
+import { BriefReview } from "@/components/deal-workspace/brief-review";
+import { DeliverableSubmission } from "@/components/deal-workspace/deliverable-submission";
+import { BrandReviewActions } from "@/components/deal-workspace/brand-review-actions";
 import {
   ActivityLog,
   CollabMessages,
-} from "@/components/collaboration-workspace/collab-messages";
-import { CollaborationPaymentCard } from "@/components/collaboration-workspace/collaboration-payment-card";
+} from "@/components/deal-workspace/collab-messages";
+import { CollaborationPaymentCard } from "@/components/deal-workspace/collaboration-payment-card";
 
-import { WaitingOnBadge } from "@/components/collaboration-workspace/waiting-on-badge";
-import { StaleNudgeBanner } from "@/components/collaboration-workspace/stale-nudge-banner";
-import { CompletionActions } from "@/components/collaboration-workspace/completion-actions";
-import { useCollaborationWorkspace } from "@/hooks/use-collaboration-workspace";
+import { WaitingOnBadge } from "@/components/deal-workspace/waiting-on-badge";
+import { StaleNudgeBanner } from "@/components/deal-workspace/stale-nudge-banner";
+import { CompletionActions } from "@/components/deal-workspace/completion-actions";
+import { useCollaborationWorkspace } from "@/hooks/use-deal-workspace";
 import { useUser } from "@/hooks/use-user";
 import {
   getCollaborationPayment,
   type CollabPaymentData,
-} from "@/app/(app)/collaboration-workspace/actions";
+} from "@/app/(app)/deal-workspace/actions";
 import { initFunding, confirmFunding } from "@/app/(app)/deals/payment-actions";
-import type { BriefValues } from "@/lib/validations/collaboration-workspace";
+import type { BriefValues } from "@/lib/validations/deal-workspace";
 import { ArrowLeft, Pencil, Rocket, Lock, PanelRight } from "lucide-react";
 
 export default function CollaborationWorkspacePage({
@@ -205,7 +205,7 @@ export default function CollaborationWorkspacePage({
           <Rocket className="size-4 text-primary" />
         </div>
         <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
-          Collaboration Workspace
+          Deal Workspace
         </p>
         <WaitingOnBadge state={collaboration.state} userRole={userRole} />
       </div>

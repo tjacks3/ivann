@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { Send, MessageSquare } from "lucide-react";
-import type { TrackingItem } from "@/app/(app)/brand/quick-collab/actions";
+import type { TrackingItem } from "@/app/(app)/brand/quick-deal/actions";
 
 const STATUS_FILTERS = [
   "all",

@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
 import { Target, Package, Calendar, DollarSign } from "lucide-react";
-import type { CollaborationData } from "@/app/(app)/collaboration-workspace/actions";
-import type { BriefValues } from "@/lib/validations/collaboration-workspace";
+import type { CollaborationData } from "@/app/(app)/deal-workspace/actions";
+import type { BriefValues } from "@/lib/validations/deal-workspace";
 
 const STATE_STYLES: Record<string, string> = {
   awaiting_brand_brief: "bg-amber-500/10 text-amber-600",

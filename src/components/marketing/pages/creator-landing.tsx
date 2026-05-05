@@ -122,8 +122,8 @@ export function CreatorLandingPage() {
       <SectionWrapper>
         <ValueProp
           icon={Handshake}
-          title="Collaborations on your terms"
-          description="When a brand sends you a collaboration request, you're in control. Review the offer, accept or decline, and manage the entire partnership through ivann's built-in messaging."
+          title="Deals on your terms"
+          description="When a brand sends you a deal, you're in control. Review the terms, accept or decline, and manage the entire partnership through ivann's built-in messaging."
           features={[
             "Incoming requests with full campaign details",
             "Accept, decline, or negotiate directly",

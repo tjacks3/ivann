@@ -12,7 +12,7 @@ import {
   updateOutreachMessage,
   sendOutreaches,
   getQuickCollabRequest,
-} from "@/app/(app)/brand/quick-collab/actions";
+} from "@/app/(app)/brand/quick-deal/actions";
 import type { QuickCollabIntakeValues, CampaignEditValues } from "@/lib/validations/quick-collab";
 
 export function useQuickCollab(requestId?: string) {

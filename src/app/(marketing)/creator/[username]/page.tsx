@@ -8,6 +8,7 @@ import { PlatformGrid, type PlatformData } from "@/components/profile/platform-g
 import { PackagePublicCard } from "@/components/packages/package-public-card";
 import { RelatedCreators } from "@/components/discover/related-creators";
 import { RequestForm } from "@/components/collaborations/request-form";
+import { PackageOfferSummary } from "@/components/collaborations/package-offer-summary";
 import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -110,6 +111,7 @@ export default function PublicCreatorProfilePage({
             <FavoriteButton creatorId={profile.id} isFavorited={isFavorited} />
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger
+              onClick={() => setSelectedPackageId(undefined)}
               className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/85"
             >
               <Handshake className="size-3.5" />
@@ -124,13 +126,22 @@ export default function PublicCreatorProfilePage({
                   <X className="size-5" />
                 </SheetClose>
               </div>
-              <RequestForm
-                creatorId={profile.id}
-                creatorName={profile.fullName || ""}
-                packages={activePackages}
-                preSelectedPackageId={selectedPackageId}
-                onClose={() => setSheetOpen(false)}
-              />
+              {selectedPackageId && activePackages.find((p) => p.id === selectedPackageId) ? (
+                <PackageOfferSummary
+                  pkg={activePackages.find((p) => p.id === selectedPackageId)!}
+                  creatorId={profile.id}
+                  creatorName={profile.fullName || ""}
+                  onClose={() => setSheetOpen(false)}
+                />
+              ) : (
+                <RequestForm
+                  creatorId={profile.id}
+                  creatorName={profile.fullName || ""}
+                  packages={activePackages}
+                  preSelectedPackageId={selectedPackageId}
+                  onClose={() => setSheetOpen(false)}
+                />
+              )}
             </SheetContent>
           </Sheet>
           </div>

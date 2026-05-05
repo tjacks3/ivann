@@ -6,6 +6,9 @@ import {
   users,
   socialAccounts,
   collaborationRequests,
+  deals,
+  messageThreads,
+  messageThreadMembers,
   quickCollabRequests,
   quickCollabMatches,
   quickCollabCampaigns,
@@ -597,7 +600,7 @@ export async function sendOutreaches(outreachIds: string[]) {
       youtube_promo: "YouTube Promo",
       tiktok_post: "TikTok Post",
       podcast_mention: "Podcast Mention",
-      other: "Custom Collaboration",
+      other: "Custom Deal",
     };
 
     const [collabRequest] = await db
@@ -605,7 +608,7 @@ export async function sendOutreaches(outreachIds: string[]) {
       .values({
         brandId: user.id,
         creatorId: outreach.creatorId,
-        title: `QuickCollab: ${collabTypeLabels[request.collabType] ?? request.collabType} for ${request.businessName}`,
+        title: `Quick Deal: ${collabTypeLabels[request.collabType] ?? request.collabType} for ${request.businessName}`,
         message: outreach.message,
         budget: budgetRangeToCents(request.budgetRange),
         currency: "usd",
@@ -614,8 +617,40 @@ export async function sendOutreaches(outreachIds: string[]) {
       })
       .returning();
 
-    // Update outreach with link and status
+    // Create message thread
     const now = new Date();
+    const [thread] = await db
+      .insert(messageThreads)
+      .values({
+        subject: collabRequest.title,
+        lastMessageAt: now,
+      })
+      .returning();
+
+    await db.insert(messageThreadMembers).values([
+      { threadId: thread.id, userId: user.id },
+      { threadId: thread.id, userId: outreach.creatorId },
+    ]);
+
+    // Create deal linked to the collab request
+    const [deal] = await db
+      .insert(deals)
+      .values({
+        brandId: user.id,
+        creatorId: outreach.creatorId,
+        collabRequestId: collabRequest.id,
+        threadId: thread.id,
+        title: collabRequest.title,
+        deliverables: null,
+        budget: collabRequest.budget,
+        currency: collabRequest.currency,
+        timeline: collabRequest.deadline,
+        notes: outreach.message,
+        status: "pending",
+      })
+      .returning();
+
+    // Update outreach with link and status
     await db
       .update(quickCollabOutreaches)
       .set({
@@ -637,13 +672,13 @@ export async function sendOutreaches(outreachIds: string[]) {
       createAndEmail({
         userId: creator.id,
         type: "collab_request",
-        title: `New collaboration request from ${user.brandName ?? user.fullName ?? "a brand"}`,
-        body: `${user.brandName ?? user.fullName ?? "A brand"} wants to collaborate with you: "${collabRequest.title}". Review and accept or decline on your dashboard.`,
-        actionUrl: "/creator/dashboard",
-        referenceId: collabRequest.id,
+        title: `New deal from ${user.brandName ?? user.fullName ?? "a brand"}`,
+        body: `${user.brandName ?? user.fullName ?? "A brand"} wants to work with you: "${collabRequest.title}". Review and accept or decline on your dashboard.`,
+        actionUrl: `/deals/${deal.id}`,
+        referenceId: deal.id,
         referenceType: "collab_request",
         email: creator.email,
-        emailSubject: `New collaboration request: ${collabRequest.title}`,
+        emailSubject: `New deal: ${collabRequest.title}`,
       }).catch(() => {});
     }
 

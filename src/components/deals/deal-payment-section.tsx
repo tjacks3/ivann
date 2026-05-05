@@ -37,12 +37,13 @@ export function DealPaymentSection({
   const { t, locale } = useTranslation();
   const [funding, setFunding] = useState(false);
 
+  const isTerminal = dealStatus === "cancelled" || dealStatus === "completed";
   const showPaymentSection =
     dealStatus === "accepted" ||
     dealStatus === "in_progress" ||
     dealStatus === "delivered" ||
     dealStatus === "completed" ||
-    dealStatus === "cancelled";
+    (dealStatus === "cancelled" && payment?.status && payment.status !== "unpaid");
 
   if (!showPaymentSection) return null;
 
@@ -73,8 +74,8 @@ export function DealPaymentSection({
           <div className="flex items-center gap-3">
             {/* Status icon */}
             {status === "unpaid" && (
-              <div className="flex size-10 items-center justify-center rounded-full bg-muted">
-                <DollarSign className="size-5 text-foreground" />
+              <div className="flex size-10 items-center justify-center rounded-full bg-primary">
+                <DollarSign className="size-5 text-white" />
               </div>
             )}
             {status === "funding_pending" && (
@@ -139,8 +140,8 @@ export function DealPaymentSection({
             </div>
           </div>
 
-          {/* Fund button (brand only, unpaid only) */}
-          {isBrand && status === "unpaid" && amount > 0 && (
+          {/* Fund button (brand only, unpaid only, not cancelled) */}
+          {isBrand && status === "unpaid" && !isTerminal && amount > 0 && (
             <Button
               onClick={handleFund}
               disabled={funding}

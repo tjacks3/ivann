@@ -44,73 +44,66 @@ export async function createDeal(data: CreateDealValues) {
   const parsed = createDealSchema.safeParse(data);
   if (!parsed.success) return { success: false as const, error: "VALIDATION_ERROR" };
 
-  const now = new Date();
+  try {
+    const now = new Date();
 
-  // Create message thread immediately
-  const [thread] = await db
-    .insert(messageThreads)
-    .values({
-      subject: parsed.data.title,
-      lastMessageAt: now,
-    })
-    .returning();
+    // Create message thread immediately
+    const [thread] = await db
+      .insert(messageThreads)
+      .values({
+        subject: parsed.data.title,
+        lastMessageAt: now,
+      })
+      .returning();
 
-  // Add both users as thread members
-  await db.insert(messageThreadMembers).values([
-    { threadId: thread.id, userId: user.id },
-    { threadId: thread.id, userId: parsed.data.creatorId },
-  ]);
+    // Add both users as thread members
+    await db.insert(messageThreadMembers).values([
+      { threadId: thread.id, userId: user.id },
+      { threadId: thread.id, userId: parsed.data.creatorId },
+    ]);
 
-  // Seed initial message from the brand
-  const initialMessage = parsed.data.notes
-    ? parsed.data.notes
-    : `Hi! I'd like to propose a deal: "${parsed.data.title}".`;
+    // Create the deal
+    const [deal] = await db
+      .insert(deals)
+      .values({
+        brandId: user.id,
+        creatorId: parsed.data.creatorId,
+        threadId: thread.id,
+        title: parsed.data.title,
+        deliverables: parsed.data.deliverables ?? null,
+        budget: parsed.data.budget ?? null,
+        currency: parsed.data.currency ?? "usd",
+        timeline: parsed.data.timeline ?? null,
+        notes: parsed.data.notes ?? null,
+        status: "pending",
+      })
+      .returning();
 
-  await db.insert(messages).values({
-    threadId: thread.id,
-    senderId: user.id,
-    body: initialMessage,
-  });
+    // Notify creator
+    const [creator] = await db
+      .select({ id: users.id, email: users.email, fullName: users.fullName })
+      .from(users)
+      .where(eq(users.id, parsed.data.creatorId))
+      .limit(1);
 
-  // Create the deal
-  const [deal] = await db
-    .insert(deals)
-    .values({
-      brandId: user.id,
-      creatorId: parsed.data.creatorId,
-      threadId: thread.id,
-      title: parsed.data.title,
-      deliverables: parsed.data.deliverables ?? null,
-      budget: parsed.data.budget ?? null,
-      currency: parsed.data.currency ?? "usd",
-      timeline: parsed.data.timeline ?? null,
-      notes: parsed.data.notes ?? null,
-      status: "draft",
-    })
-    .returning();
+    if (creator) {
+      createAndEmail({
+        userId: creator.id,
+        type: "collab_request",
+        title: `New deal proposal from ${user.brandName ?? user.fullName ?? "a brand"}`,
+        body: parsed.data.title,
+        actionUrl: `/deals/${deal.id}`,
+        referenceId: deal.id,
+        referenceType: "collab_request",
+        email: creator.email,
+        emailSubject: `New deal proposal: ${parsed.data.title}`,
+      }).catch(() => {});
+    }
 
-  // Notify creator
-  const [creator] = await db
-    .select({ id: users.id, email: users.email, fullName: users.fullName })
-    .from(users)
-    .where(eq(users.id, parsed.data.creatorId))
-    .limit(1);
-
-  if (creator) {
-    createAndEmail({
-      userId: creator.id,
-      type: "collab_request",
-      title: `New deal proposal from ${user.brandName ?? user.fullName ?? "a brand"}`,
-      body: parsed.data.title,
-      actionUrl: `/deals/${deal.id}`,
-      referenceId: deal.id,
-      referenceType: "collab_request",
-      email: creator.email,
-      emailSubject: `New deal proposal: ${parsed.data.title}`,
-    }).catch(() => {});
+    return { success: true as const, dealId: deal.id, threadId: thread.id };
+  } catch {
+    return { success: false as const, error: "SERVER_ERROR" };
   }
-
-  return { success: true as const, dealId: deal.id, threadId: thread.id };
 }
 
 // ─── Get Deal ───────────────────────────────────────────────────────────────
@@ -295,7 +288,7 @@ export async function editProposal(dealId: string, data: UpdateDealValues) {
 
   if (!deal) return { success: false as const, error: "NOT_FOUND" };
   if (deal.brandId !== user.id) return { success: false as const, error: "UNAUTHORIZED" };
-  if (deal.status !== "draft" && deal.status !== "negotiating") {
+  if (deal.status !== "draft" && deal.status !== "pending" && deal.status !== "negotiating") {
     return { success: false as const, error: "NOT_EDITABLE" };
   }
 
@@ -319,11 +312,11 @@ export async function editProposal(dealId: string, data: UpdateDealValues) {
     notes: parsed.data.notes ?? null,
   });
 
-  // Update deal status only
+  // Update deal status only — keep pending if still pending, otherwise negotiating
   await db
     .update(deals)
     .set({
-      status: deal.status === "draft" ? "draft" : "negotiating",
+      status: deal.status === "draft" || deal.status === "pending" ? "pending" : "negotiating",
       updatedAt: new Date(),
     })
     .where(eq(deals.id, dealId));
@@ -369,7 +362,7 @@ export async function submitCounterProposal(dealId: string, data: UpdateDealValu
 
   if (!deal) return { success: false as const, error: "NOT_FOUND" };
   if (deal.creatorId !== user.id) return { success: false as const, error: "UNAUTHORIZED" };
-  if (deal.status !== "draft" && deal.status !== "negotiating") {
+  if (deal.status !== "draft" && deal.status !== "pending" && deal.status !== "negotiating") {
     return { success: false as const, error: "NOT_EDITABLE" };
   }
 
@@ -501,7 +494,8 @@ export async function getDealRevisions(dealId: string): Promise<RevisionItem[]> 
 // ─── Update Deal Status ─────────────────────────────────────────────────────
 
 const STATUS_TRANSITIONS: Record<string, { allowed: string[]; roles: ("brand" | "creator")[] }[]> = {
-  draft: [{ allowed: ["negotiating"], roles: ["brand", "creator"] }, { allowed: ["accepted"], roles: ["creator"] }, { allowed: ["cancelled"], roles: ["brand", "creator"] }],
+  draft: [{ allowed: ["pending"], roles: ["brand"] }, { allowed: ["cancelled"], roles: ["brand", "creator"] }],
+  pending: [{ allowed: ["negotiating"], roles: ["brand", "creator"] }, { allowed: ["accepted"], roles: ["creator"] }, { allowed: ["cancelled"], roles: ["brand", "creator"] }],
   negotiating: [{ allowed: ["accepted"], roles: ["creator"] }, { allowed: ["cancelled"], roles: ["brand", "creator"] }],
   accepted: [{ allowed: ["in_progress"], roles: ["brand", "creator"] }, { allowed: ["cancelled"], roles: ["brand", "creator"] }],
   in_progress: [{ allowed: ["delivered"], roles: ["creator"] }, { allowed: ["cancelled"], roles: ["brand", "creator"] }],
@@ -534,56 +528,60 @@ export async function updateDealStatus(dealId: string, newStatus: string) {
   );
   if (!valid) return { success: false as const, error: "INVALID_TRANSITION" };
 
-  await db
-    .update(deals)
-    .set({ status: newStatus as typeof deal.status, updatedAt: new Date() })
-    .where(eq(deals.id, dealId));
+  try {
+    await db
+      .update(deals)
+      .set({ status: newStatus as typeof deal.status, updatedAt: new Date() })
+      .where(eq(deals.id, dealId));
 
-  // Auto-release payment on completion, auto-refund on cancellation
-  if (newStatus === "completed") {
-    releasePayment(dealId).catch(() => {});
-  } else if (newStatus === "cancelled") {
-    refundPayment(dealId).catch(() => {});
+    // Auto-release payment on completion, auto-refund on cancellation
+    if (newStatus === "completed") {
+      releasePayment(dealId).catch(() => {});
+    } else if (newStatus === "cancelled") {
+      refundPayment(dealId).catch(() => {});
+    }
+
+    // Auto-create collaboration workspace on acceptance (awaited to avoid race conditions)
+    if (newStatus === "accepted") {
+      const { createCollaboration } = await import(
+        "@/app/(app)/deal-workspace/actions"
+      );
+      await createCollaboration(dealId);
+    }
+
+    // Notify the other party
+    const otherUserId = isBrand ? deal.creatorId : deal.brandId;
+    const [otherUser] = await db
+      .select({ id: users.id, email: users.email })
+      .from(users)
+      .where(eq(users.id, otherUserId))
+      .limit(1);
+
+    const statusLabels: Record<string, string> = {
+      negotiating: "is being negotiated",
+      accepted: "has been accepted",
+      in_progress: "is now in progress",
+      delivered: "has been marked as delivered",
+      completed: "has been completed",
+      cancelled: "has been cancelled",
+    };
+
+    if (otherUser) {
+      createAndEmail({
+        userId: otherUser.id,
+        type: "collab_update",
+        title: `Deal "${deal.title}" ${statusLabels[newStatus] ?? "was updated"}`,
+        body: `Status changed to ${newStatus.replace("_", " ")}`,
+        actionUrl: `/deals/${deal.id}`,
+        referenceId: deal.id,
+        referenceType: "collab_request",
+        email: otherUser.email,
+        emailSubject: `Deal update: ${deal.title}`,
+      }).catch(() => {});
+    }
+
+    return { success: true as const };
+  } catch {
+    return { success: false as const, error: "SERVER_ERROR" };
   }
-
-  // Auto-create collaboration workspace on acceptance (awaited to avoid race conditions)
-  if (newStatus === "accepted") {
-    const { createCollaboration } = await import(
-      "@/app/(app)/collaboration-workspace/actions"
-    );
-    await createCollaboration(dealId);
-  }
-
-  // Notify the other party
-  const otherUserId = isBrand ? deal.creatorId : deal.brandId;
-  const [otherUser] = await db
-    .select({ id: users.id, email: users.email })
-    .from(users)
-    .where(eq(users.id, otherUserId))
-    .limit(1);
-
-  const statusLabels: Record<string, string> = {
-    negotiating: "is being negotiated",
-    accepted: "has been accepted",
-    in_progress: "is now in progress",
-    delivered: "has been marked as delivered",
-    completed: "has been completed",
-    cancelled: "has been cancelled",
-  };
-
-  if (otherUser) {
-    createAndEmail({
-      userId: otherUser.id,
-      type: "collab_update",
-      title: `Deal "${deal.title}" ${statusLabels[newStatus] ?? "was updated"}`,
-      body: `Status changed to ${newStatus.replace("_", " ")}`,
-      actionUrl: `/deals/${deal.id}`,
-      referenceId: deal.id,
-      referenceType: "collab_request",
-      email: otherUser.email,
-      emailSubject: `Deal update: ${deal.title}`,
-    }).catch(() => {});
-  }
-
-  return { success: true as const };
 }

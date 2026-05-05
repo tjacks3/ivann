@@ -6,7 +6,7 @@ import { useSupabase } from "@/hooks/use-supabase";
 import {
   getCollaboration,
   getCollaborationMessages,
-} from "@/app/(app)/collaboration-workspace/actions";
+} from "@/app/(app)/deal-workspace/actions";
 
 interface UseCollaborationWorkspaceOptions {
   /** When true, messages poll more aggressively (every 3s). */

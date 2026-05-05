@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/currency";
 import { useTranslation } from "@/i18n";
-import type { CollaborationData } from "@/app/(app)/collaboration-workspace/actions";
+import type { CollaborationData } from "@/app/(app)/deal-workspace/actions";
 
 function getInitials(name: string | null): string {
   return (name || "?")

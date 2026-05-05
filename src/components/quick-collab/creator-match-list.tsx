@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { CreatorMatchCard } from "./creator-match-card";
 import { useTranslation } from "@/i18n";
 import { SearchX, MapPin, Info } from "lucide-react";
-import type { MatchedCreator } from "@/app/(app)/brand/quick-collab/actions";
+import type { MatchedCreator } from "@/app/(app)/brand/quick-deal/actions";
 
 interface CreatorMatchListProps {
   matches: MatchedCreator[];

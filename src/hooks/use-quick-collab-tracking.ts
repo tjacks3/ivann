@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getQuickCollabTracking } from "@/app/(app)/brand/quick-collab/actions";
+import { getQuickCollabTracking } from "@/app/(app)/brand/quick-deal/actions";
 
 export function useQuickCollabTracking() {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);

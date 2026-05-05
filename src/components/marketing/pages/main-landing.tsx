@@ -76,7 +76,7 @@ export function MainLandingPage() {
           stats={[
             { value: "10K+", label: "Creators" },
             { value: "2K+", label: "Brands" },
-            { value: "50K+", label: "Collaborations" },
+            { value: "50K+", label: "Deals" },
             { value: "$5M+", label: "Creator Earnings" },
           ]}
         />
@@ -192,8 +192,8 @@ export function MainLandingPage() {
             },
             {
               icon: Handshake,
-              title: "Collaboration Requests",
-              description: "Brands send offers directly. Creators accept, decline, or counter.",
+              title: "Deal Requests",
+              description: "Brands send deals directly. Creators accept, decline, or request changes.",
             },
             {
               icon: MessageSquare,

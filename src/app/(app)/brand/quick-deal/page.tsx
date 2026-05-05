@@ -20,7 +20,7 @@ import { useQuickCollab } from "@/hooks/use-quick-collab";
 import { useBrandProfile } from "@/hooks/use-brand-profile";
 import { useTranslation } from "@/i18n";
 import { ArrowLeft, ArrowRight, CheckCircle, Zap, Search, MessageSquare, Shield, Sparkles } from "lucide-react";
-import type { MatchedCreator, OutreachDraft } from "@/app/(app)/brand/quick-collab/actions";
+import type { MatchedCreator, OutreachDraft } from "@/app/(app)/brand/quick-deal/actions";
 import type { QuickCollabCampaign } from "@/db/schema/quick-collab";
 
 type WizardStep =
@@ -304,7 +304,7 @@ export default function QuickCollabPage() {
           </p>
           <div className="mt-8 flex items-center gap-3">
             <Link
-              href="/brand/quick-collab/tracking"
+              href="/brand/quick-deal/tracking"
               className={buttonVariants()}
             >
               {t("quickCollab.success.viewTracking")}
@@ -358,7 +358,7 @@ export default function QuickCollabPage() {
               </div>
               <h1 className="text-2xl font-bold">Find Creators That Fit Your Brand</h1>
               <p className="mt-3 text-muted-foreground">
-                QuickCollab makes it easy to discover, connect with, and collaborate with creators who align with your brand&nbsp;&mdash;&nbsp;in&nbsp;just&nbsp;a&nbsp;few&nbsp;steps.
+                Quick Deal makes it easy to discover, connect with, and send deals to creators who align with your brand&nbsp;&mdash;&nbsp;in&nbsp;just&nbsp;a&nbsp;few&nbsp;steps.
               </p>
             </div>
 

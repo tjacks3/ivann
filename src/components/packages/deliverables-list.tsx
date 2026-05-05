@@ -30,7 +30,7 @@ export function DeliverablesList({ value, limit }: DeliverablesListProps) {
       {display.map((item, i) => (
         <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
           <Check className="mt-0.5 size-3 shrink-0 text-primary" />
-          <span>{item}</span>
+          <span className="break-words min-w-0">{item}</span>
         </li>
       ))}
       {remaining > 0 && (

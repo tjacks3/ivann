@@ -187,9 +187,9 @@ export async function getMyCollaborations(): Promise<CollabWithDetails[]> {
 
   return collabs
     .filter((c) => {
-      // Exclude accepted collabs that already have a linked deal — they show as deals instead
+      // Exclude collabs that have a linked deal — they show as deals instead
       const dealId = dealByCollabReqId.get(c.id);
-      return !(c.status === "accepted" && dealId);
+      return !dealId;
     })
     .map((c) => {
     const brand = userMap.get(c.brandId);
@@ -305,7 +305,7 @@ export async function acceptCollaboration(id: string) {
 
   // Auto-create collaboration workspace (awaited so it exists before UI fetches)
   const { createCollaboration } = await import(
-    "@/app/(app)/collaboration-workspace/actions"
+    "@/app/(app)/deal-workspace/actions"
   );
   const collabResult = await createCollaboration(deal.id);
 
@@ -317,7 +317,7 @@ export async function acceptCollaboration(id: string) {
     .limit(1);
 
   const workspaceUrl = collabResult.success && collabResult.collaborationId
-    ? `/collaboration-workspace/${collabResult.collaborationId}`
+    ? `/deal-workspace/${collabResult.collaborationId}`
     : `/deals/${deal.id}`;
 
   if (brand) {
@@ -488,7 +488,7 @@ export async function launchCollaborationWorkspace(collabRequestId: string) {
 
   // Create workspace if it doesn't exist
   const { createCollaboration } = await import(
-    "@/app/(app)/collaboration-workspace/actions"
+    "@/app/(app)/deal-workspace/actions"
   );
   const result = await createCollaboration(dealId);
 

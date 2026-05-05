@@ -285,3 +285,5 @@ TrailBlaze Outdoors brand@trailblaze.example.com TestPass123!
 3. Creator customizes any field → saves
 4. "Start from scratch" → form opens empty (previous behavior)
 5. Editing an existing package → sheet opens directly to form (no template step)
+
+### Collaboration Launch Flow

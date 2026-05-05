@@ -65,7 +65,7 @@ export function RequestForm({
     defaultValues: {
       creatorId,
       packageId: preSelectedPackageId,
-      title: preSelectedPkg ? `Collaboration: ${preSelectedPkg.title}` : "",
+      title: preSelectedPkg ? `Deal: ${preSelectedPkg.title}` : "",
       description: "",
       deliverables: [],
       type: preSelectedPkg?.type as CollaborationRequestValues["type"] ?? undefined,
@@ -92,7 +92,7 @@ export function RequestForm({
       const pkg = availablePackages?.find((p) => p.id === pkgId);
       if (pkg) {
         setValue("packageId", pkg.id);
-        setValue("title", `Collaboration: ${pkg.title}`);
+        setValue("title", `Deal: ${pkg.title}`);
         setValue("budget", pkg.priceInCents);
         setValue("type", pkg.type as CollaborationRequestValues["type"]);
         const pkgDeliverables = pkg.deliverables
@@ -156,7 +156,7 @@ export function RequestForm({
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="min-w-[var(--anchor-width)] w-max">
                 <SelectItem value="custom">{t("collab.form.customRequest")}</SelectItem>
                 {availablePackages.map((pkg) => (
                   <SelectItem key={pkg.id} value={pkg.id}>

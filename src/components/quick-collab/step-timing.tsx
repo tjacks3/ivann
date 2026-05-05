@@ -57,7 +57,7 @@ export function StepTiming({
         <div className="space-y-2">
           <Label htmlFor="notes">
             {t("quickCollab.timing.notes")}{" "}
-            <span className="text-muted-foreground">({t("quickCollab.location.optional")})</span>
+            <span className="font-normal text-muted-foreground">(optional)</span>
           </Label>
           <Textarea
             id="notes"

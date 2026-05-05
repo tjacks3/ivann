@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   approveDeliverable,
   requestRevision,
-} from "@/app/(app)/collaboration-workspace/actions";
+} from "@/app/(app)/deal-workspace/actions";
 import {
   Loader2,
   Eye,

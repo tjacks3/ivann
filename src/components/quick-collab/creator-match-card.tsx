@@ -7,7 +7,7 @@ import { MapPin, Users, Eye } from "lucide-react";
 import { getPlatformMeta } from "@/lib/social/platforms";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
-import type { MatchedCreator } from "@/app/(app)/brand/quick-collab/actions";
+import type { MatchedCreator } from "@/app/(app)/brand/quick-deal/actions";
 
 function formatCount(count: number): string {
   if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;

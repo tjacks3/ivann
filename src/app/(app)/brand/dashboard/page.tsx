@@ -8,24 +8,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { LoadingState } from "@/components/shared/loading-state";
-import { EmptyState } from "@/components/shared/empty-state";
-import { DealStatusBadge } from "@/components/deals/deal-status-badge";
-import { WaitingOnBadge } from "@/components/collaboration-workspace/waiting-on-badge";
 import { PaymentSummaryCard } from "@/components/deals/payment-summary-card";
-import { RequestCard } from "@/components/collaborations/request-card";
+import { DealsDashboardSection } from "@/components/deals/deals-dashboard-section";
 import { useBrandProfile } from "@/hooks/use-brand-profile";
 import { useMyDeals } from "@/hooks/use-deals";
 import { useCollaborations } from "@/hooks/use-collaborations";
 import { useTranslation } from "@/i18n";
-import { formatPrice } from "@/lib/currency";
 import { getPaymentSummary, type PaymentSummary } from "@/app/(app)/deals/payment-actions";
-import { Compass, Globe, Handshake, Zap, ClipboardList } from "lucide-react";
+import { Compass, Globe, Zap, ClipboardList } from "lucide-react";
 
 export default function BrandDashboardPage() {
   const { t } = useTranslation();
   const { profile, isLoading } = useBrandProfile();
   const { deals, isLoading: dealsLoading } = useMyDeals();
-  const { collaborations, isLoading: collabsLoading, refetch: refetchCollabs } = useCollaborations();
+  const { collaborations, isLoading: collabsLoading } = useCollaborations();
   const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
 
   useEffect(() => {
@@ -94,7 +90,7 @@ export default function BrandDashboardPage() {
 
           <Card className="transition-colors hover:border-primary/30">
             <CardContent className="pt-4">
-              <Link href="/brand/quick-collab" className="flex items-center gap-3">
+              <Link href="/brand/quick-deal" className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Zap className="size-4" />
                 </div>
@@ -108,7 +104,7 @@ export default function BrandDashboardPage() {
 
           <Card className="transition-colors hover:border-primary/30">
             <CardContent className="pt-4">
-              <Link href="/brand/quick-collab/tracking" className="flex items-center gap-3">
+              <Link href="/brand/quick-deal/tracking" className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <ClipboardList className="size-4" />
                 </div>
@@ -144,78 +140,20 @@ export default function BrandDashboardPage() {
         />
       </div>
 
-      {/* Collaborations & Deals */}
+      {/* Deals */}
       <div className="mt-12">
-        <SectionHeader
-          title={t("deal.dashboardTitle")}
-          as="h2"
+        <DealsDashboardSection
+          deals={deals}
+          collaborations={collaborations}
+          isLoading={dealsLoading || collabsLoading}
+          isBrand
+          limit={8}
+          emptyAction={
+            <Link href="/discover" className={buttonVariants()}>
+              {t("nav.discover")}
+            </Link>
+          }
         />
-        <div className="mt-4">
-          {(dealsLoading || collabsLoading) ? (
-            <LoadingState variant="skeleton" count={3} />
-          ) : (deals.length === 0 && collaborations.length === 0) ? (
-            <EmptyState
-              icon={<Handshake className="size-6" />}
-              title={t("deal.emptyBrandTitle")}
-              description={t("deal.emptyBrandDescription")}
-              action={
-                <Link href="/discover" className={buttonVariants()}>
-                  {t("nav.discover")}
-                </Link>
-              }
-            />
-          ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {collaborations.map((collab) => (
-                <RequestCard
-                  key={`collab-${collab.id}`}
-                  collab={collab}
-                  viewAs="brand"
-                  onUpdated={refetchCollabs}
-                />
-              ))}
-              {deals.map((deal) => (
-                <Link
-                  key={`deal-${deal.id}`}
-                  href={
-                    deal.collaborationId
-                      ? `/collaboration-workspace/${deal.collaborationId}`
-                      : `/deals/${deal.id}`
-                  }
-                >
-                  <Card className="transition-all hover:shadow-md hover:scale-[1.01]">
-                    <CardContent className="space-y-2 pt-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="truncate font-semibold">{deal.title}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {deal.otherPartyName}
-                            {deal.otherPartyUsername && ` @${deal.otherPartyUsername}`}
-                          </p>
-                        </div>
-                        <div className="flex shrink-0 items-center gap-2">
-                          {deal.collaborationState && (
-                            <WaitingOnBadge
-                              state={deal.collaborationState}
-                              userRole="brand"
-                            />
-                          )}
-                          <DealStatusBadge status={deal.status} />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        {deal.budget && (
-                          <span>{formatPrice(deal.budget, deal.currency, "en")}</span>
-                        )}
-                        {deal.timeline && <span>{deal.timeline}</span>}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </PageContainer>
   );

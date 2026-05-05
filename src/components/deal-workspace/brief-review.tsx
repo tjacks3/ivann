@@ -8,8 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   confirmDeliverable,
   requestBriefChanges,
-} from "@/app/(app)/collaboration-workspace/actions";
-import type { BriefValues } from "@/lib/validations/collaboration-workspace";
+} from "@/app/(app)/deal-workspace/actions";
+import type { BriefValues } from "@/lib/validations/deal-workspace";
 import {
   Loader2,
   FileText,

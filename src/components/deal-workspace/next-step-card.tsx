@@ -149,7 +149,7 @@ function getStepConfig(
     case "completed":
       return {
         icon: Trophy,
-        title: "Collaboration complete!",
+        title: "Deal complete!",
         description:
           "The deliverable has been approved. Great work!",
         borderColor: "border-l-primary",

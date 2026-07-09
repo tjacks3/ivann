@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Settings, LogOut } from "lucide-react";
+import { User, Settings, LogOut, ClipboardList } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -60,6 +60,12 @@ export function UserMenu({ name, email, avatarUrl, role = "creator" }: UserMenuP
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
+        {role === "brand" && (
+          <DropdownMenuItem render={<Link href="/brand/campaigns" />}>
+            <ClipboardList className="size-4" />
+            My Campaigns
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem render={<Link href={role === "brand" ? "/brand/profile/edit" : "/creator/profile/edit"} />}>
           <User className="size-4" />
           {t("userMenu.editProfile")}

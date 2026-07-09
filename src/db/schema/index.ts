@@ -12,6 +12,7 @@ export * from "./quick-collab";
 export * from "./deals";
 export * from "./deal-payments";
 export * from "./collaborations";
+export * from "./campaigns";
 
 export * from "./social-tokens";
 

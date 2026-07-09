@@ -47,7 +47,7 @@ export function PackageOfferSummary({
 
     const result = await createDeal({
       creatorId,
-      title: `Deal: ${pkg.title}`,
+      title: pkg.title,
       deliverables: deliverablesText || undefined,
       budget: pkg.priceInCents,
       currency,

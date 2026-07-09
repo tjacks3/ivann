@@ -146,3 +146,31 @@ export const qcOutreachStatusEnum = pgEnum("qc_outreach_status", [
   "accepted",
   "declined",
 ]);
+
+// Campaign Builder enums
+export const campaignTypeEnum = pgEnum("campaign_type", [
+  "product_promotion",
+  "brand_awareness",
+  "restaurant_promotion",
+  "event_marketing",
+  "ugc",
+  "giveaway",
+  "launch",
+  "ongoing_partnership",
+]);
+
+export const campaignStatusEnum = pgEnum("campaign_status", [
+  "draft",
+  "matching",
+  "recruiting",
+  "active",
+  "paused",
+  "completed",
+  "archived",
+]);
+
+export const campaignMatchStatusEnum = pgEnum("campaign_match_status", [
+  "recommended",
+  "added",
+  "skipped",
+]);

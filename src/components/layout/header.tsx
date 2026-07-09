@@ -17,7 +17,17 @@ import { FavoritesDropdown } from "@/components/favorites/favorites-dropdown";
 import { useUser } from "@/hooks/use-user";
 import { useUnreadCount } from "@/hooks/use-unread-count";
 import { useTranslation } from "@/i18n";
-import { Menu, Compass, MessageSquare, User, LayoutDashboard, Zap, Handshake, X } from "lucide-react";
+import {
+  Menu,
+  Compass,
+  MessageSquare,
+  User,
+  LayoutDashboard,
+  Target,
+  Handshake,
+  Package,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { HeaderVariant } from "@/types";
 
@@ -37,14 +47,23 @@ export function Header({ variant = "marketing" }: HeaderProps) {
   ];
 
   const creatorLinks = [
-    { href: "/creator/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
+    {
+      href: "/creator/dashboard",
+      label: t("nav.dashboard"),
+      icon: LayoutDashboard,
+    },
+    { href: "/packages", label: t("nav.packages"), icon: Package },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
   ];
 
   const brandLinks = [
-    { href: "/brand/dashboard", label: t("nav.brandDashboard"), icon: LayoutDashboard },
-    { href: "/brand/quick-deal", label: t("nav.quickCollab"), icon: Zap },
+    {
+      href: "/brand/dashboard",
+      label: t("nav.brandDashboard"),
+      icon: LayoutDashboard,
+    },
     { href: "/discover", label: t("nav.discover"), icon: Compass },
+    { href: "/brand/campaigns", label: "Campaigns", icon: Target },
     { href: "/messages", label: t("nav.messages"), icon: MessageSquare },
   ];
 
@@ -59,9 +78,9 @@ export function Header({ variant = "marketing" }: HeaderProps) {
           <Image
             src="/ivann_logo.png"
             alt="ivann"
-            width={100}
-            height={36}
-            className="h-6 w-auto"
+            width={200}
+            height={48}
+            className="h-7 w-auto"
             priority
           />
         </Link>
@@ -76,9 +95,10 @@ export function Header({ variant = "marketing" }: HeaderProps) {
                 href={link.href}
                 className={cn(
                   "relative rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-                  pathname === link.href || (isMessages && pathname.startsWith("/messages"))
+                  pathname === link.href ||
+                    (isMessages && pathname.startsWith("/messages"))
                     ? "font-semibold text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {link.label}
@@ -116,10 +136,7 @@ export function Header({ variant = "marketing" }: HeaderProps) {
               >
                 {t("nav.signIn")}
               </Link>
-              <Link
-                href="/signup"
-                className={buttonVariants({ size: "sm" })}
-              >
+              <Link href="/signup" className={buttonVariants({ size: "sm" })}>
                 {t("nav.getStarted")}
               </Link>
             </div>
@@ -132,22 +149,31 @@ export function Header({ variant = "marketing" }: HeaderProps) {
                 <SheetTrigger aria-label={t("nav.toggleMenu")}>
                   <Menu className="size-5" />
                 </SheetTrigger>
-                <SheetContent side="right" className="w-72 p-0" showCloseButton={false}>
+                <SheetContent
+                  side="right"
+                  className="w-72 p-0"
+                  showCloseButton={false}
+                >
                   <div className="flex h-14 items-center justify-between border-b px-4">
-                    <SheetTitle className="text-base font-bold text-primary">ivann</SheetTitle>
+                    <SheetTitle className="text-base font-bold text-primary">
+                      ivann
+                    </SheetTitle>
                     <SheetClose>
                       <X className="size-5" />
                     </SheetClose>
                   </div>
                   <nav className="flex flex-col gap-1 p-4">
                     {links.map((link) => (
-                      <SheetClose key={link.href} render={<Link href={link.href} />}>
+                      <SheetClose
+                        key={link.href}
+                        render={<Link href={link.href} />}
+                      >
                         <span
                           className={cn(
                             "block rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                             pathname === link.href
                               ? "bg-secondary text-foreground"
-                              : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                              : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                           )}
                         >
                           {link.label}
@@ -156,10 +182,29 @@ export function Header({ variant = "marketing" }: HeaderProps) {
                     ))}
                     {!isAuthenticated && (
                       <div className="mt-4 flex flex-col gap-2 border-t pt-4">
-                        <SheetClose render={<Link href="/login" className={buttonVariants({ variant: "outline", className: "w-full" })} />}>
+                        <SheetClose
+                          render={
+                            <Link
+                              href="/login"
+                              className={buttonVariants({
+                                variant: "outline",
+                                className: "w-full",
+                              })}
+                            />
+                          }
+                        >
                           {t("nav.signIn")}
                         </SheetClose>
-                        <SheetClose render={<Link href="/signup" className={buttonVariants({ className: "w-full" })} />}>
+                        <SheetClose
+                          render={
+                            <Link
+                              href="/signup"
+                              className={buttonVariants({
+                                className: "w-full",
+                              })}
+                            />
+                          }
+                        >
                           {t("nav.getStarted")}
                         </SheetClose>
                       </div>

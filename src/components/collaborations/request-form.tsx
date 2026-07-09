@@ -65,7 +65,7 @@ export function RequestForm({
     defaultValues: {
       creatorId,
       packageId: preSelectedPackageId,
-      title: preSelectedPkg ? `Deal: ${preSelectedPkg.title}` : "",
+      title: preSelectedPkg ? preSelectedPkg.title : "",
       description: "",
       deliverables: [],
       type: preSelectedPkg?.type as CollaborationRequestValues["type"] ?? undefined,
@@ -92,7 +92,7 @@ export function RequestForm({
       const pkg = availablePackages?.find((p) => p.id === pkgId);
       if (pkg) {
         setValue("packageId", pkg.id);
-        setValue("title", `Deal: ${pkg.title}`);
+        setValue("title", pkg.title);
         setValue("budget", pkg.priceInCents);
         setValue("type", pkg.type as CollaborationRequestValues["type"]);
         const pkgDeliverables = pkg.deliverables

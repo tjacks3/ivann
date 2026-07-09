@@ -386,7 +386,7 @@ export function DealsDashboardSection({
           {/* Column headers — desktop only */}
           <div className="hidden items-center gap-4 border-b px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground sm:flex">
             <div className="w-10 shrink-0" /> {/* avatar spacer */}
-            <div className="min-w-0 flex-1">Deal</div>
+            <div className="min-w-0 flex-1" />
             <div className="hidden w-24 shrink-0 text-right sm:block">
               {t("deal.budget")}
             </div>

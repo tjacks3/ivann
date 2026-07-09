@@ -94,7 +94,7 @@ async function transitionState(
   const STATE_LABELS: Record<string, string> = {
     awaiting_brand_brief: "Waiting for brand brief",
     awaiting_creator_confirmation: "Waiting for creator confirmation",
-    revision_requested: "Brief revision requested",
+    revision_requested: "Creator requested changes",
     in_progress: "In progress",
     submitted: "Deliverable submitted",
     completed: "Completed",
@@ -226,6 +226,22 @@ export async function submitBrief(
     return { success: false as const, error: "INVALID_TRANSITION" };
   }
 
+  // Block brief submission if payment has not been funded
+  if (
+    collab.state === "awaiting_brand_brief" ||
+    collab.state === "revision_requested"
+  ) {
+    const [pmnt] = await db
+      .select()
+      .from(dealPayments)
+      .where(eq(dealPayments.dealId, collab.dealId))
+      .limit(1);
+
+    if (!pmnt || pmnt.status !== "funded") {
+      return { success: false as const, error: "PAYMENT_NOT_FUNDED" };
+    }
+  }
+
   await db
     .update(collaborations)
     .set({ briefData: parsed.data, briefDraft: null, updatedAt: new Date() })
@@ -236,26 +252,45 @@ export async function submitBrief(
     collab.state === "awaiting_brand_brief" ||
     collab.state === "revision_requested"
   ) {
+    const isResubmission = collab.state === "revision_requested";
+
+    // Log the brief edit as a distinct activity entry before the state transition
+    if (isResubmission) {
+      await db.insert(collaborationMessages).values({
+        collaborationId,
+        senderId: null,
+        body: "Brand updated the campaign brief based on your feedback",
+        isSystemEvent: true,
+        actionType: "review_brief",
+        actionLabel: "Review Updated Brief",
+      });
+    }
+
     const result = await transitionState(
       collaborationId,
       collab.state,
       "awaiting_creator_confirmation",
       user.id,
-      "Brand submitted campaign brief",
+      isResubmission
+        ? "Brand updated brief"
+        : "Brand submitted campaign brief",
     );
 
     if (!result.success) return result;
   } else {
-    // Just log the edit as a system message
+    // Edit during later stages — log as activity
     await db.insert(collaborationMessages).values({
       collaborationId,
       senderId: null,
       body: "Brand updated the campaign brief",
       isSystemEvent: true,
+      actionType: "review_brief",
+      actionLabel: "Review Brief",
     });
   }
 
   // Notify creator
+  const wasResubmission = collab.state === "revision_requested";
   const [creator] = await db
     .select({ id: users.id, email: users.email })
     .from(users)
@@ -266,13 +301,19 @@ export async function submitBrief(
     createAndEmail({
       userId: creator.id,
       type: "collab_update",
-      title: "Campaign brief submitted",
-      body: "The brand has submitted the campaign brief. Please review and confirm.",
+      title: wasResubmission
+        ? "Campaign brief updated"
+        : "Campaign brief submitted",
+      body: wasResubmission
+        ? "The brand has updated the campaign brief based on your feedback. Please review the changes and confirm."
+        : "The brand has submitted the campaign brief. Please review and confirm.",
       actionUrl: `/deal-workspace/${collaborationId}`,
       referenceId: collaborationId,
       referenceType: "collaboration",
       email: creator.email,
-      emailSubject: "Campaign brief ready for review",
+      emailSubject: wasResubmission
+        ? "Campaign brief updated — please review"
+        : "Campaign brief ready for review",
     }).catch(() => {});
   }
 
@@ -294,6 +335,17 @@ export async function confirmDeliverable(collaborationId: string) {
   if (!collab) return { success: false as const, error: "NOT_FOUND" };
   if (collab.creatorId !== user.id)
     return { success: false as const, error: "UNAUTHORIZED" };
+
+  // Block start work if deal payment is not funded
+  const [payment] = await db
+    .select()
+    .from(dealPayments)
+    .where(eq(dealPayments.dealId, collab.dealId))
+    .limit(1);
+
+  if (payment && payment.status !== "funded") {
+    return { success: false as const, error: "PAYMENT_NOT_FUNDED" };
+  }
 
   const result = await transitionState(
     collaborationId,
@@ -367,7 +419,7 @@ export async function requestBriefChanges(
     "awaiting_creator_confirmation",
     "revision_requested",
     user.id,
-    "Creator requested changes to the brief",
+    "Creator requested changes",
   );
 
   if (!result.success) return result;

@@ -69,8 +69,8 @@ export function DealSummaryCard({
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">{t("deal.brand")}</p>
                 <p className="truncate text-sm font-medium">{deal.brandName}</p>
+                <p className="text-xs text-muted-foreground">{t("deal.brand")}</p>
               </div>
             </div>
 
@@ -87,11 +87,11 @@ export function DealSummaryCard({
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">{t("deal.creator")}</p>
                 <p className="truncate text-sm font-medium">{deal.creatorName}</p>
                 {deal.creatorUsername && (
                   <p className="text-xs text-muted-foreground">@{deal.creatorUsername}</p>
                 )}
+                <p className="text-xs text-muted-foreground">{t("deal.creator")}</p>
               </div>
             </div>
         </div>

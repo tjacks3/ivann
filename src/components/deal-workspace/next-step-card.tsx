@@ -11,6 +11,7 @@ import {
   Eye,
   Trophy,
   AlertCircle,
+  Lock,
 } from "lucide-react";
 
 interface NextStepCardProps {
@@ -19,6 +20,7 @@ interface NextStepCardProps {
   onAction?: () => void;
   secondaryAction?: { label: string; onClick: () => void };
   paymentStatus?: string | null;
+  revisionRequestedAt?: Date | null;
 }
 
 interface StepConfig {
@@ -34,9 +36,23 @@ interface StepConfig {
 function getStepConfig(
   state: string,
   isBrand: boolean,
+  revisionRequestedAt?: Date | null,
+  paymentStatus?: string | null,
 ): StepConfig {
   switch (state) {
     case "awaiting_brand_brief":
+      if (isBrand && paymentStatus !== "funded") {
+        return {
+          icon: Lock,
+          title: "Fund the deal to continue",
+          description:
+            "Payment must be secured before you can submit the campaign brief. Fund the deal to proceed.",
+          actionLabel: "Fund Deal",
+          borderColor: "border-l-amber-500",
+          iconBg: "bg-amber-500/10",
+          iconColor: "text-amber-600",
+        };
+      }
       return isBrand
         ? {
             icon: FileText,
@@ -103,15 +119,27 @@ function getStepConfig(
           };
 
     case "in_progress":
-      return isBrand
+      if (isBrand) {
+        return {
+          icon: Clock,
+          title: "Creator is working on deliverable",
+          description:
+            "The creator is working on the content. You will be notified when they submit.",
+          borderColor: "border-l-blue-500",
+          iconBg: "bg-blue-500/10",
+          iconColor: "text-blue-600",
+        };
+      }
+      return revisionRequestedAt
         ? {
-            icon: Clock,
-            title: "Creator is working on deliverable",
+            icon: AlertCircle,
+            title: "Revisions requested",
             description:
-              "The creator is working on the content. You will be notified when they submit.",
-            borderColor: "border-l-blue-500",
-            iconBg: "bg-blue-500/10",
-            iconColor: "text-blue-600",
+              "The brand reviewed your submission and requested changes. Review the feedback and resubmit your deliverable.",
+            actionLabel: "Resubmit Deliverable",
+            borderColor: "border-l-amber-500",
+            iconBg: "bg-amber-500/10",
+            iconColor: "text-amber-600",
           }
         : {
             icon: Upload,
@@ -175,8 +203,9 @@ export function NextStepCard({
   onAction,
   secondaryAction,
   paymentStatus,
+  revisionRequestedAt,
 }: NextStepCardProps) {
-  const config = getStepConfig(state, isBrand);
+  const config = getStepConfig(state, isBrand, revisionRequestedAt, paymentStatus);
   const Icon = config.icon;
 
   const showPaymentWarning =

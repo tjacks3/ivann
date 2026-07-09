@@ -7,12 +7,13 @@ import { PageContainer } from "@/components/shared/page-container";
 import { LoadingState } from "@/components/shared/loading-state";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CollaborationSummary } from "@/components/deal-workspace/collaboration-summary";
 import { NextStepCard } from "@/components/deal-workspace/next-step-card";
 import { BrandBriefForm } from "@/components/deal-workspace/brand-brief-form";
 import { BriefReview } from "@/components/deal-workspace/brief-review";
+import { BriefRevisionView } from "@/components/deal-workspace/brief-revision-view";
 import { DeliverableSubmission } from "@/components/deal-workspace/deliverable-submission";
 import { BrandReviewActions } from "@/components/deal-workspace/brand-review-actions";
 import {
@@ -28,11 +29,13 @@ import { useCollaborationWorkspace } from "@/hooks/use-deal-workspace";
 import { useUser } from "@/hooks/use-user";
 import {
   getCollaborationPayment,
+  submitBrief,
   type CollabPaymentData,
 } from "@/app/(app)/deal-workspace/actions";
+import { updateDealStatus } from "@/app/(app)/deals/actions";
 import { initFunding, confirmFunding } from "@/app/(app)/deals/payment-actions";
 import type { BriefValues } from "@/lib/validations/deal-workspace";
-import { ArrowLeft, Pencil, Rocket, Lock, PanelRight } from "lucide-react";
+import { ArrowLeft, Pencil, Rocket, Lock, PanelRight, FileText } from "lucide-react";
 
 export default function CollaborationWorkspacePage({
   params,
@@ -97,10 +100,15 @@ export default function CollaborationWorkspacePage({
     : collaboration.creatorId;
   const dashboardHref = isBrand ? "/brand/dashboard" : "/creator/dashboard";
 
-  const canAddBrief =
-    isBrand &&
-    (collaboration.state === "awaiting_brand_brief" ||
-      collaboration.state === "revision_requested");
+  const isBriefState =
+    collaboration.state === "awaiting_brand_brief" ||
+    collaboration.state === "revision_requested";
+
+  const isPaymentFunded = payment?.status === "funded";
+
+  const canAddBrief = isBrand && isBriefState && isPaymentFunded;
+
+  const needsPaymentBeforeBrief = isBrand && isBriefState && !isPaymentFunded;
 
   const showBriefReview =
     isCreator &&
@@ -110,6 +118,18 @@ export default function CollaborationWorkspacePage({
   const showDeliverableSubmission =
     isCreator && collaboration.state === "in_progress";
 
+  const isDeliverableResubmission =
+    showDeliverableSubmission &&
+    collaboration.revisionRequestedAt !== null;
+
+  const deliverableRevisionFeedback = isDeliverableResubmission
+    ? messages
+        .filter(
+          (m) => !m.isSystemEvent && m.senderId === collaboration.brandUserId,
+        )
+        .at(-1) ?? null
+    : null;
+
   const showBrandReview = isBrand && collaboration.state === "submitted";
 
   const showBriefReadOnly =
@@ -117,12 +137,25 @@ export default function CollaborationWorkspacePage({
     collaboration.state === "awaiting_creator_confirmation" &&
     collaboration.briefData;
 
+  const showBriefRevision =
+    collaboration.state === "revision_requested" && collaboration.briefData;
+
   const showBriefSummary =
     collaboration.briefData &&
     !canAddBrief &&
     !showBriefReview &&
     !showBriefReadOnly &&
+    !showBriefRevision &&
     ["in_progress", "submitted", "completed"].includes(collaboration.state);
+
+  // Get the last non-system message as the revision request message
+  const revisionMsg = showBriefRevision
+    ? messages
+        .filter((m) => !m.isSystemEvent && m.senderId === collaboration.creatorId)
+        .at(-1) ?? null
+    : null;
+  const revisionMessage = revisionMsg?.body ?? null;
+  const revisionRequestedAt = revisionMsg?.createdAt ?? null;
 
   const scrollToTab = (tab: string) => {
     setActiveTab(tab);
@@ -131,7 +164,23 @@ export default function CollaborationWorkspacePage({
     }, 100);
   };
 
+  const handleKeepCurrentBrief = async () => {
+    if (!collaboration.briefData) return;
+    await submitBrief(collaborationId, collaboration.briefData as BriefValues);
+    handleRefresh();
+  };
+
+  const handleCancelDeal = async () => {
+    if (!collaboration.dealId) return;
+    await updateDealStatus(collaboration.dealId, "cancelled");
+    handleRefresh();
+  };
+
   const handleNextStepAction = () => {
+    if (needsPaymentBeforeBrief) {
+      handleFundDeal();
+      return;
+    }
     if (canAddBrief) {
       setBriefSheetOpen(true);
     } else if (showBriefReview) {
@@ -218,6 +267,7 @@ export default function CollaborationWorkspacePage({
           onAction={handleNextStepAction}
           secondaryAction={secondaryAction}
           paymentStatus={payment?.status ?? null}
+          revisionRequestedAt={collaboration.revisionRequestedAt}
         />
       </div>
 
@@ -270,7 +320,7 @@ export default function CollaborationWorkspacePage({
                 Campaign Brief
               </TabsTrigger>
               <TabsTrigger value="details" className="flex-1">
-                Collaboration Details
+                Deal Details
               </TabsTrigger>
               <TabsTrigger value="messages" className="flex-1">
                 Messages
@@ -279,6 +329,19 @@ export default function CollaborationWorkspacePage({
 
             {/* Campaign Brief tab */}
             <TabsContent value="brief" className="mt-3 space-y-4">
+              {/* Brief revision view (revision_requested state) */}
+              {showBriefRevision && (
+                <BriefRevisionView
+                  briefData={collaboration.briefData as BriefValues}
+                  revisionMessage={revisionMessage}
+                  revisionRequestedAt={revisionRequestedAt}
+                  isBrand={!!isBrand}
+                  onUpdateBrief={isBrand ? () => setBriefSheetOpen(true) : undefined}
+                  onAcceptUpdates={isBrand ? handleKeepCurrentBrief : undefined}
+                  onCancel={isBrand ? handleCancelDeal : undefined}
+                />
+              )}
+
               {/* Creator Brief Review (awaiting confirmation) */}
               {showBriefReview && (
                 <BriefReview
@@ -313,10 +376,22 @@ export default function CollaborationWorkspacePage({
               {!collaboration.briefData && (
                 <div className="rounded-xl bg-muted/30 p-8 text-center">
                   <p className="text-sm text-muted-foreground">
-                    {isBrand
-                      ? "No campaign brief yet. Add one to get started."
-                      : "The brand hasn't submitted a campaign brief yet."}
+                    {needsPaymentBeforeBrief
+                      ? "Fund the deal before adding the campaign brief."
+                      : isBrand
+                        ? "No campaign brief yet. Add one to get started."
+                        : "The brand hasn't submitted a campaign brief yet."}
                   </p>
+                  {needsPaymentBeforeBrief && (
+                    <Button
+                      className="mt-3 cursor-pointer"
+                      size="sm"
+                      onClick={handleFundDeal}
+                    >
+                      <Lock className="size-3.5" />
+                      Fund Deal First
+                    </Button>
+                  )}
                   {canAddBrief && (
                     <Button
                       className="mt-3 cursor-pointer"
@@ -338,6 +413,9 @@ export default function CollaborationWorkspacePage({
                   collaborationId={collaborationId}
                   dueDate={collaboration.dueDate}
                   onSuccess={handleRefresh}
+                  isResubmission={isDeliverableResubmission}
+                  revisionFeedbackBody={deliverableRevisionFeedback?.body ?? null}
+                  revisionFeedbackAt={deliverableRevisionFeedback?.createdAt ?? null}
                 />
               )}
 
@@ -351,9 +429,9 @@ export default function CollaborationWorkspacePage({
                 />
               )}
 
-              {/* Submitted deliverable read-only (creator waiting for review) */}
-              {isCreator &&
-                collaboration.state === "submitted" &&
+              {/* Submitted deliverable read-only (waiting for review or completed) */}
+              {(collaboration.state === "submitted" ||
+                collaboration.state === "completed") &&
                 collaboration.submittedUrl && (
                   <SubmittedReadOnly
                     url={collaboration.submittedUrl}
@@ -434,34 +512,43 @@ function BriefReadOnly({
   const activeFields = fields.filter(({ key }) => briefData[key]);
 
   return (
-    <div className="rounded-xl bg-muted/30 p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-semibold">Campaign Brief</h3>
-        {onEdit && (
-          <Button
-            variant="outline"
-            size="xs"
-            onClick={onEdit}
-            className="cursor-pointer"
-          >
-            <Pencil className="size-3" />
-            Edit Brief
-          </Button>
-        )}
-      </div>
-      <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
-        {activeFields.map(({ key, label }) => (
-          <div key={key} className="space-y-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {label}
-            </p>
-            <p className="whitespace-pre-wrap text-sm text-foreground">
-              {briefData[key]}
-            </p>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <FileText className="size-4" />
+            Campaign Brief
+          </CardTitle>
+          {onEdit && (
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={onEdit}
+              className="cursor-pointer"
+            >
+              <Pencil className="size-3" />
+              Edit Brief
+            </Button>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-xl bg-muted/30 p-4">
+          <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+            {activeFields.map(({ key, label }) => (
+              <div key={key} className="space-y-1 p-2">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {label}
+                </p>
+                <p className="whitespace-pre-wrap text-sm text-foreground">
+                  {briefData[key]}
+                </p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

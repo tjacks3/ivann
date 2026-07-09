@@ -13,7 +13,8 @@ import {
   deliverableSubmissionSchema,
   type DeliverableSubmissionValues,
 } from "@/lib/validations/deal-workspace";
-import { Loader2, Upload, ExternalLink, Clock } from "lucide-react";
+import { Loader2, Upload, ExternalLink, Clock, AlertTriangle, MessageSquare } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 function getDaysUntil(date: Date | null): string | null {
   if (!date) return null;
@@ -37,12 +38,18 @@ interface DeliverableSubmissionProps {
   collaborationId: string;
   dueDate?: Date | null;
   onSuccess: () => void;
+  isResubmission?: boolean;
+  revisionFeedbackBody?: string | null;
+  revisionFeedbackAt?: Date | null;
 }
 
 export function DeliverableSubmission({
   collaborationId,
   dueDate,
   onSuccess,
+  isResubmission,
+  revisionFeedbackBody,
+  revisionFeedbackAt,
 }: DeliverableSubmissionProps) {
   const [saving, setSaving] = useState(false);
   const [serverError, setServerError] = useState("");
@@ -82,17 +89,69 @@ export function DeliverableSubmission({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
             <Upload className="size-4" />
-            Submit Deliverable
+            {isResubmission ? "Resubmit Deliverable" : "Submit Deliverable"}
           </CardTitle>
-          {dueDateLabel && (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Clock className="size-3" />
-              {dueDateLabel}
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {isResubmission && (
+              <Badge
+                variant="outline"
+                className="border-amber-500/30 bg-amber-500/10 text-amber-600"
+              >
+                <AlertTriangle className="mr-1 size-3" />
+                Revisions Requested
+              </Badge>
+            )}
+            {dueDateLabel && (
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="size-3" />
+                {dueDateLabel}
+              </span>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>
+        {/* Revision context */}
+        {isResubmission && (
+          <div className="mb-6 space-y-3">
+            <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
+              <p className="text-sm text-amber-700 dark:text-amber-400">
+                The brand reviewed your submission and requested changes.
+                Please review the feedback below and resubmit.
+              </p>
+            </div>
+
+            {revisionFeedbackBody && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    <MessageSquare className="size-3" />
+                    Brand Feedback
+                  </p>
+                  {revisionFeedbackAt && (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Clock className="size-3" />
+                      {new Date(revisionFeedbackAt).toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}{" "}
+                      at{" "}
+                      {new Date(revisionFeedbackAt).toLocaleTimeString(undefined, {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  )}
+                </div>
+                <div className="rounded-lg border border-dashed bg-muted/30 p-3">
+                  <p className="whitespace-pre-wrap text-sm">{revisionFeedbackBody}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="contentUrl">Content URL *</Label>
@@ -141,7 +200,7 @@ export function DeliverableSubmission({
               className="cursor-pointer"
             >
               {saving && <Loader2 className="size-3.5 animate-spin" />}
-              Submit Deliverable
+              {isResubmission ? "Resubmit Deliverable" : "Submit Deliverable"}
             </Button>
           </div>
         </form>

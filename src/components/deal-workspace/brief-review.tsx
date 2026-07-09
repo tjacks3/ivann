@@ -202,28 +202,40 @@ export function BriefReview({
 
         {/* Action buttons */}
         {!showChangeRequest && !showConfirmNote && (
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setShowConfirmNote(true)}
-              disabled={saving}
-              className="cursor-pointer"
-            >
-              {saving ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                <CheckCircle2 className="size-3.5" />
+          <div className="space-y-3">
+            {paymentStatus !== "funded" && (
+              <div className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-50 px-3 py-2 dark:bg-amber-900/10">
+                <AlertTriangle className="size-3.5 shrink-0 text-amber-600" />
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  Work cannot start until the brand funds the deal. You&rsquo;ll be notified once payment is secured.
+                </p>
+              </div>
+            )}
+            <div className="flex gap-2">
+              {paymentStatus === "funded" && (
+                <Button
+                  onClick={() => setShowConfirmNote(true)}
+                  disabled={saving}
+                  className="cursor-pointer"
+                >
+                  {saving ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="size-3.5" />
+                  )}
+                  Confirm &amp; Start Working
+                </Button>
               )}
-              Confirm &amp; Start Working
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setShowChangeRequest(true)}
-              disabled={saving}
-              className="cursor-pointer"
-            >
-              <MessageSquare className="size-3.5" />
-              Request Changes
-            </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowChangeRequest(true)}
+                disabled={saving}
+                className="cursor-pointer"
+              >
+                <MessageSquare className="size-3.5" />
+                Request Changes
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>

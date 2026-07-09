@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageContainer } from "@/components/shared/page-container";
 import { SectionHeader } from "@/components/shared/section-header";
@@ -15,7 +16,8 @@ import { useMyDeals } from "@/hooks/use-deals";
 import { useCollaborations } from "@/hooks/use-collaborations";
 import { useTranslation } from "@/i18n";
 import { getPaymentSummary, type PaymentSummary } from "@/app/(app)/deals/payment-actions";
-import { Compass, Globe, Zap, ClipboardList } from "lucide-react";
+import { getMyCampaigns, type CampaignListItem } from "@/app/(app)/brand/campaigns/actions";
+import { Target, Users, DollarSign, ArrowRight, Plus } from "lucide-react";
 
 export default function BrandDashboardPage() {
   const { t } = useTranslation();
@@ -23,9 +25,15 @@ export default function BrandDashboardPage() {
   const { deals, isLoading: dealsLoading } = useMyDeals();
   const { collaborations, isLoading: collabsLoading } = useCollaborations();
   const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
+  const [campaignsList, setCampaignsList] = useState<CampaignListItem[]>([]);
 
   useEffect(() => {
     getPaymentSummary().then(setPaymentSummary);
+    getMyCampaigns().then((result) => {
+      if (result.success) {
+        setCampaignsList(result.campaigns.slice(0, 3));
+      }
+    });
   }, []);
 
   if (isLoading) {
@@ -45,103 +53,72 @@ export default function BrandDashboardPage() {
 
   return (
     <PageContainer>
-      <SectionHeader
-        title={t("brandDashboard.title")}
-        description={t("brandDashboard.subtitle")}
-      />
-
-      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Brand Profile Card */}
-        <Card className="lg:col-span-2">
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
-              <Avatar className="size-16 text-lg">
-                {profile.avatarUrl && <AvatarImage src={profile.avatarUrl} alt={profile.brandName || ""} />}
-                <AvatarFallback className="text-lg">{initials}</AvatarFallback>
-              </Avatar>
-
-              <div className="flex-1 text-center sm:text-left">
-                <h2 className="text-lg font-semibold">{profile.brandName}</h2>
-                {profile.industry && (
-                  <p className="text-sm text-muted-foreground">{t(`onboarding.category.${profile.industry}`)}</p>
-                )}
-                {profile.bio && (
-                  <p className="mt-2 line-clamp-2 max-w-md text-sm text-muted-foreground">{profile.bio}</p>
-                )}
-                {profile.companyWebsite && (
-                  <a
-                    href={profile.companyWebsite}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-                  >
-                    <Globe className="size-3.5" />
-                    {profile.companyWebsite.replace(/^https?:\/\//, "")}
-                  </a>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-muted-foreground">{t("brandDashboard.quickActions")}</h3>
-
-          <Card className="transition-colors hover:border-primary/30">
-            <CardContent className="pt-4">
-              <Link href="/brand/quick-deal" className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <Zap className="size-4" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{t("quickCollab.cta.title")}</p>
-                  <p className="text-xs text-muted-foreground">{t("quickCollab.cta.hint")}</p>
-                </div>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="transition-colors hover:border-primary/30">
-            <CardContent className="pt-4">
-              <Link href="/brand/quick-deal/tracking" className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <ClipboardList className="size-4" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{t("brandDashboard.trackOutreach")}</p>
-                  <p className="text-xs text-muted-foreground">{t("brandDashboard.trackOutreachHint")}</p>
-                </div>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="transition-colors hover:border-primary/30">
-            <CardContent className="pt-4">
-              <Link href="/discover" className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <Compass className="size-4" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{t("brandDashboard.discoverCreators")}</p>
-                  <p className="text-xs text-muted-foreground">{t("brandDashboard.discoverCreatorsHint")}</p>
-                </div>
-              </Link>
-            </CardContent>
-          </Card>
+      {/* Mini Profile Summary */}
+      <div className="flex items-center gap-3">
+        <Avatar className="size-10">
+          {profile.avatarUrl && <AvatarImage src={profile.avatarUrl} alt={profile.brandName || ""} />}
+          <AvatarFallback>{initials}</AvatarFallback>
+        </Avatar>
+        <div>
+          <h1 className="text-base font-semibold leading-tight">{profile.brandName}</h1>
+          <p className="text-xs text-muted-foreground">Brand</p>
         </div>
       </div>
 
       {/* Payment Summary */}
-      <div className="mt-8">
+      <div className="mt-6">
         <PaymentSummaryCard
           summary={paymentSummary ?? { totalReleased: 0, totalFunded: 0, currency: "usd", recentTransactions: [] }}
           isBrand
         />
       </div>
 
+      {/* Campaigns */}
+      <div className="mt-6">
+        <div className="flex items-center justify-between">
+          <SectionHeader title="Campaigns" as="h2" />
+          <Link href="/brand/campaigns/new" className={buttonVariants({ variant: "outline", size: "sm" })}>
+            <Plus className="size-3.5" />
+            New Campaign
+          </Link>
+        </div>
+        {campaignsList.length > 0 ? (
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {campaignsList.map((campaign) => (
+              <Link key={campaign.id} href={`/brand/campaigns/${campaign.id}`} className="group">
+                <Card className="transition-colors hover:border-primary/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <h3 className="truncate text-sm font-semibold group-hover:text-primary">{campaign.name}</h3>
+                      <Badge className="shrink-0 text-xs capitalize">{campaign.status}</Badge>
+                    </div>
+                    <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1"><Users className="size-3" />{campaign.creatorCount}</span>
+                      <span className="flex items-center gap-1"><DollarSign className="size-3" />${(campaign.totalBudgetInCents / 100).toLocaleString()}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+            {campaignsList.length >= 3 && (
+              <Link href="/brand/campaigns" className="flex items-center justify-center gap-1 text-sm text-primary hover:underline">
+                View all campaigns <ArrowRight className="size-3.5" />
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="mt-3 rounded-lg border border-dashed p-6 text-center">
+            <Target className="mx-auto size-8 text-muted-foreground/50" />
+            <p className="mt-2 text-sm text-muted-foreground">No campaigns yet</p>
+            <Link href="/brand/campaigns/new" className={buttonVariants({ size: "sm", className: "mt-3" })}>
+              Create your first campaign
+            </Link>
+          </div>
+        )}
+      </div>
+
       {/* Deals */}
-      <div className="mt-12">
+      <div className="mt-6">
         <DealsDashboardSection
           deals={deals}
           collaborations={collaborations}

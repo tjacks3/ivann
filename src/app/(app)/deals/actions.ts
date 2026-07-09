@@ -10,8 +10,9 @@ import {
   messageThreadMembers,
   messages,
   collaborations,
+  campaignDeals,
 } from "@/db/schema";
-import { eq, or, desc, asc } from "drizzle-orm";
+import { eq, or, desc, asc, isNull, and } from "drizzle-orm";
 import { createAndEmail } from "@/lib/notifications/create";
 import { releasePayment, refundPayment } from "./payment-actions";
 import {
@@ -210,7 +211,7 @@ export async function getMyDeals(): Promise<DealListItem[]> {
 
   const isBrand = user.role === "brand";
 
-  const allDeals = await db
+  const query = db
     .select({
       id: deals.id,
       title: deals.title,
@@ -227,12 +228,16 @@ export async function getMyDeals(): Promise<DealListItem[]> {
     })
     .from(deals)
     .leftJoin(collaborations, eq(collaborations.dealId, deals.id))
-    .where(
-      isBrand
-        ? eq(deals.brandId, user.id)
-        : eq(deals.creatorId, user.id),
-    )
-    .orderBy(desc(deals.updatedAt));
+    .leftJoin(campaignDeals, eq(campaignDeals.dealId, deals.id));
+
+  // For brands: exclude campaign-generated deals (those are managed inside Campaign Workspace)
+  // For creators: show all deals (they don't know about campaigns)
+  const allDeals = await (isBrand
+    ? query.where(
+        and(eq(deals.brandId, user.id), isNull(campaignDeals.id)),
+      )
+    : query.where(eq(deals.creatorId, user.id))
+  ).orderBy(desc(deals.updatedAt));
 
   if (allDeals.length === 0) return [];
 
